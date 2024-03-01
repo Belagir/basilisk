@@ -22,7 +22,7 @@ package entity {
     struct engine_entity_template_copy as "entity_template_copy"  {
 
         + entity_template_copy entity_template_copy_create(entity_template template, allocator alloc)
-        + void entity_template_create_copy_destroy(engine_entity_template_copy *template, allocator alloc)
+        + void entity_template_copy_destroy(entity_template_copy *template, allocator alloc)
     }
     note bottom of engine_entity_template_copy : typedef of entity_template to signal memory allocation
     engine_entity_template_copy <--> engine_entity_template
@@ -93,9 +93,9 @@ package command {
         + entity *source
         + union { command_add_entity, command_remove_entity, engine_command_subscribe_to_event } cmd
 
-        + command command_create_add_entity(char *id_path, char *id, engine_entity_template template, allocator alloc)
-        + command command_create_remove_entity(char *id_path, allocator alloc)
-        + command command_create_subscribe_to_event(char *id_path, allocator alloc)
+        + command command_create_add_entity(entity *source, char *id_path, char *id, engine_entity_template template, allocator alloc)
+        + command command_create_remove_entity(entity *source, char *id_path, allocator alloc)
+        + command command_create_subscribe_to_event(entity *source, char *id_path, allocator alloc)
         + void command_destroy(command *cmd, allocator alloc)
     }
     engine_command::flavor -- engine_command_flavor
@@ -112,7 +112,7 @@ package command {
         + command_queue *command_queue_create(allocator alloc)
         + void command_queue_destroy(command_queue **queue, allocator alloc)
         ..
-        + void command_queue_append(command_queue *queue, entity *source, command cmd, allocator alloc)
+        + void command_queue_append(command_queue *queue, command cmd, allocator alloc)
         + command command_queue_pop_front(command_queue *queue)
         ..
         + void command_queue_remove_commands_of(command_queue *queue, entity *target, allocator alloc)
