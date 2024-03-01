@@ -9,8 +9,17 @@
 
 #define TARASQUE_COLLECTIONS_START_SIZE (32)
 
-typedef range(u8) range_identifier;
+/**
+ * @brief 
+ * 
+ */
+typedef range(const char) range_identifier;
 
+/*  */
 range_identifier *range_identifier_from_cstring(const char *str, allocator alloc);
+
+/*  */
+i32 range_identifier_compare(const void *lhs, const void *rhs);
+
 
 #endif

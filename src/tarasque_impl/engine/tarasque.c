@@ -23,7 +23,7 @@ typedef struct tarasque_engine {
     allocator alloc;
 } tarasque_engine;
 
-
+/*  */
 static void tarasque_engine_process_command(tarasque_engine *handle, command cmd);
 
 // -------------------------------------------------------------------------------------------------

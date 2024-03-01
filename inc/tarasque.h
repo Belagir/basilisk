@@ -8,11 +8,15 @@
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-
+/*  */
 typedef struct tarasque_engine tarasque_engine;
 
 // -------------------------------------------------------------------------------------------------
 
+/**
+ * @brief 
+ * 
+ */
 typedef struct entity_template {
     size_t data_size;
     void *data;
@@ -26,16 +30,21 @@ typedef struct entity_template {
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
+/*  */
 tarasque_engine *tarasque_engine_create(void);
+/*  */
 void tarasque_engine_destroy(tarasque_engine **handle);
 
 // -------------------------------------------------------------------------------------------------
 
+/*  */
 void tarasque_engine_run(tarasque_engine *handle, int fps);
+/*  */
 void tarasque_engine_quit(tarasque_engine *handle);
 
 // -------------------------------------------------------------------------------------------------
 
+/*  */
 void tarasque_engine_add_entity(tarasque_engine *handle, char *str_path, char *str_id, entity_template template);
 
 #endif

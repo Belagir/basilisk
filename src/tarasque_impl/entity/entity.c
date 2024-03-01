@@ -1,5 +1,11 @@
 
+#include <ustd/sorting.h>
+
 #include "entity.h"
+
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 /**
  * @brief 
@@ -12,6 +18,10 @@ typedef struct entity {
 
     entity_template_copy template;
 } entity;
+
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 /**
  * @brief 
@@ -43,6 +53,12 @@ entity *entity_create(range_identifier *id, entity_template_copy template, alloc
     return new_entity;
 }
 
+/**
+ * @brief 
+ * 
+ * @param target 
+ * @param alloc 
+ */
 void entity_destroy(entity **target, allocator alloc)
 {
     if (!target || !*target) {
@@ -57,6 +73,43 @@ void entity_destroy(entity **target, allocator alloc)
     *target = NULL;
 }
 
+// -------------------------------------------------------------------------------------------------
+
+/**
+ * @brief 
+ * 
+ * @param target 
+ * @param new_child 
+ * @param alloc 
+ */
+void entity_add_child(entity *target, entity *new_child, allocator alloc)
+{
+    if (!target || !new_child) {
+        return;
+    }
+
+    target->children = range_ensure_capacity(alloc, range_to_any(target->children));
+    (void) sorted_range_insert_in(range_to_any(target->children), &range_identifier_compare, &new_child);
+}
+
+/**
+ * @brief 
+ * 
+ * @param target 
+ * @param removed 
+ */
+void entity_remove_child(entity *target, entity *removed)
+{
+    if (!target || !removed) {
+        return;
+    }
+
+    (void) sorted_range_remove_from(range_to_any(target->children), &range_identifier_compare, &removed);
+}
+
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 /**
  * @brief 
