@@ -2,10 +2,8 @@
 #ifndef __COMMAND_H__
 #define __COMMAND_H__
 
-#include <ustd/allocation.h>
-#include <ustd/range.h>
-
-#include <tarasque.h>
+#include "../common.h"
+#include "../entity/entity.h"
 
 typedef struct command_queue command_queue;
 
@@ -17,24 +15,24 @@ typedef enum command_flavor {
 } command_flavor;
 
 typedef struct command_remove_entity {
-    range(u8) *id_path;
+    range_identifier *id_path;
 } command_remove_entity;
 
 typedef struct command_add_entity {
-    range(u8) *id_path;
-    range(u8) *id;
-    //TODO : entity_template_copy template;
+    range_identifier *id_path;
+    range_identifier *id;
+    entity_template_copy template;
 } command_add_entity;
 
 typedef struct command_subscribe_to_event {
-    range(u8) *target_event_name;
-    // TODO : entity *subscribed;
+    range_identifier *target_event_name;
+    entity *subscribed;
     void (*callback)(void *entity_data, void *event_data);
 } command_subscribe_to_event;
 
 typedef struct command {
     command_flavor flavor;
-    // TODO : entity *source;
+    entity *source;
 } command;
 
 command command_create_add_entity(char *id_path, char *id, entity_template template, allocator alloc);
