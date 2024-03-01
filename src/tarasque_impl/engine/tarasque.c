@@ -10,7 +10,7 @@
 typedef struct tarasque_engine {
     command_queue *commands;
     // TODO event_stack *events;
-    // TODO entity *root_entity;
+    entity *root_entity;
     allocator alloc;
 } tarasque_engine;
 
@@ -66,10 +66,11 @@ void tarasque_engine_destroy(tarasque_engine **handle)
  */
 void tarasque_engine_add_entity(tarasque_engine *handle, char *str_path, char *str_id, entity_template template)
 {
+
     if (!handle || !str_path || !str_id) {
         // TODO : log failure
         return;
     }
 
-
+    command_queue_append(handle->commands, command_create_add_entity(handle->root_entity, str_path, str_id, template, handle->alloc), handle->alloc);
 }
