@@ -1,6 +1,12 @@
 
-int main(int argc, char const *argv[])
+#include <tarasque.h>
+
+int main(void)
 {
-    /* code */
+    tarasque_engine *handle = tarasque_engine_create();
+
+
+    tarasque_engine_destroy(&handle);
+
     return 0;
 }
