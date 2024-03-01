@@ -8,9 +8,9 @@ package main_header {
         + void *data
         + size_t data_size
         ..
-        + {field} void (*on_init)(void *data, engine *handle)
-        + {field} void (*on_deinit)(void *data, engine *handle)
-        + {field} void (*on_frame)(void *data, f32 elapsed_ms, engine *handle)
+        + {field} void (*on_init)(void *data, tarasque_engine *handle)
+        + {field} void (*on_deinit)(void *data, tarasque_engine *handle)
+        + {field} void (*on_frame)(void *data, float elapsed_ms, tarasque_engine *handle)
         __
     }
 }
@@ -77,6 +77,7 @@ package command {
     ' ------------------------------------------------------------------------------
 
     enum engine_command_flavor as "command_flavor" {
+        INVALID
         ADD_ENTITY
         REMOVE_ENTITY
         SUBSCRIBE_TO_EVENT
@@ -88,7 +89,7 @@ package command {
     ' ------------------------------------------------------------------------------
 
     struct engine_command as "command" {
-        + engine_command_flavor flavor
+        + command_flavor flavor
         + entity *source
         + union { command_add_entity, command_remove_entity, engine_command_subscribe_to_event } cmd
 
@@ -196,7 +197,7 @@ package main_header {
         + tarasque_engine *tarasque_engine_create(void)
         + void tarasque_engine_destroy(tarasque_engine **handle)
         ..
-        + void tarasque_engine_run(tarasque_engine *handle, u32 fps)
+        + void tarasque_engine_run(tarasque_engine *handle, int fps)
         + void tarasque_engine_quit(tarasque_engine *handle)
         ..
         + void tarasque_engine_add_entity(tarasque_engine *handle, char *str_path, char *str_id, entity_template template)
