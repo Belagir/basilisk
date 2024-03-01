@@ -16,6 +16,51 @@ typedef struct entity {
 /**
  * @brief 
  * 
+ * @param id 
+ * @param  
+ * @param alloc 
+ * @return 
+ */
+entity *entity_create(range_identifier *id, entity_template_copy template, allocator alloc)
+{
+    entity *new_entity = NULL;
+
+    if (!id) {
+        return NULL;
+    }
+
+    new_entity = alloc.malloc(alloc, sizeof(new_entity));
+
+    if (new_entity) {
+        *new_entity = (entity) {
+                .parent = NULL,
+                .children = range_create_dynamic(alloc, sizeof(*new_entity->children->data), TARASQUE_COLLECTIONS_START_SIZE),
+                .id = range_create_dynamic_from_copy_of(alloc, range_to_any(id)),
+                .template = entity_template_copy_create(template, alloc),
+        };
+    }
+
+    return new_entity;
+}
+
+void entity_destroy(entity **target, allocator alloc)
+{
+    if (!target || !*target) {
+        return;
+    }
+
+    range_destroy_dynamic(alloc, &range_to_any((*target)->children));
+    range_destroy_dynamic(alloc, &range_to_any((*target)->id));
+    entity_template_copy_destroy(&(*target)->template, alloc);
+
+    alloc.free(alloc, *target);
+    *target = NULL;
+}
+
+
+/**
+ * @brief 
+ * 
  * @param  
  * @param alloc 
  * @return 
