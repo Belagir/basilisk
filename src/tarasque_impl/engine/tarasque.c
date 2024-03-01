@@ -1,14 +1,16 @@
 
 #include "../common.h"
 
+#include "../command/command.h"
+
 /**
  * @brief 
  * 
  */
 typedef struct tarasque_engine {
-    // TODO command_queue *commands
-    // TODO event_stack *events
-    // TODO entity *root_entity
+    command_queue *commands;
+    // TODO event_stack *events;
+    // TODO entity *root_entity;
     allocator alloc;
 } tarasque_engine;
 
@@ -26,6 +28,7 @@ tarasque_engine *tarasque_engine_create(void)
     if (new_engine) {
         *new_engine = (tarasque_engine) {
                 .alloc = used_alloc,
+                .commands = command_queue_create(used_alloc),
         };
     }
 
@@ -47,7 +50,26 @@ void tarasque_engine_destroy(tarasque_engine **handle)
 
     used_alloc = (*handle)->alloc;
 
+    command_queue_destroy(&(*handle)->commands, used_alloc);
+
     used_alloc.free(used_alloc, *handle);
     *handle = NULL;
 }
 
+/**
+ * @brief 
+ * 
+ * @param handle 
+ * @param str_path 
+ * @param str_id 
+ * @param  
+ */
+void tarasque_engine_add_entity(tarasque_engine *handle, char *str_path, char *str_id, entity_template template)
+{
+    if (!handle || !str_path || !str_id) {
+        // TODO : log failure
+        return;
+    }
+
+
+}

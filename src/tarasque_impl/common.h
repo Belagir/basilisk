@@ -7,6 +7,8 @@
 
 #include <tarasque.h>
 
+#define TARASQUE_COLLECTIONS_START_SIZE (32)
+
 typedef range(u8) range_identifier;
 
 #endif
