@@ -21,8 +21,8 @@ package main_header {
 package entity {
     struct engine_entity_template_copy as "entity_template_copy"  {
 
-        + entity_template_copy entity_template_copy_create(entity_template template)
-        + void entity_template_create_copy_destroy(engine_entity_template_copy *template)
+        + entity_template_copy entity_template_copy_create(entity_template template, allocator alloc)
+        + void entity_template_create_copy_destroy(engine_entity_template_copy *template, allocator alloc)
     }
     note bottom of engine_entity_template_copy : typedef of entity_template to signal memory allocation
     engine_entity_template_copy <--> engine_entity_template
@@ -36,13 +36,13 @@ package entity {
         ..
         + entity_template_copy template
         __
-        + entity *entity_create(range(u8) *id, entity_template_copy template)
-        + void entity_destroy(entity **target)
+        + entity *entity_create(range(u8) *id, entity_template_copy template, allocator alloc)
+        + void entity_destroy(entity **target, allocator alloc)
         ..
-        + void entity_add_child(entity *target, entity *new_child)
+        + void entity_add_child(entity *target, entity *new_child, allocator alloc)
         + void entity_remove_child(entity *target, entity *removed)
         + entity *entity_get_child(entity *target, range(u8) *id_path)
-        + range(entity *) *entity_get_children(entity *target)
+        + range(entity *) *entity_get_children(entity *target, allocator alloc)
     }
     engine_entity::template --* "1" engine_entity_template_copy
 }
@@ -92,10 +92,10 @@ package command {
         + entity *source
         + union { command_add_entity, command_remove_entity, engine_command_subscribe_to_event } cmd
 
-        + command command_create_add_entity(char *id_path, char *id, engine_entity_template template)
-        + command command_create_remove_entity(char *id_path)
-        + command command_create_subscribe_to_event(char *id_path, )
-        + void command_destroy(command *cmd)
+        + command command_create_add_entity(char *id_path, char *id, engine_entity_template template, allocator alloc)
+        + command command_create_remove_entity(char *id_path, allocator alloc)
+        + command command_create_subscribe_to_event(char *id_path, allocator alloc)
+        + void command_destroy(command *cmd, allocator alloc)
     }
     engine_command::flavor -- engine_command_flavor
     engine_command::source --o "1" engine_entity
@@ -108,13 +108,13 @@ package command {
     struct engine_command_queue as "command_queue" << (*, SteelBlue) >> {
         - {field} range(command) *queue
         __
-        + command_queue *command_queue_create(void)
-        + void command_queue_destroy(command_queue **destroy)
+        + command_queue *command_queue_create(allocator alloc)
+        + void command_queue_destroy(command_queue **queue, allocator alloc)
         ..
-        + void command_queue_append(command_queue *queue, entity *source, command cmd)
+        + void command_queue_append(command_queue *queue, entity *source, command cmd, allocator alloc)
         + command command_queue_pop_front(command_queue *queue)
         ..
-        + void command_queue_remove_commands_of(command_queue *queue, entity *target)
+        + void command_queue_remove_commands_of(command_queue *queue, entity *target, allocator alloc)
     }
     engine_command_queue::queue --* "0..*" engine_command
 }
@@ -137,10 +137,10 @@ package event {
     struct engine_event_broker as "event_broker" << (*, SteelBlue) >> {
         - {field} range(subscription) *subs
         __
-        + event_broker *event_broker_create(void)
-        + void event_broker_destroy(event_broker **brkr)
+        + event_broker *event_broker_create(allocator alloc)
+        + void event_broker_destroy(event_broker **brkr, allocator alloc)
         ..
-        + void event_broker_subscribe(event_broker *brkr, range(u8) *target_event_name, entity *subscribed, void (*callback)(void *entity_data, void *event_data))
+        + void event_broker_subscribe(event_broker *brkr, range(u8) *target_event_name, entity *subscribed, void (*callback)(void *entity_data, void *event_data), allocator alloc)
         + void event_broker_unsubscribe(event_broker *brkr, entity *target)
         + void event_broker_publish(event_broker *brkr, event ev)
     }
@@ -154,8 +154,8 @@ package event {
         + size_t data_size
         + void *data
         __
-        + event event_create(char *name, size_t data_size, void *data)
-        + event event_destroy(event ev*)
+        + event event_create(char *name, size_t data_size, void *data, allocator alloc)
+        + event event_destroy(event *ev, allocator alloc)
     }
 
     ' ------------------------------------------------------------------------------
@@ -173,10 +173,10 @@ package event {
     struct engine_event_stack as "event_stack" << (*, SteelBlue) >> {
         - {field} range(event_stacked) *stack
         __
-        + event_stack *event_stack_create(void)
-        + void event_stack_destroy(event_stack **stack)
+        + event_stack *event_stack_create(allocator alloc)
+        + void event_stack_destroy(event_stack **stack, allocator alloc)
         ..
-        + void event_stack_push(event_stack *stack, entity *source, event ev)
+        + void event_stack_push(event_stack *stack, entity *source, event ev, allocator alloc)
         + event event_stack_pop(event_stack *stack)
     }
     engine_event_stack::stack --* "0..*" engine_event_stacked
@@ -186,26 +186,28 @@ package event {
 ' ------------------------------------------------------------------------------
 
 package main_header {
-    struct engine << (*, SteelBlue) >> {
+    struct tarasque_engine << (*, SteelBlue) >> {
         - command_queue *commands
         - event_stack *events
         - event_broker *pub_sub
         - entity *root_entity
+        - allocator alloc
         __
-        + engine *engine_create(void)
-        + void engine_destroy(engine **handle)
+        + tarasque_engine *tarasque_engine_create(void)
+        + void tarasque_engine_destroy(tarasque_engine **handle)
         ..
-        + void engine_run(engine *handle, u32 fps)
-        + void engine_quit(engine *handle)
+        + void tarasque_engine_run(tarasque_engine *handle, u32 fps)
+        + void tarasque_engine_quit(tarasque_engine *handle)
         ..
-        + void engine_add_entity(engine *handle, char *str_path, char *str_id, entity_template template)
-        + void engine_remove_entity(engine *handle, char *str_path)
-        + void engine_stack_event(engine *handle, char *str_id, size_t data_size, void *data, bool is_detached)
-        + void engine_subscribe_to_event(engine *handle, char *str_id, void (*callback)(void *entity_data, void *event_data))
+        + void tarasque_engine_add_entity(tarasque_engine *handle, char *str_path, char *str_id, entity_template template)
+        + void tarasque_engine_remove_entity(tarasque_engine *handle, char *str_path)
+        + void tarasque_engine_stack_event(tarasque_engine *handle, char *str_id, size_t data_size, void *data, bool is_detached)
+        + void tarasque_engine_subscribe_to_event(tarasque_engine *handle, char *str_id, void (*callback)(void *entity_data, void *event_data))
     }
-    engine::root_entity --* "1" engine_entity
-    engine::commands --* "1" engine_command_queue
-    engine::pub_sub --* "1" engine_event_broker
-    engine::events --* "1" engine_event_stack
+    tarasque_engine::root_entity --* "1" engine_entity
+    tarasque_engine::commands --* "1" engine_command_queue
+    tarasque_engine::pub_sub --* "1" engine_event_broker
+    tarasque_engine::events --* "1" engine_event_stack
 }
 
+@enduml
