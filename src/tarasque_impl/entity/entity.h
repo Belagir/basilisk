@@ -17,5 +17,7 @@ void entity_remove_child(entity *target, entity *removed);
 entity *entity_get_child(entity *target, range_identifier *id_path);
 range(entity *) *entity_get_children(entity *target, allocator alloc);
 
+entity_template_copy entity_template_copy_create(entity_template template, allocator alloc);
+void entity_template_copy_destroy(entity_template_copy *template, allocator alloc);
 
 #endif

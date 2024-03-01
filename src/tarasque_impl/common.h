@@ -11,4 +11,6 @@
 
 typedef range(u8) range_identifier;
 
+range_identifier *range_identifier_from_cstring(const char *str, allocator alloc);
+
 #endif
