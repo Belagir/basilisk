@@ -114,6 +114,7 @@ package command {
         ..
         + void command_queue_append(command_queue *queue, command cmd, allocator alloc)
         + command command_queue_pop_front(command_queue *queue)
+        + size_t command_queue_length(command_queue *queue)
         ..
         + void command_queue_remove_commands_of(command_queue *queue, entity *target, allocator alloc)
     }
@@ -192,6 +193,7 @@ package main_header {
         - event_stack *events
         - event_broker *pub_sub
         - entity *root_entity
+        - bool should_quit
         - allocator alloc
         __
         + tarasque_engine *tarasque_engine_create(void)

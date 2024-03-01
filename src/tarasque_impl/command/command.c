@@ -127,3 +127,38 @@ void command_queue_append(command_queue *queue, command cmd, allocator alloc)
     queue->queue_impl = range_ensure_capacity(alloc, range_to_any(queue->queue_impl));
     range_insert_value(range_to_any(queue->queue_impl), queue->queue_impl->length, &cmd);
 }
+
+/**
+ * @brief 
+ * 
+ * @param queue 
+ * @return command 
+ */
+command command_queue_pop_front(command_queue *queue)
+{
+    command popped_command = { 0u };
+
+    if (!queue || !queue->queue_impl || (queue->queue_impl->length == 0u)) {
+        return (command) { .flavor = COMMAND_INVALID };
+    }
+
+    popped_command = queue->queue_impl->data[0u];
+    range_remove(range_to_any(queue->queue_impl), 0u);
+
+    return popped_command;
+}
+
+/**
+ * @brief 
+ * 
+ * @param queue 
+ * @return 
+ */
+size_t command_queue_length(command_queue *queue)
+{
+    if (!queue || !queue->queue_impl) {
+        return 0u;
+    }
+
+    return queue->queue_impl->length;
+}

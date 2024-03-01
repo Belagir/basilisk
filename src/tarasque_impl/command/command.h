@@ -79,5 +79,7 @@ void command_queue_destroy(command_queue **queue, allocator alloc);
 // -------------------------------------------------------------------------------------------------
 
 void command_queue_append(command_queue *queue, command cmd, allocator alloc);
+command command_queue_pop_front(command_queue *queue);
+size_t command_queue_length(command_queue *queue);
 
 #endif

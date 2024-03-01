@@ -1,6 +1,10 @@
 
 #include "entity.h"
 
+/**
+ * @brief 
+ * 
+ */
 typedef struct entity {
     entity *parent;
     range(entity *) *children;
@@ -9,6 +13,13 @@ typedef struct entity {
     entity_template_copy template;
 } entity;
 
+/**
+ * @brief 
+ * 
+ * @param  
+ * @param alloc 
+ * @return 
+ */
 entity_template_copy entity_template_copy_create(entity_template template, allocator alloc)
 {
     entity_template_copy copy = {
@@ -26,6 +37,12 @@ entity_template_copy entity_template_copy_create(entity_template template, alloc
     return copy;
 }
 
+/**
+ * @brief 
+ * 
+ * @param  
+ * @param alloc 
+ */
 void entity_template_copy_destroy(entity_template_copy *template, allocator alloc)
 {
     if (!template) {
