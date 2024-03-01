@@ -1,0 +1,211 @@
+@startuml full design
+
+' ------------------------------------------------------------------------------
+' ------------------------------------------------------------------------------
+
+package main_header {
+    struct engine_entity_template as "entity_template" {
+        + void *data
+        + size_t data_size
+        ..
+        + {field} void (*on_init)(void *data, engine *handle)
+        + {field} void (*on_deinit)(void *data, engine *handle)
+        + {field} void (*on_frame)(void *data, f32 elapsed_ms, engine *handle)
+        __
+    }
+}
+
+' ------------------------------------------------------------------------------
+' ------------------------------------------------------------------------------
+
+package entity {
+    struct engine_entity_template_copy as "entity_template_copy"  {
+
+        + entity_template_copy entity_template_copy_create(entity_template template)
+        + void entity_template_create_copy_destroy(engine_entity_template_copy *template)
+    }
+    note bottom of engine_entity_template_copy : typedef of entity_template to signal memory allocation
+    engine_entity_template_copy <--> engine_entity_template
+
+    ' ------------------------------------------------------------------------------
+
+    struct engine_entity as "entity" << (*, SteelBlue) >> {
+        - entity *parent
+        - {field} range(entity) *children
+        - {field} range(u8) *id
+        ..
+        + entity_template_copy template
+        __
+        + entity *entity_create(range(u8) *id, entity_template_copy template)
+        + void entity_destroy(entity **target)
+        ..
+        + void entity_add_child(entity *target, entity *new_child)
+        + void entity_remove_child(entity *target, entity *removed)
+        + entity *entity_get_child(entity *target, range(u8) *id_path)
+        + range(entity *) *entity_get_children(entity *target)
+    }
+    engine_entity::template --* "1" engine_entity_template_copy
+}
+
+' ------------------------------------------------------------------------------
+' ------------------------------------------------------------------------------
+
+package command {
+
+    struct engine_command_add_entity as "command_add_entity" {
+        + {field} range(u8) *id_path
+        + {field} range(u8) *id
+        + entity_template_copy template
+    }
+    engine_command_add_entity::template --* "1" engine_entity_template_copy
+
+    ' ------------------------------------------------------------------------------
+
+    struct engine_command_remove_entity as "command_remove_entity" {
+        + {field} range(u8) *id_path
+    }
+
+    ' ------------------------------------------------------------------------------
+
+    struct engine_command_subscribe_to_event as "command_subscribe_to_event" {
+        + {field} range(u8) *target_event_name
+        + entity *subscribed
+        + {field} void (*callback)(void *entity_data, void *event_data)
+    }
+    engine_command_subscribe_to_event::subscribed --o "1" engine_entity
+
+    ' ------------------------------------------------------------------------------
+
+    enum engine_command_flavor as "command_flavor" {
+        ADD_ENTITY
+        REMOVE_ENTITY
+        SUBSCRIBE_TO_EVENT
+    }
+    engine_command_flavor::ADD_ENTITY .. engine_command_add_entity
+    engine_command_flavor::REMOVE_ENTITY .. engine_command_remove_entity
+    engine_command_flavor::SUBSCRIBE_TO_EVENT .. engine_command_subscribe_to_event
+
+    ' ------------------------------------------------------------------------------
+
+    struct engine_command as "command" {
+        + engine_command_flavor flavor
+        + entity *source
+        + union { command_add_entity, command_remove_entity, engine_command_subscribe_to_event } cmd
+
+        + command command_create_add_entity(char *id_path, char *id, engine_entity_template template)
+        + command command_create_remove_entity(char *id_path)
+        + command command_create_subscribe_to_event(char *id_path, )
+        + void command_destroy(command *cmd)
+    }
+    engine_command::flavor -- engine_command_flavor
+    engine_command::source --o "1" engine_entity
+    engine_command::cmd --* engine_command_add_entity
+    engine_command::cmd --* engine_command_remove_entity
+    engine_command::cmd --* engine_command_subscribe_to_event
+
+    ' ------------------------------------------------------------------------------
+
+    struct engine_command_queue as "command_queue" << (*, SteelBlue) >> {
+        - {field} range(command) *queue
+        __
+        + command_queue *command_queue_create(void)
+        + void command_queue_destroy(command_queue **destroy)
+        ..
+        + void command_queue_append(command_queue *queue, entity *source, command cmd)
+        + command command_queue_pop_front(command_queue *queue)
+        ..
+        + void command_queue_remove_commands_of(command_queue *queue, entity *target)
+    }
+    engine_command_queue::queue --* "0..*" engine_command
+}
+
+' ------------------------------------------------------------------------------
+' ------------------------------------------------------------------------------
+
+package event {
+    struct engine_subscription as "subscription" {
+        + {field} range(u8) *target_event_name
+        ..
+        + entity *subscribed
+        + {field} void (*callback)(void *entity_data, void *event_data)
+        __
+    }
+    engine_subscription::subscribed --o "1" engine_entity
+
+    ' ------------------------------------------------------------------------------
+
+    struct engine_event_broker as "event_broker" << (*, SteelBlue) >> {
+        - {field} range(subscription) *subs
+        __
+        + event_broker *event_broker_create(void)
+        + void event_broker_destroy(event_broker **brkr)
+        ..
+        + void event_broker_subscribe(event_broker *brkr, range(u8) *target_event_name, entity *subscribed, void (*callback)(void *entity_data, void *event_data))
+        + void event_broker_unsubscribe(event_broker *brkr, entity *target)
+        + void event_broker_publish(event_broker *brkr, event ev)
+    }
+    engine_event_broker::subs --* "0..*" engine_subscription
+
+    ' ------------------------------------------------------------------------------
+
+    struct engine_event as "event" {
+        + {field} range(u8) *name
+        ..
+        + size_t data_size
+        + void *data
+        __
+        + event event_create(char *name, size_t data_size, void *data)
+        + event event_destroy(event ev*)
+    }
+
+    ' ------------------------------------------------------------------------------
+
+    struct engine_event_stacked as "event_stacked" {
+        + event ev
+        + entity *source
+        __
+    }
+    engine_event_stacked::source --o "0..1" engine_entity
+    engine_event_stacked::ev --* "1" engine_event
+
+    ' ------------------------------------------------------------------------------
+
+    struct engine_event_stack as "event_stack" << (*, SteelBlue) >> {
+        - {field} range(event_stacked) *stack
+        __
+        + event_stack *event_stack_create(void)
+        + void event_stack_destroy(event_stack **stack)
+        ..
+        + void event_stack_push(event_stack *stack, entity *source, event ev)
+        + event event_stack_pop(event_stack *stack)
+    }
+    engine_event_stack::stack --* "0..*" engine_event_stacked
+}
+
+' ------------------------------------------------------------------------------
+' ------------------------------------------------------------------------------
+
+package main_header {
+    struct engine << (*, SteelBlue) >> {
+        - command_queue *commands
+        - event_stack *events
+        - event_broker *pub_sub
+        - entity *root_entity
+        __
+        + engine *engine_create(void)
+        + void engine_destroy(engine **handle)
+        ..
+        + void engine_run(engine *handle, u32 fps)
+        + void engine_quit(engine *handle)
+        ..
+        + void engine_add_entity(engine *handle, char *str_path, char *str_id, entity_template template)
+        + void engine_remove_entity(engine *handle, char *str_path)
+        + void engine_stack_event(engine *handle, char *str_id, size_t data_size, void *data, bool is_detached)
+        + void engine_subscribe_to_event(engine *handle, char *str_id, void (*callback)(void *entity_data, void *event_data))
+    }
+    engine::root_entity --* "1" engine_entity
+    engine::commands --* "1" engine_command_queue
+    engine::pub_sub --* "1" engine_event_broker
+    engine::events --* "1" engine_event_stack
+}
+
