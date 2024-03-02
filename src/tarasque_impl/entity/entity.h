@@ -19,7 +19,7 @@ typedef entity_template entity_template_copy;
 // -------------------------------------------------------------------------------------------------
 
 /*  */
-entity *entity_create(range_identifier *id, entity_template_copy template, allocator alloc);
+entity *entity_create(identifier *id, entity_template_copy template, allocator alloc);
 /*  */
 void entity_destroy(entity **target, allocator alloc);
 
@@ -33,7 +33,7 @@ void entity_remove_child(entity *target, entity *removed);
 // -------------------------------------------------------------------------------------------------
 
 /*  */
-entity *entity_get_child(entity *target, range_identifier *id_path);
+entity *entity_get_child(entity *target, identifier *id_path);
 /*  */
 range(entity *) *entity_get_children(entity *target, allocator alloc);
 

@@ -34,7 +34,7 @@ typedef enum command_flavor {
  * 
  */
 typedef struct command_remove_entity {
-    range_identifier *id_path;
+    identifier *id_path;
 } command_remove_entity;
 
 // -------------------------------------------------------------------------------------------------
@@ -44,8 +44,8 @@ typedef struct command_remove_entity {
  * 
  */
 typedef struct command_add_entity {
-    range_identifier *id_path;
-    range_identifier *id;
+    identifier *id_path;
+    identifier *id;
     entity_template_copy template;
 } command_add_entity;
 
@@ -56,7 +56,7 @@ typedef struct command_add_entity {
  * 
  */
 typedef struct command_subscribe_to_event {
-    range_identifier *target_event_name;
+    identifier *target_event_name;
     entity *subscribed;
     void (*callback)(void *entity_data, void *event_data);
 } command_subscribe_to_event;

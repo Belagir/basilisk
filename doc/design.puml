@@ -18,13 +18,33 @@ package main_header {
 ' ------------------------------------------------------------------------------
 ' ------------------------------------------------------------------------------
 
+package identifier {
+
+    struct identifier {
+        == typedef of ==
+        {field} range(unsigned char)
+    }
+
+    struct path {
+        == typedef of ==
+        {field} range(identifier)
+    }
+    path --* "*" identifier
+
+}
+
+' ------------------------------------------------------------------------------
+' ------------------------------------------------------------------------------
+
 package entity {
     struct engine_entity_template_copy as "entity_template_copy"  {
-
+        == typedef of ==
+        entity_template
+        __
         + entity_template_copy entity_template_copy_create(entity_template template, allocator alloc)
         + void entity_template_copy_destroy(entity_template_copy *template, allocator alloc)
     }
-    note bottom of engine_entity_template_copy : typedef of entity_template to signal memory allocation
+    note bottom of engine_entity_template_copy : used to signal memory allocation
     engine_entity_template_copy <--> engine_entity_template
 
     ' ------------------------------------------------------------------------------
@@ -32,19 +52,20 @@ package entity {
     struct engine_entity as "entity" << (*, SteelBlue) >> {
         - entity *parent
         - {field} range(entity *) *children
-        - {field} range(u8) *id
+        - identifier *id
         ..
         - entity_template_copy template
         __
-        + entity *entity_create(range(u8) *id, entity_template_copy template, allocator alloc)
+        + entity *entity_create(identifier *id, entity_template_copy template, allocator alloc)
         + void entity_destroy(entity **target, allocator alloc)
         ..
         + void entity_add_child(entity *target, entity *new_child, allocator alloc)
         + void entity_remove_child(entity *target, entity *removed)
-        + entity *entity_get_child(entity *target, range(u8) *id_path)
+        + entity *entity_get_child(entity *target, path *id_path)
         + range(entity *) *entity_get_children(entity *target, allocator alloc)
     }
     engine_entity::template --* "1" engine_entity_template_copy
+    engine_entity::id --* "1" identifier
 }
 
 ' ------------------------------------------------------------------------------
@@ -53,25 +74,29 @@ package entity {
 package command {
 
     struct engine_command_add_entity as "command_add_entity" {
-        + {field} range(u8) *id_path
-        + {field} range(u8) *id
+        + path *id_path
+        + identifier *id
         + entity_template_copy template
     }
     engine_command_add_entity::template --* "1" engine_entity_template_copy
+    engine_command_add_entity::id_path --* "1" path
+    engine_command_add_entity::id --* "1" identifier
 
     ' ------------------------------------------------------------------------------
 
     struct engine_command_remove_entity as "command_remove_entity" {
-        + {field} range(u8) *id_path
+        + path *id_path
     }
+    engine_command_remove_entity::id_path --* "1" path
 
     ' ------------------------------------------------------------------------------
 
     struct engine_command_subscribe_to_event as "command_subscribe_to_event" {
-        + {field} range(u8) *target_event_name
+        + identifier *target_event_name
         + entity *subscribed
         + {field} void (*callback)(void *entity_data, void *event_data)
     }
+    engine_command_subscribe_to_event::target_event_name --* "1" identifier
     engine_command_subscribe_to_event::subscribed --o "1" engine_entity
 
     ' ------------------------------------------------------------------------------
@@ -126,12 +151,13 @@ package command {
 
 package event {
     struct engine_subscription as "subscription" {
-        + {field} range(u8) *target_event_name
+        + identifier *target_event_name
         ..
         + entity *subscribed
         + {field} void (*callback)(void *entity_data, void *event_data)
         __
     }
+    engine_subscription::target_event_name --* "1" identifier
     engine_subscription::subscribed --o "1" engine_entity
 
     ' ------------------------------------------------------------------------------
@@ -151,7 +177,7 @@ package event {
     ' ------------------------------------------------------------------------------
 
     struct engine_event as "event" {
-        + {field} range(u8) *name
+        + identifier *name
         ..
         + size_t data_size
         + void *data
@@ -159,7 +185,8 @@ package event {
         + event event_create(char *name, size_t data_size, void *data, allocator alloc)
         + event event_destroy(event *ev, allocator alloc)
     }
-
+    engine_event::name --* "1" identifier
+    
     ' ------------------------------------------------------------------------------
 
     struct engine_event_stacked as "event_stacked" {

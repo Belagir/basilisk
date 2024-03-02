@@ -13,13 +13,27 @@
  * @brief 
  * 
  */
-typedef range(const char) range_identifier;
+typedef range(const char) identifier;
+
+/**
+ * @brief 
+ * 
+ */
+typedef range(identifier) path;
 
 /*  */
-range_identifier *range_identifier_from_cstring(const char *str, allocator alloc);
+identifier *tarasque_string_from_cstring(const char *str, allocator alloc);
 
 /*  */
-i32 range_identifier_compare(const void *lhs, const void *rhs);
+void tarasque_string_destroy(identifier **string, allocator alloc);
 
+/*  */
+path *tarasque_path_from_cstring(const char *str, allocator alloc);
+
+/*  */
+void tarasque_path_destroy(path **path, allocator alloc);
+
+/*  */
+i32 tarasque_string_compare(const void *lhs, const void *rhs);
 
 #endif

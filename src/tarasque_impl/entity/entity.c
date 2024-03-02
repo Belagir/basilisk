@@ -14,7 +14,7 @@
 typedef struct entity {
     entity *parent;
     range(entity *) *children;
-    range_identifier *id;
+    identifier *id;
 
     entity_template_copy template;
 } entity;
@@ -31,7 +31,7 @@ typedef struct entity {
  * @param alloc 
  * @return 
  */
-entity *entity_create(range_identifier *id, entity_template_copy template, allocator alloc)
+entity *entity_create(identifier *id, entity_template_copy template, allocator alloc)
 {
     entity *new_entity = NULL;
 
@@ -89,7 +89,7 @@ void entity_add_child(entity *target, entity *new_child, allocator alloc)
     }
 
     target->children = range_ensure_capacity(alloc, range_to_any(target->children));
-    (void) sorted_range_insert_in(range_to_any(target->children), &range_identifier_compare, &new_child);
+    (void) sorted_range_insert_in(range_to_any(target->children), &tarasque_string_compare, &new_child);
 }
 
 /**
@@ -104,7 +104,25 @@ void entity_remove_child(entity *target, entity *removed)
         return;
     }
 
-    (void) sorted_range_remove_from(range_to_any(target->children), &range_identifier_compare, &removed);
+    (void) sorted_range_remove_from(range_to_any(target->children), &tarasque_string_compare, &removed);
+}
+
+/**
+ * @brief 
+ * 
+ * @param target 
+ * @param id_path 
+ * @return 
+ */
+entity *entity_get_child(entity *target, identifier *id_path)
+{
+    if (!target) {
+        return NULL;
+    } else (!id_path) {
+        return target;
+    }
+
+    
 }
 
 // -------------------------------------------------------------------------------------------------
