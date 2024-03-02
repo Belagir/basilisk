@@ -9,8 +9,8 @@
 #include "../command/command.h"
 
 /**
- * @brief 
- * 
+ * @brief
+ *
  */
 typedef struct tarasque_engine {
     command_queue *commands;
@@ -47,8 +47,8 @@ static void cockatrice_engine_int_handler(int val) {
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief 
- *  
+ * @brief
+ *
  */
 tarasque_engine *tarasque_engine_create(void)
 {
@@ -72,14 +72,14 @@ tarasque_engine *tarasque_engine_create(void)
 }
 
 /**
- * @brief 
- * 
- * @param handle 
+ * @brief
+ *
+ * @param handle
  */
 void tarasque_engine_destroy(tarasque_engine **handle)
 {
     allocator used_alloc = make_system_allocator();
-    
+
     if (!handle || !*handle) {
         return;
     }
@@ -94,10 +94,10 @@ void tarasque_engine_destroy(tarasque_engine **handle)
 }
 
 /**
- * @brief 
- * 
- * @param handle 
- * @param fps 
+ * @brief
+ *
+ * @param handle
+ * @param fps
  */
 void tarasque_engine_run(tarasque_engine *handle, int fps) {
     f64 frame_delay = { 0. };
@@ -125,12 +125,12 @@ void tarasque_engine_run(tarasque_engine *handle, int fps) {
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief 
- * 
- * @param handle 
- * @param str_path 
- * @param str_id 
- * @param  
+ * @brief
+ *
+ * @param handle
+ * @param str_path
+ * @param str_id
+ * @param
  */
 void tarasque_engine_add_entity(tarasque_engine *handle, char *str_path, char *str_id, entity_template template)
 {
@@ -148,10 +148,10 @@ void tarasque_engine_add_entity(tarasque_engine *handle, char *str_path, char *s
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief 
- * 
- * @param handle 
- * @param cmd 
+ * @brief
+ *
+ * @param handle
+ * @param cmd
  */
 static void tarasque_engine_process_command(tarasque_engine *handle, command cmd)
 {
@@ -164,7 +164,7 @@ static void tarasque_engine_process_command(tarasque_engine *handle, command cmd
     case COMMAND_ADD_ENTITY:
         // TODO : process add_entity
         break;
-    
+
     default:
         break;
     }

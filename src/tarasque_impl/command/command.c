@@ -6,8 +6,8 @@
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief 
- * 
+ * @brief
+ *
  */
 typedef struct command_queue {
     range(command) *queue_impl;
@@ -18,14 +18,14 @@ typedef struct command_queue {
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief 
- * 
- * @param source 
- * @param id_path 
- * @param id 
- * @param  
- * @param alloc 
- * @return 
+ * @brief
+ *
+ * @param source
+ * @param id_path
+ * @param id
+ * @param
+ * @param alloc
+ * @return
  */
 command command_create_add_entity(entity *source, char *id_path, char *id, entity_template template, allocator alloc)
 {
@@ -38,7 +38,7 @@ command command_create_add_entity(entity *source, char *id_path, char *id, entit
     new_cmd = (command) {
             .flavor = COMMAND_ADD_ENTITY,
             .source = source,
-            .cmd.add_entity = (command_add_entity) { 
+            .cmd.add_entity = (command_add_entity) {
                     .id = identifier_from_cstring(id, alloc),
                     .id_path = path_from_cstring(id_path, alloc),
                     .template = entity_template_copy_create(template, alloc),
@@ -51,10 +51,10 @@ command command_create_add_entity(entity *source, char *id_path, char *id, entit
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief 
- * 
- * @param cmd 
- * @param alloc 
+ * @brief
+ *
+ * @param cmd
+ * @param alloc
  */
 void command_destroy(command *cmd, allocator alloc)
 {
@@ -68,7 +68,7 @@ void command_destroy(command *cmd, allocator alloc)
         path_destroy(&(cmd->cmd.add_entity.id_path), alloc);
         entity_template_copy_destroy(&(cmd->cmd.add_entity.template), alloc);
         break;
-    
+
     default:
         break;
     }
@@ -81,10 +81,10 @@ void command_destroy(command *cmd, allocator alloc)
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief 
- * 
- * @param alloc 
- * @return 
+ * @brief
+ *
+ * @param alloc
+ * @return
  */
 command_queue *command_queue_create(allocator alloc)
 {
@@ -102,10 +102,10 @@ command_queue *command_queue_create(allocator alloc)
 }
 
 /**
- * @brief 
- * 
- * @param queue 
- * @param alloc 
+ * @brief
+ *
+ * @param queue
+ * @param alloc
  */
 void command_queue_destroy(command_queue **queue, allocator alloc)
 {
@@ -125,12 +125,12 @@ void command_queue_destroy(command_queue **queue, allocator alloc)
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief 
- * 
- * @param queue 
- * @param source 
- * @param cmd 
- * @param alloc 
+ * @brief
+ *
+ * @param queue
+ * @param source
+ * @param cmd
+ * @param alloc
  */
 void command_queue_append(command_queue *queue, command cmd, allocator alloc)
 {
@@ -143,10 +143,10 @@ void command_queue_append(command_queue *queue, command cmd, allocator alloc)
 }
 
 /**
- * @brief 
- * 
- * @param queue 
- * @return command 
+ * @brief
+ *
+ * @param queue
+ * @return command
  */
 command command_queue_pop_front(command_queue *queue)
 {
@@ -163,10 +163,10 @@ command command_queue_pop_front(command_queue *queue)
 }
 
 /**
- * @brief 
- * 
- * @param queue 
- * @return 
+ * @brief
+ *
+ * @param queue
+ * @return
  */
 size_t command_queue_length(command_queue *queue)
 {

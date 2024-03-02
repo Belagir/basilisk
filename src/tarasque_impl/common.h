@@ -10,14 +10,14 @@
 #define TARASQUE_COLLECTIONS_START_SIZE (32)
 
 /**
- * @brief 
- * 
+ * @brief
+ *
  */
 typedef range(const char) identifier;
 
 /**
- * @brief 
- * 
+ * @brief
+ *
  */
 typedef range(identifier *) path;
 

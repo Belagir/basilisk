@@ -17,8 +17,8 @@ typedef struct command_queue command_queue;
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief 
- * 
+ * @brief
+ *
  */
 typedef enum command_flavor {
     COMMAND_INVALID,
@@ -30,8 +30,8 @@ typedef enum command_flavor {
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief 
- * 
+ * @brief
+ *
  */
 typedef struct command_remove_entity {
     path *id_path;
@@ -40,8 +40,8 @@ typedef struct command_remove_entity {
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief 
- * 
+ * @brief
+ *
  */
 typedef struct command_add_entity {
     path *id_path;
@@ -52,8 +52,8 @@ typedef struct command_add_entity {
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief 
- * 
+ * @brief
+ *
  */
 typedef struct command_subscribe_to_event {
     identifier *target_event_name;
@@ -64,8 +64,8 @@ typedef struct command_subscribe_to_event {
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief 
- * 
+ * @brief
+ *
  */
 typedef struct command {
     command_flavor flavor;
@@ -75,7 +75,7 @@ typedef struct command {
         command_add_entity add_entity;
         command_subscribe_to_event subscribe_to_event;
     } cmd;
-    
+
 } command;
 
 // -------------------------------------------------------------------------------------------------

@@ -26,11 +26,11 @@ static i32 identifier_compare_character(const void *lhs, const void *rhs)
 }
 
 /**
- * @brief 
- * 
- * @param str 
- * @param alloc 
- * @return 
+ * @brief
+ *
+ * @param str
+ * @param alloc
+ * @return
  */
 identifier *identifier_from_cstring(const char *str, allocator alloc)
 {
@@ -48,11 +48,11 @@ identifier *identifier_from_cstring(const char *str, allocator alloc)
 }
 
 /**
- * @brief 
- * 
- * @param str 
- * @param alloc 
- * @return 
+ * @brief
+ *
+ * @param str
+ * @param alloc
+ * @return
  */
 path *path_from_cstring(const char *str, allocator alloc)
 {
@@ -77,7 +77,7 @@ path *path_from_cstring(const char *str, allocator alloc)
                 &identifier_compare_character,
                 &(const char) { '/' },
                 end_of_token + 1);
-        
+
         if (start_of_token != end_of_token) {
             token = range_create_dynamic_from_subrange_of(alloc, range_to_any(source_string), start_of_token, end_of_token);
 
@@ -97,10 +97,10 @@ path *path_from_cstring(const char *str, allocator alloc)
 }
 
 /**
- * @brief 
- * 
- * @param path 
- * @param alloc 
+ * @brief
+ *
+ * @param path
+ * @param alloc
  */
 void path_destroy(path **p, allocator alloc)
 {
@@ -117,9 +117,9 @@ void path_destroy(path **p, allocator alloc)
 }
 
 /**
- * @brief 
- * 
- * @param p 
+ * @brief
+ *
+ * @param p
  */
 void print_path(const path *p)
 {

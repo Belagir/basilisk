@@ -8,8 +8,8 @@
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief 
- * 
+ * @brief
+ *
  */
 typedef struct entity {
     identifier *id;
@@ -24,18 +24,18 @@ typedef struct entity {
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief 
- * 
- * @param id 
- * @param  
- * @param alloc 
- * @return 
+ * @brief
+ *
+ * @param id
+ * @param
+ * @param alloc
+ * @return
  */
 entity *entity_create(const identifier *id, entity_template_copy template, allocator alloc)
 {
     entity *new_entity = NULL;
 
-    new_entity = alloc.malloc(alloc, sizeof(new_entity));
+    new_entity = alloc.malloc(alloc, sizeof(*new_entity));
 
     if (new_entity) {
         *new_entity = (entity) {
@@ -50,10 +50,10 @@ entity *entity_create(const identifier *id, entity_template_copy template, alloc
 }
 
 /**
- * @brief 
- * 
- * @param target 
- * @param alloc 
+ * @brief
+ *
+ * @param target
+ * @param alloc
  */
 void entity_destroy(entity **target, allocator alloc)
 {
@@ -72,11 +72,11 @@ void entity_destroy(entity **target, allocator alloc)
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief 
- * 
- * @param target 
- * @param new_child 
- * @param alloc 
+ * @brief
+ *
+ * @param target
+ * @param new_child
+ * @param alloc
  */
 void entity_add_child(entity *target, entity *new_child, allocator alloc)
 {
@@ -89,10 +89,10 @@ void entity_add_child(entity *target, entity *new_child, allocator alloc)
 }
 
 /**
- * @brief 
- * 
- * @param target 
- * @param removed 
+ * @brief
+ *
+ * @param target
+ * @param removed
  */
 void entity_remove_child(entity *target, entity *removed)
 {
@@ -104,11 +104,11 @@ void entity_remove_child(entity *target, entity *removed)
 }
 
 /**
- * @brief 
- * 
- * @param target 
- * @param id_path 
- * @return 
+ * @brief
+ *
+ * @param target
+ * @param id_path
+ * @return
  */
 entity *entity_get_child(entity *target, path *id_path)
 {
@@ -131,7 +131,7 @@ entity *entity_get_child(entity *target, path *id_path)
                 &identifier_compare,
                 &(id_path->data[pos_path]),
                 &pos_next_entity);
-        
+
         if (found_next_entity) {
             visited_entity = visited_entity->children->data[pos_next_entity];
             pos_path += 1;
@@ -146,11 +146,11 @@ entity *entity_get_child(entity *target, path *id_path)
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief 
- * 
- * @param  
- * @param alloc 
- * @return 
+ * @brief
+ *
+ * @param
+ * @param alloc
+ * @return
  */
 entity_template_copy entity_template_copy_create(entity_template template, allocator alloc)
 {
@@ -170,10 +170,10 @@ entity_template_copy entity_template_copy_create(entity_template template, alloc
 }
 
 /**
- * @brief 
- * 
- * @param  
- * @param alloc 
+ * @brief
+ *
+ * @param
+ * @param alloc
  */
 void entity_template_copy_destroy(entity_template_copy *template, allocator alloc)
 {
