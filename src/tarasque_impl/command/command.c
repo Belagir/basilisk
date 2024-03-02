@@ -38,7 +38,7 @@ command command_create_add_entity(entity *source, char *id_path, char *id, entit
     new_cmd = (command) {
             .flavor = COMMAND_ADD_ENTITY,
             .source = source,
-            .cmd.add_entity = (command_add_entity) {
+            .specific.add_entity = (command_add_entity) {
                     .id = identifier_from_cstring(id, alloc),
                     .id_path = path_from_cstring(id_path, alloc),
                     .template = entity_template_copy_create(template, alloc),
@@ -64,9 +64,9 @@ void command_destroy(command *cmd, allocator alloc)
 
     switch (cmd->flavor) {
     case COMMAND_ADD_ENTITY:
-        range_destroy_dynamic(alloc, &range_to_any(cmd->cmd.add_entity.id));
-        path_destroy(&(cmd->cmd.add_entity.id_path), alloc);
-        entity_template_copy_destroy(&(cmd->cmd.add_entity.template), alloc);
+        range_destroy_dynamic(alloc, &range_to_any(cmd->specific.add_entity.id));
+        path_destroy(&(cmd->specific.add_entity.id_path), alloc);
+        entity_template_copy_destroy(&(cmd->specific.add_entity.template), alloc);
         break;
 
     default:

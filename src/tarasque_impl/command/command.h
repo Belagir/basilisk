@@ -74,7 +74,7 @@ typedef struct command {
         command_remove_entity remove_entity;
         command_add_entity add_entity;
         command_subscribe_to_event subscribe_to_event;
-    } cmd;
+    } specific;
 
 } command;
 

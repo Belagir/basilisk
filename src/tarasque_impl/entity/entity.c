@@ -86,6 +86,7 @@ void entity_add_child(entity *target, entity *new_child, allocator alloc)
 
     target->children = range_ensure_capacity(alloc, range_to_any(target->children));
     (void) sorted_range_insert_in(range_to_any(target->children), &identifier_compare, &new_child);
+    new_child->parent = target;
 }
 
 /**
@@ -100,6 +101,7 @@ void entity_remove_child(entity *target, entity *removed)
         return;
     }
 
+    removed->parent = NULL;
     (void) sorted_range_remove_from(range_to_any(target->children), &identifier_compare, &removed);
 }
 

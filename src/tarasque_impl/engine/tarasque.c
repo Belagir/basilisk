@@ -26,6 +26,9 @@ typedef struct tarasque_engine {
 /*  */
 static void tarasque_engine_process_command(tarasque_engine *handle, command cmd);
 
+/*  */
+static void tarasque_engine_process_command_add_entity(tarasque_engine *handle, command_add_entity cmd);
+
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
@@ -162,7 +165,7 @@ static void tarasque_engine_process_command(tarasque_engine *handle, command cmd
     switch (cmd.flavor)
     {
     case COMMAND_ADD_ENTITY:
-        // TODO : process add_entity
+        tarasque_engine_process_command_add_entity(handle, cmd.specific.add_entity);
         break;
 
     default:
@@ -170,4 +173,27 @@ static void tarasque_engine_process_command(tarasque_engine *handle, command cmd
     }
 
     command_destroy(&cmd, handle->alloc);
+}
+
+/**
+ * @brief
+ *
+ * @param handle
+ * @param cmd
+ */
+static void tarasque_engine_process_command_add_entity(tarasque_engine *handle, command_add_entity cmd)
+{
+    entity *new_entity = NULL;
+    entity *found_parent = NULL;
+
+    if (!handle) {
+        return;
+    }
+
+    found_parent = entity_get_child(handle->root_entity, cmd.id_path);
+
+    if (found_parent) {
+        new_entity = entity_create(cmd.id, cmd.template, handle->alloc);
+        entity_add_child(found_parent, new_entity, handle->alloc);
+    }
 }
