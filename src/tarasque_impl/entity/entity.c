@@ -12,9 +12,9 @@
  * 
  */
 typedef struct entity {
+    identifier *id;
     entity *parent;
     range(entity *) *children;
-    identifier *id;
 
     entity_template_copy template;
 } entity;
@@ -116,13 +116,33 @@ void entity_remove_child(entity *target, entity *removed)
  */
 entity *entity_get_child(entity *target, path *id_path)
 {
+    entity *visited_entity = NULL;
+    size_t pos_next_entity = 0u;
+    size_t pos_path = 0u;
+    bool found_next_entity = false;
+
     if (!target) {
         return NULL;
-    } else if (!id_path) {
+    } else if (!id_path || (id_path->length == 0u)) {
         return target;
     }
 
-    // TODO
+    visited_entity = target;
+    found_next_entity = true;
+    while (found_next_entity && (pos_path < id_path->length)) {
+        found_next_entity = sorted_range_find_in(
+                range_to_any(visited_entity->children),
+                &identifier_compare,
+                &(id_path->data[pos_path]),
+                &pos_next_entity);
+        
+        if (found_next_entity) {
+            visited_entity = visited_entity->children->data[pos_next_entity];
+            pos_path += 1;
+        }
+    }
+
+    return visited_entity;
 }
 
 // -------------------------------------------------------------------------------------------------
