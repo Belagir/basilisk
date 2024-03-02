@@ -23,6 +23,9 @@ typedef struct tarasque_engine {
     allocator alloc;
 } tarasque_engine;
 
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+
 /*  */
 static void tarasque_engine_process_command(tarasque_engine *handle, command cmd);
 
@@ -88,6 +91,8 @@ void tarasque_engine_destroy(tarasque_engine **handle)
     }
 
     used_alloc = (*handle)->alloc;
+
+    entity_destroy_children((*handle)->root_entity, used_alloc);
 
     command_queue_destroy(&(*handle)->commands, used_alloc);
     entity_destroy(&(*handle)->root_entity, used_alloc);

@@ -138,7 +138,7 @@ void command_queue_append(command_queue *queue, command cmd, allocator alloc)
         return;
     }
 
-    queue->queue_impl = range_ensure_capacity(alloc, range_to_any(queue->queue_impl));
+    queue->queue_impl = range_ensure_capacity(alloc, range_to_any(queue->queue_impl), 1);
     range_insert_value(range_to_any(queue->queue_impl), queue->queue_impl->length, &cmd);
 }
 

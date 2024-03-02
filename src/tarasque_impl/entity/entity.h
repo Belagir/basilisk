@@ -12,6 +12,9 @@
 typedef struct entity entity;
 
 /*  */
+typedef range(entity *) entity_range;
+
+/*  */
 typedef entity_template entity_template_copy;
 
 // -------------------------------------------------------------------------------------------------
@@ -29,13 +32,15 @@ void entity_destroy(entity **target, allocator alloc);
 void entity_add_child(entity *target, entity *new_child, allocator alloc);
 /*  */
 void entity_remove_child(entity *target, entity *removed);
+/*  */
+void entity_destroy_children(entity *target, allocator alloc);
 
 // -------------------------------------------------------------------------------------------------
 
 /*  */
 entity *entity_get_child(entity *target, path *id_path);
 /*  */
-range(entity *) *entity_get_children(entity *target, allocator alloc);
+entity_range *entity_get_children(entity *target, allocator alloc);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------

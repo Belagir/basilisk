@@ -1,5 +1,6 @@
 
 #include <ustd/sorting.h>
+#include <stdio.h>
 
 #include "entity.h"
 
@@ -14,7 +15,7 @@
 typedef struct entity {
     identifier *id;
     entity *parent;
-    range(entity *) *children;
+    entity_range *children;
 
     entity_template_copy template;
 } entity;
@@ -84,7 +85,7 @@ void entity_add_child(entity *target, entity *new_child, allocator alloc)
         return;
     }
 
-    target->children = range_ensure_capacity(alloc, range_to_any(target->children));
+    target->children = range_ensure_capacity(alloc, range_to_any(target->children), 1);
     (void) sorted_range_insert_in(range_to_any(target->children), &identifier_compare, &new_child);
     new_child->parent = target;
 }
@@ -103,6 +104,30 @@ void entity_remove_child(entity *target, entity *removed)
 
     removed->parent = NULL;
     (void) sorted_range_remove_from(range_to_any(target->children), &identifier_compare, &removed);
+}
+
+/**
+ * @brief
+ *
+ * @param target
+ * @param alloc
+ */
+void entity_destroy_children(entity *target, allocator alloc)
+{
+    entity_range *all_children = NULL;
+
+    if (!target) {
+        return;
+    }
+
+    all_children = entity_get_children(target, alloc);
+    for (int i = (int) all_children->length - 1 ; i >= 0 ; i--) {
+        printf("destroying \"%s\"\n", all_children->data[i]->id->data);
+        entity_destroy(all_children->data + i, alloc);
+    }
+    range_destroy_dynamic(alloc, &range_to_any(all_children));
+
+    target->children->length = 0u;
 }
 
 /**
@@ -141,6 +166,33 @@ entity *entity_get_child(entity *target, path *id_path)
     }
 
     return visited_entity;
+}
+
+/**
+ * @brief
+ *
+ * @param target
+ * @param alloc
+ * @return entity_range*
+ */
+entity_range *entity_get_children(entity *target, allocator alloc)
+{
+    size_t child_pos = 0u;
+    entity_range *entities = NULL;
+
+    if (!target) {
+        return NULL;
+    }
+
+    entities = range_create_dynamic_from_copy_of(alloc, range_to_any(target->children));
+
+    while (child_pos < entities->length) {
+        entities = range_ensure_capacity(alloc, range_to_any(entities), entities->data[child_pos]->children->length);
+        range_insert_range(range_to_any(entities), entities->length, range_to_any(entities->data[child_pos]->children));
+        child_pos += 1u;
+    }
+
+    return entities;
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -11,21 +11,6 @@ const identifier *const identifier_root = (const identifier *const) &identifier_
 static i32 identifier_compare_character(const void *lhs, const void *rhs);
 
 /**
- * @brief Compares two characters with their position on the ASCII table.
- *
- * @param lhs
- * @param rhs
- * @return i32
- */
-static i32 identifier_compare_character(const void *lhs, const void *rhs)
-{
-    const char c_lhs = { *(const char *) lhs };
-    const char c_rhs = { *(const char *) rhs };
-
-    return (c_lhs > c_rhs) - (c_lhs < c_rhs);
-}
-
-/**
  * @brief
  *
  * @param str
@@ -90,7 +75,7 @@ path *path_from_cstring(const char *str, allocator alloc)
             token = range_create_dynamic_from_subrange_of(alloc, range_to_any(source_string), start_of_token, end_of_token);
 
             if (token) {
-                new_path = range_ensure_capacity(alloc, range_to_any(new_path));
+                new_path = range_ensure_capacity(alloc, range_to_any(new_path), 1);
                 (void) range_insert_value(range_to_any(new_path), new_path->length, &token);
             }
         }
@@ -153,8 +138,23 @@ void print_path(const path *p)
  */
 i32 identifier_compare(const void *lhs, const void *rhs)
 {
-    identifier *name_lhs = { (identifier *) lhs };
-    identifier *name_rhs = { (identifier *) rhs };
+    identifier *name_lhs = { *(identifier **) lhs };
+    identifier *name_rhs = { *(identifier **) rhs };
 
     return range_compare(&range_to_any(name_lhs), &range_to_any(name_rhs), &identifier_compare_character);
+}
+
+/**
+ * @brief Compares two characters with their position on the ASCII table.
+ *
+ * @param lhs
+ * @param rhs
+ * @return i32
+ */
+static i32 identifier_compare_character(const void *lhs, const void *rhs)
+{
+    const char c_lhs = { *(const char *) lhs };
+    const char c_rhs = { *(const char *) rhs };
+
+    return (c_lhs > c_rhs) - (c_lhs < c_rhs);
 }
