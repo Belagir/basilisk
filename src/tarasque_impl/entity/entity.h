@@ -33,7 +33,7 @@ void entity_remove_child(entity *target, entity *removed);
 // -------------------------------------------------------------------------------------------------
 
 /*  */
-entity *entity_get_child(entity *target, identifier *id_path);
+entity *entity_get_child(entity *target, path *id_path);
 /*  */
 range(entity *) *entity_get_children(entity *target, allocator alloc);
 

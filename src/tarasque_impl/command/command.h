@@ -34,7 +34,7 @@ typedef enum command_flavor {
  * 
  */
 typedef struct command_remove_entity {
-    identifier *id_path;
+    path *id_path;
 } command_remove_entity;
 
 // -------------------------------------------------------------------------------------------------
@@ -44,7 +44,7 @@ typedef struct command_remove_entity {
  * 
  */
 typedef struct command_add_entity {
-    identifier *id_path;
+    path *id_path;
     identifier *id;
     entity_template_copy template;
 } command_add_entity;

@@ -114,8 +114,13 @@ void entity_remove_child(entity *target, entity *removed)
  * @param id_path 
  * @return 
  */
-entity *entity_get_child(entity *target, identifier *id_path)
+entity *entity_get_child(entity *target, path *id_path)
 {
+    if (!target) {
+        return NULL;
+    } else if (!id_path) {
+        return target;
+    }
 
     // TODO
 }
