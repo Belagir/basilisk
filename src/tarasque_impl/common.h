@@ -19,21 +19,21 @@ typedef range(const char) identifier;
  * @brief 
  * 
  */
-typedef range(identifier) path;
+typedef range(identifier *) path;
 
 /*  */
-identifier *tarasque_string_from_cstring(const char *str, allocator alloc);
+identifier *identifier_from_cstring(const char *str, allocator alloc);
 
 /*  */
-void tarasque_string_destroy(identifier **string, allocator alloc);
+path *path_from_cstring(const char *str, allocator alloc);
 
 /*  */
-path *tarasque_path_from_cstring(const char *str, allocator alloc);
+void path_destroy(path **p, allocator alloc);
 
 /*  */
-void tarasque_path_destroy(path **path, allocator alloc);
+void print_path(const path *p);
 
 /*  */
-i32 tarasque_string_compare(const void *lhs, const void *rhs);
+i32 identifier_compare(const void *lhs, const void *rhs);
 
 #endif

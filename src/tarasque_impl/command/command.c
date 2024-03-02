@@ -39,8 +39,8 @@ command command_create_add_entity(entity *source, char *id_path, char *id, entit
             .flavor = COMMAND_ADD_ENTITY,
             .source = source,
             .cmd.add_entity = (command_add_entity) { 
-                    .id = tarasque_string_from_cstring(id, alloc),
-                    .id_path = tarasque_string_from_cstring(id_path, alloc),
+                    .id = identifier_from_cstring(id, alloc),
+                    .id_path = identifier_from_cstring(id_path, alloc),
                     .template = entity_template_copy_create(template, alloc),
              },
     };

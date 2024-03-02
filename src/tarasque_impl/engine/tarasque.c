@@ -14,9 +14,9 @@
  */
 typedef struct tarasque_engine {
     command_queue *commands;
-    // TODO event_stack *events;
+    // TODO : event_stack *events;
     entity *root_entity;
-    // TODO :event_broker *pub_sub
+    // TODO : event_broker *pub_sub
 
     bool should_quit;
 
@@ -161,7 +161,7 @@ static void tarasque_engine_process_command(tarasque_engine *handle, command cmd
     switch (cmd.flavor)
     {
     case COMMAND_ADD_ENTITY:
-        // TODO
+        // TODO : process add_entity
         break;
     
     default:

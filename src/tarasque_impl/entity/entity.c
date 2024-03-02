@@ -89,7 +89,7 @@ void entity_add_child(entity *target, entity *new_child, allocator alloc)
     }
 
     target->children = range_ensure_capacity(alloc, range_to_any(target->children));
-    (void) sorted_range_insert_in(range_to_any(target->children), &tarasque_string_compare, &new_child);
+    (void) sorted_range_insert_in(range_to_any(target->children), &identifier_compare, &new_child);
 }
 
 /**
@@ -104,7 +104,7 @@ void entity_remove_child(entity *target, entity *removed)
         return;
     }
 
-    (void) sorted_range_remove_from(range_to_any(target->children), &tarasque_string_compare, &removed);
+    (void) sorted_range_remove_from(range_to_any(target->children), &identifier_compare, &removed);
 }
 
 /**
@@ -116,13 +116,8 @@ void entity_remove_child(entity *target, entity *removed)
  */
 entity *entity_get_child(entity *target, identifier *id_path)
 {
-    if (!target) {
-        return NULL;
-    } else (!id_path) {
-        return target;
-    }
 
-    
+    // TODO
 }
 
 // -------------------------------------------------------------------------------------------------
