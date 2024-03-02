@@ -19,7 +19,7 @@ typedef entity_template entity_template_copy;
 // -------------------------------------------------------------------------------------------------
 
 /*  */
-entity *entity_create(identifier *id, entity_template_copy template, allocator alloc);
+entity *entity_create(const identifier *id, entity_template_copy template, allocator alloc);
 /*  */
 void entity_destroy(entity **target, allocator alloc);
 

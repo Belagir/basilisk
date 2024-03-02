@@ -36,4 +36,6 @@ void print_path(const path *p);
 /*  */
 i32 identifier_compare(const void *lhs, const void *rhs);
 
+extern const identifier *const identifier_root;
+
 #endif

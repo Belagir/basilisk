@@ -3,6 +3,10 @@
 
 #include "common.h"
 
+
+static const range(const char, 1) identifier_root_impl = range_create_static_fit(const char, {'\0'});
+const identifier *const identifier_root = (const identifier *const) &identifier_root_impl;
+
 /*  */
 static i32 identifier_compare_character(const void *lhs, const void *rhs);
 

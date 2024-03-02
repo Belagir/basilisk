@@ -61,7 +61,7 @@ tarasque_engine *tarasque_engine_create(void)
         *new_engine = (tarasque_engine) {
                 .alloc = used_alloc,
                 .commands = command_queue_create(used_alloc),
-                // TODO : .root_entity
+                .root_entity = entity_create(identifier_root, (entity_template) { 0u }, used_alloc),
                 .should_quit = false,
         };
     }
@@ -87,6 +87,7 @@ void tarasque_engine_destroy(tarasque_engine **handle)
     used_alloc = (*handle)->alloc;
 
     command_queue_destroy(&(*handle)->commands, used_alloc);
+    entity_destroy(&(*handle)->root_entity, used_alloc);
 
     used_alloc.free(used_alloc, *handle);
     *handle = NULL;

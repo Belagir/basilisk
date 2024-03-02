@@ -31,21 +31,17 @@ typedef struct entity {
  * @param alloc 
  * @return 
  */
-entity *entity_create(identifier *id, entity_template_copy template, allocator alloc)
+entity *entity_create(const identifier *id, entity_template_copy template, allocator alloc)
 {
     entity *new_entity = NULL;
-
-    if (!id) {
-        return NULL;
-    }
 
     new_entity = alloc.malloc(alloc, sizeof(new_entity));
 
     if (new_entity) {
         *new_entity = (entity) {
+                .id = range_create_dynamic_from_copy_of(alloc, range_to_any(id)),
                 .parent = NULL,
                 .children = range_create_dynamic(alloc, sizeof(*new_entity->children->data), TARASQUE_COLLECTIONS_START_SIZE),
-                .id = range_create_dynamic_from_copy_of(alloc, range_to_any(id)),
                 .template = entity_template_copy_create(template, alloc),
         };
     }
