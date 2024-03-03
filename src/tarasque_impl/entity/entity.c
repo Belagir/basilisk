@@ -1,6 +1,5 @@
 
 #include <ustd/sorting.h>
-#include <stdio.h>
 
 #include "entity.h"
 
@@ -122,7 +121,6 @@ void entity_destroy_children(entity *target, allocator alloc)
 
     all_children = entity_get_children(target, alloc);
     for (int i = (int) all_children->length - 1 ; i >= 0 ; i--) {
-        printf("destroying \"%s\"\n", all_children->data[i]->id->data);
         entity_destroy(all_children->data + i, alloc);
     }
     range_destroy_dynamic(alloc, &range_to_any(all_children));
@@ -143,6 +141,7 @@ entity *entity_get_child(entity *target, path *id_path)
     size_t pos_next_entity = 0u;
     size_t pos_path = 0u;
     bool found_next_entity = false;
+    identifier **current_path_identifier = NULL;
 
     if (!target) {
         return NULL;
@@ -153,10 +152,12 @@ entity *entity_get_child(entity *target, path *id_path)
     visited_entity = target;
     found_next_entity = true;
     while (found_next_entity && (pos_path < id_path->length)) {
+        current_path_identifier = &id_path->data[pos_path];
+
         found_next_entity = sorted_range_find_in(
                 range_to_any(visited_entity->children),
                 &identifier_compare,
-                &(id_path->data[pos_path]),
+                &current_path_identifier,
                 &pos_next_entity);
 
         if (found_next_entity) {
@@ -165,7 +166,10 @@ entity *entity_get_child(entity *target, path *id_path)
         }
     }
 
-    return visited_entity;
+    if (found_next_entity) {
+        return visited_entity;
+    }
+    return NULL;
 }
 
 /**

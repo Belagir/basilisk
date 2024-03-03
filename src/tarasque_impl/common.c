@@ -31,7 +31,7 @@ identifier *identifier_from_cstring(const char *str, allocator alloc)
         str_length += 1;
     }
 
-    new_identifier = range_create_dynamic_from(alloc, sizeof(*str), str_length, str_length, str);
+    new_identifier = range_create_dynamic_from(alloc, sizeof(*str), str_length + 1, str_length + 1, str);
     is_id_allowed = (range_count(range_to_any(new_identifier), &identifier_compare_character, &(const char) { ' ' },  0u) == 0u)
                  && (range_count(range_to_any(new_identifier), &identifier_compare_character, &(const char) { '\t' }, 0u) == 0u)
                  && (range_count(range_to_any(new_identifier), &identifier_compare_character, &(const char) { '/' },  0u) == 0u)
@@ -138,8 +138,9 @@ void print_path(const path *p)
  */
 i32 identifier_compare(const void *lhs, const void *rhs)
 {
-    identifier *name_lhs = { *(identifier **) lhs };
-    identifier *name_rhs = { *(identifier **) rhs };
+    // FIXME : triple pointer ???  because the comparator must receive a pointer to whatever is stored in the range, ie a pointer to an entity, that holds a pointer to an identifier........
+    identifier *name_lhs = { **(identifier ***) lhs };
+    identifier *name_rhs = { **(identifier ***) rhs };
 
     return range_compare(&range_to_any(name_lhs), &range_to_any(name_rhs), &identifier_compare_character);
 }
