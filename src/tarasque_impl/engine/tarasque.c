@@ -7,6 +7,7 @@
 #include "../common.h"
 
 #include "../command/command.h"
+#include "../entity/entity.h"
 
 /**
  * @brief
@@ -28,9 +29,11 @@ typedef struct tarasque_engine {
 
 /*  */
 static void tarasque_engine_process_command(tarasque_engine *handle, command cmd);
-
 /*  */
 static void tarasque_engine_process_command_add_entity(tarasque_engine *handle, command_add_entity cmd);
+
+/*  */
+static void tarasque_engine_frame_step_entities(tarasque_engine *handle, f32 elapsed_time);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -124,6 +127,8 @@ void tarasque_engine_run(tarasque_engine *handle, int fps) {
             tarasque_engine_process_command(handle, command_queue_pop_front(handle->commands));
         }
 
+        tarasque_engine_frame_step_entities(handle, (f32) frame_delay);
+
         (void) nanosleep(&(struct timespec) { .tv_nsec = (long) (frame_delay * 1000000.f) }, NULL);
     } while (!handle->should_quit);
 }
@@ -201,4 +206,31 @@ static void tarasque_engine_process_command_add_entity(tarasque_engine *handle, 
         new_entity = entity_create(cmd.id, cmd.template, handle->alloc);
         entity_add_child(found_parent, new_entity, handle->alloc);
     }
+}
+
+/**
+ * @brief 
+ * 
+ * @param handle 
+ * @param elapsed_time 
+ */
+static void tarasque_engine_frame_step_entities(tarasque_engine *handle, f32 elapsed_ms)
+{
+    entity_range *all_entities = NULL;
+
+    if (!handle) {
+        return;
+    }
+
+    all_entities = entity_get_children(handle->root_entity, handle->alloc);
+
+    if (!all_entities) {
+        return;
+    }
+
+    for (size_t i = 0u ; i < all_entities->length ; i++) {
+        entity_step_frame(all_entities->data[i], elapsed_ms, handle);
+    }
+
+    range_destroy_dynamic(handle->alloc, &range_to_any(all_entities));
 }

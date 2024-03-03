@@ -51,7 +51,7 @@ path *path_from_cstring(const char *str, allocator alloc)
 {
     identifier *source_string = { 0u };
     size_t start_of_token = 0u;
-    size_t end_of_token = 1u;
+    size_t end_of_token = 0u;
     identifier *token = { 0u };
     path *new_path = { 0u };
 

@@ -50,9 +50,9 @@ package entity {
     ' ------------------------------------------------------------------------------
 
     struct engine_entity as "entity" << (*, SteelBlue) >> {
+        - identifier *id
         - entity *parent
         - {field} range(entity *) *children
-        - identifier *id
         ..
         - entity_template_copy template
         __

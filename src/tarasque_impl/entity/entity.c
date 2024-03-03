@@ -45,6 +45,10 @@ entity *entity_create(const identifier *id, entity_template_copy template, alloc
                 .children = range_create_dynamic(alloc, sizeof(*new_entity->children->data), TARASQUE_COLLECTIONS_START_SIZE),
                 .template = entity_template_copy_create(template, alloc),
         };
+
+        if (new_entity->template.on_init) {
+            new_entity->template.on_init(new_entity->template.data, NULL);
+        }
     }
 
     return new_entity;
@@ -60,6 +64,10 @@ void entity_destroy(entity **target, allocator alloc)
 {
     if (!target || !*target) {
         return;
+    }
+
+    if ((*target)->template.on_deinit) {
+        (*target)->template.on_deinit((*target)->template.data, NULL);
     }
 
     range_destroy_dynamic(alloc, &range_to_any((*target)->children));
@@ -198,6 +206,23 @@ entity_range *entity_get_children(entity *target, allocator alloc)
     }
 
     return entities;
+}
+
+/**
+ * @brief 
+ * 
+ * @param target 
+ * @param elapsed_ms 
+ */
+void entity_step_frame(entity *target, f32 elapsed_ms, tarasque_engine *handle)
+{
+    if (!target) {
+        return;
+    }
+
+    if (target->template.on_frame) {
+        target->template.on_frame(target->template.data, elapsed_ms, handle);
+    }
 }
 
 // -------------------------------------------------------------------------------------------------
