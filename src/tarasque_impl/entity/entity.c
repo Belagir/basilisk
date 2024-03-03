@@ -95,7 +95,7 @@ void entity_add_child(entity *target, entity *new_child, allocator alloc)
     }
 
     target->children = range_ensure_capacity(alloc, range_to_any(target->children), 1);
-    (void) sorted_range_insert_in(range_to_any(target->children), &identifier_compare, &new_child);
+    (void) sorted_range_insert_in(range_to_any(target->children), &identifier_compare_tripleref, &new_child);
     new_child->parent = target;
 }
 
@@ -111,7 +111,7 @@ void entity_deparent(entity *target)
         return;
     }
 
-    (void) sorted_range_remove_from(range_to_any(target->parent->children), &identifier_compare, &target);
+    (void) sorted_range_remove_from(range_to_any(target->parent->children), &identifier_compare_tripleref, &target);
     target->parent = NULL;
 }
 
@@ -166,7 +166,7 @@ entity *entity_get_child(entity *target, const path *id_path)
 
         found_next_entity = sorted_range_find_in(
                 range_to_any(visited_entity->children),
-                &identifier_compare,
+                &identifier_compare_tripleref,
                 &current_path_identifier,
                 &pos_next_entity);
 

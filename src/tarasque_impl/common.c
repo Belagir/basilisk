@@ -168,11 +168,26 @@ void print_path(const path *p)
  * @param rhs
  * @return i32
  */
-i32 identifier_compare(const void *lhs, const void *rhs)
+i32 identifier_compare_tripleref(const void *lhs, const void *rhs)
 {
     // FIXME : triple pointer ???  because the comparator must receive a pointer to whatever is stored in the range, ie a pointer to an entity, that holds a pointer to an identifier........
     identifier *name_lhs = { **(identifier ***) lhs };
     identifier *name_rhs = { **(identifier ***) rhs };
+
+    return identifier_compare(name_lhs, name_rhs);
+}
+
+/**
+ * @brief
+ *
+ * @param lhs
+ * @param rhs
+ * @return
+ */
+i32 identifier_compare(const void *lhs, const void *rhs)
+{
+    identifier *name_lhs = { (identifier *) lhs };
+    identifier *name_rhs = { (identifier *) rhs };
 
     return range_compare(&range_to_any(name_lhs), &range_to_any(name_rhs), &identifier_compare_character);
 }

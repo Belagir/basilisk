@@ -53,6 +53,9 @@ void print_path(const path *p);
 // -------------------------------------------------------------------------------------------------
 
 /*  */
+i32 identifier_compare_tripleref(const void *lhs, const void *rhs);
+
+/*  */
 i32 identifier_compare(const void *lhs, const void *rhs);
 
 // -------------------------------------------------------------------------------------------------

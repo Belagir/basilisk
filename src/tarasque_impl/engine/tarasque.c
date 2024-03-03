@@ -241,6 +241,7 @@ tarasque_engine *tarasque_engine_for(tarasque_engine *handle, entity *current_en
 static void tarasque_engine_full_destroy_entity(tarasque_engine *handle, entity *target)
 {
     command_queue_remove_commands_of(handle->commands, target, handle->alloc);
+    event_broker_unsubscribe(handle->pub_sub, target, NULL, NULL, handle->alloc);
 
     entity_deparent(target);
     entity_destroy_children(target, handle, handle->alloc);
