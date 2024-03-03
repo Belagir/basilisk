@@ -60,7 +60,7 @@ package entity {
         + void entity_destroy(entity **target, allocator alloc)
         ..
         + void entity_add_child(entity *target, entity *new_child, allocator alloc)
-        + void entity_remove_child(entity *target, entity *removed)
+        + void entity_deparent(entity *target)
         + entity *entity_get_child(entity *target, path *id_path)
         + range(entity *) *entity_get_children(entity *target, allocator alloc)
     }

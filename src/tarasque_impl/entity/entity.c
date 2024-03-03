@@ -104,14 +104,14 @@ void entity_add_child(entity *target, entity *new_child, allocator alloc)
  * @param target
  * @param removed
  */
-void entity_remove_child(entity *target, entity *removed)
+void entity_deparent(entity *target)
 {
-    if (!target || !removed) {
+    if (!target || !target->parent) {
         return;
     }
 
-    removed->parent = NULL;
-    (void) sorted_range_remove_from(range_to_any(target->children), &identifier_compare, &removed);
+    (void) sorted_range_remove_from(range_to_any(target->parent->children), &identifier_compare, &target);
+    target->parent = NULL;
 }
 
 /**

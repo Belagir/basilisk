@@ -31,7 +31,7 @@ void entity_destroy(entity **target, allocator alloc);
 /*  */
 void entity_add_child(entity *target, entity *new_child, allocator alloc);
 /*  */
-void entity_remove_child(entity *target, entity *removed);
+void entity_deparent(entity *target);
 /*  */
 void entity_destroy_children(entity *target, allocator alloc);
 
