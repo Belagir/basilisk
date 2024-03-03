@@ -244,8 +244,11 @@ static void tarasque_engine_process_command_add_entity(tarasque_engine *handle, 
     found_parent = entity_get_child(handle->root_entity, cmd.id_path);
 
     if (found_parent) {
+        // TODO : enforce unique entity identifier among children
         new_entity = entity_create(cmd.id, cmd.template, handle->alloc);
         entity_add_child(found_parent, new_entity, handle->alloc);
+    } else {
+        // TODO : log failure
     }
 }
 
@@ -267,6 +270,8 @@ static void tarasque_engine_process_command_remove_entity(tarasque_engine *handl
 
     if (found_entity) {
         tarasque_engine_full_destroy_entity(handle, found_entity);
+    } else {
+        // TODO : log failure
     }
 }
 

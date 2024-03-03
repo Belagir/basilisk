@@ -166,11 +166,11 @@ package event {
         - {field} range(subscription) *subs
         __
         + event_broker *event_broker_create(allocator alloc)
-        + void event_broker_destroy(event_broker **brkr, allocator alloc)
+        + void event_broker_destroy(event_broker **broker, allocator alloc)
         ..
-        + void event_broker_subscribe(event_broker *brkr, range(u8) *target_event_name, entity *subscribed, void (*callback)(void *entity_data, void *event_data), allocator alloc)
-        + void event_broker_unsubscribe(event_broker *brkr, entity *target)
-        + void event_broker_publish(event_broker *brkr, event ev)
+        + void event_broker_subscribe(event_broker *broker, entity *subscribed, identifier *target_event_name, void (*callback)(void *entity_data, void *event_data), allocator alloc)
+        + void event_broker_unsubscribe(event_broker *broker, entity *target, identifier *target_event_name, void (*callback)(void *entity_data, void *event_data), allocator alloc)
+        + void event_broker_publish(event_broker *broker, event ev)
     }
     engine_event_broker::subs --* "0..*" engine_subscription
 
