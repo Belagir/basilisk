@@ -8,6 +8,7 @@
 
 #include "../command/command.h"
 #include "../entity/entity.h"
+#include "../event/event.h"
 
 /**
  * @brief
@@ -17,7 +18,7 @@ typedef struct tarasque_engine {
     command_queue *commands;
     // TODO : event_stack *events;
     entity *root_entity;
-    // TODO : event_broker *pub_sub;
+    event_broker *pub_sub;
 
     bool should_quit;
 
@@ -76,6 +77,7 @@ tarasque_engine *tarasque_engine_create(void)
                 .alloc = used_alloc,
                 .commands = command_queue_create(used_alloc),
                 .root_entity = entity_create(identifier_root, (entity_template) { 0u }, used_alloc),
+                .pub_sub = event_broker_create(used_alloc),
                 .should_quit = false,
         };
     }
@@ -100,6 +102,7 @@ void tarasque_engine_destroy(tarasque_engine **handle)
 
     used_alloc = (*handle)->alloc;
 
+    event_broker_destroy(&(*handle)->pub_sub, used_alloc);
     command_queue_destroy(&(*handle)->commands, used_alloc);
     entity_destroy_children((*handle)->root_entity, used_alloc);
     entity_destroy(&(*handle)->root_entity, used_alloc);
@@ -281,6 +284,7 @@ static void tarasque_engine_frame_step_entities(tarasque_engine *handle, f32 ela
         return;
     }
 
+    // TODO : children collections should be updated on entities change, not every frame
     all_entities = entity_get_children(handle->root_entity, handle->alloc);
 
     if (!all_entities) {
