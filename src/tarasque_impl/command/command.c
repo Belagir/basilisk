@@ -49,17 +49,17 @@ command command_create_add_entity(const entity *source, const char *id_path, con
 }
 
 /**
- * @brief 
- * 
- * @param source 
- * @param id_path 
- * @param alloc 
- * @return 
+ * @brief
+ *
+ * @param source
+ * @param id_path
+ * @param alloc
+ * @return
  */
 command command_create_remove_entity(const entity *source, const char *id_path, allocator alloc)
 {
     command new_cmd = { 0u };
-    
+
     if (!id_path) {
         return (command) { .flavor = COMMAND_INVALID };
     }
@@ -76,12 +76,12 @@ command command_create_remove_entity(const entity *source, const char *id_path, 
 }
 
 /**
- * @brief 
- * 
- * @param source 
- * @param id_path 
- * @param alloc 
- * @return 
+ * @brief
+ *
+ * @param source
+ * @param id_path
+ * @param alloc
+ * @return
  */
 command command_create_subscribe_to_event(entity *source, const char *event_name, void (*callback)(void *entity_data, void *event_data), allocator alloc)
 {
@@ -124,11 +124,11 @@ void command_destroy(command *cmd, allocator alloc)
         path_destroy(&(cmd->specific.add_entity.id_path), alloc);
         entity_template_copy_destroy(&(cmd->specific.add_entity.template), alloc);
         break;
-    
+
     case COMMAND_REMOVE_ENTITY:
         path_destroy(&(cmd->specific.remove_entity.id_path), alloc);
         break;
-    
+
     case COMMAND_SUBSCRIBE_TO_EVENT:
         range_destroy_dynamic(alloc, &range_to_any(cmd->specific.subscribe_to_event.target_event_name));
 
@@ -243,11 +243,11 @@ size_t command_queue_length(const command_queue *queue)
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief 
- * 
- * @param queue 
- * @param target 
- * @param alloc 
+ * @brief
+ *
+ * @param queue
+ * @param target
+ * @param alloc
  */
 void command_queue_remove_commands_of(command_queue *queue, entity *target, allocator alloc)
 {

@@ -9,12 +9,12 @@
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief 
- * 
+ * @brief
+ *
  */
 typedef struct subscription {
     identifier *target_event_name;
-    
+
     entity *subscribed;
     void (*callback)(void *entity_data, void *event_data);
 } subscription;
@@ -22,8 +22,8 @@ typedef struct subscription {
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief 
- * 
+ * @brief
+ *
  */
 typedef struct event_broker {
     range(subscription *) *subs;
@@ -44,10 +44,10 @@ static void subscription_destroy(subscription **sub, allocator alloc);
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief 
- * 
- * @param alloc 
- * @return 
+ * @brief
+ *
+ * @param alloc
+ * @return
  */
 event_broker *event_broker_create(allocator alloc)
 {
@@ -65,10 +65,10 @@ event_broker *event_broker_create(allocator alloc)
 }
 
 /**
- * @brief 
- * 
- * @param broker 
- * @param alloc 
+ * @brief
+ *
+ * @param broker
+ * @param alloc
  */
 void event_broker_destroy(event_broker **broker, allocator alloc)
 {
@@ -89,21 +89,58 @@ void event_broker_destroy(event_broker **broker, allocator alloc)
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief 
- * 
- * @param brkr 
- * @param subscribed 
- * @param target_event_name 
- * @param callback 
- * @param alloc 
+ * @brief
+ *
+ * @param brkr
+ * @param subscribed
+ * @param target_event_name
+ * @param callback
+ * @param alloc
  */
 void event_broker_subscribe(event_broker *broker, entity *subscribed, identifier *target_event_name, void (*callback)(void *entity_data, void *event_data), allocator alloc)
 {
-    subscription *new_sub = subscription_create(subscribed, target_event_name, callback, alloc);
+    subscription *new_sub = NULL;
+
+    if (!broker) {
+        return;
+    }
+
+    new_sub = subscription_create(subscribed, target_event_name, callback, alloc);
 
     if (new_sub) {
         broker->subs = range_ensure_capacity(alloc, range_to_any(broker->subs), 1);
         sorted_range_insert_in(range_to_any(broker->subs), &identifier_compare, &new_sub);
+    }
+}
+
+/**
+ * @brief
+ *
+ * @param broker
+ * @param target
+ * @param target_event_name
+ * @param callback
+ * @param alloc
+ */
+void event_broker_unsubscribe(event_broker *broker, entity *target, identifier *target_event_name, void (*callback)(void *entity_data, void *event_data), allocator alloc)
+{
+    size_t target_subscriptions_index = 0u;
+    identifier **searched_event_name = &target_event_name;
+
+    if (!broker || !target) {
+        return;
+    }
+
+    if (!sorted_range_find_in(range_to_any(broker->subs), &identifier_compare, &searched_event_name, &target_subscriptions_index)) {
+        return;
+    }
+
+    while ((target_subscriptions_index < broker->subs->length)
+            && (broker->subs->data[target_subscriptions_index]->subscribed == target)) {
+
+
+
+        target_subscriptions_index += 1u;
     }
 }
 
@@ -112,13 +149,13 @@ void event_broker_subscribe(event_broker *broker, entity *subscribed, identifier
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief 
- * 
- * @param subscribed 
- * @param target_event_name 
- * @param callback 
- * @param alloc 
- * @return 
+ * @brief
+ *
+ * @param subscribed
+ * @param target_event_name
+ * @param callback
+ * @param alloc
+ * @return
  */
 static subscription *subscription_create(entity *subscribed, identifier *target_event_name, void (*callback)(void *entity_data, void *event_data), allocator alloc)
 {
@@ -142,10 +179,10 @@ static subscription *subscription_create(entity *subscribed, identifier *target_
 }
 
 /**
- * @brief 
- * 
- * @param sub 
- * @param alloc 
+ * @brief
+ *
+ * @param sub
+ * @param alloc
  */
 static void subscription_destroy(subscription **sub, allocator alloc)
 {

@@ -14,8 +14,8 @@ typedef struct tarasque_engine tarasque_engine;
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief 
- * 
+ * @brief
+ *
  */
 typedef struct entity_template {
     size_t data_size;

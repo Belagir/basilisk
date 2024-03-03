@@ -210,10 +210,10 @@ entity_range *entity_get_children(entity *target, allocator alloc)
 }
 
 /**
- * @brief 
- * 
- * @param target 
- * @param elapsed_ms 
+ * @brief
+ *
+ * @param target
+ * @param elapsed_ms
  */
 void entity_step_frame(entity *target, f32 elapsed_ms, tarasque_engine *handle)
 {

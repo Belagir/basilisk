@@ -186,7 +186,7 @@ package event {
         + event event_destroy(event *ev, allocator alloc)
     }
     engine_event::name --* "1" identifier
-    
+
     ' ------------------------------------------------------------------------------
 
     struct engine_event_stacked as "event_stacked" {

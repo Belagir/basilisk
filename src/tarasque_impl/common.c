@@ -124,9 +124,9 @@ void path_destroy(path **p, allocator alloc)
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief 
- * 
- * @param id 
+ * @brief
+ *
+ * @param id
  */
 void print_identifier(const identifier *id)
 {
