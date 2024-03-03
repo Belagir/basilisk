@@ -78,7 +78,7 @@ tarasque_engine *tarasque_engine_create(void)
         *new_engine = (tarasque_engine) {
                 .alloc = used_alloc,
                 .commands = command_queue_create(used_alloc),
-                .root_entity = entity_create(identifier_root, (entity_template) { 0u }, used_alloc),
+                .root_entity = entity_create(identifier_root, (entity_template) { 0u }, NULL, used_alloc),
                 .pub_sub = event_broker_create(used_alloc),
                 .should_quit = false,
         };
@@ -106,8 +106,8 @@ void tarasque_engine_destroy(tarasque_engine **handle)
 
     event_broker_destroy(&(*handle)->pub_sub, used_alloc);
     command_queue_destroy(&(*handle)->commands, used_alloc);
-    entity_destroy_children((*handle)->root_entity, used_alloc);
-    entity_destroy(&(*handle)->root_entity, used_alloc);
+    entity_destroy_children((*handle)->root_entity, NULL, used_alloc);
+    entity_destroy(&(*handle)->root_entity, NULL, used_alloc);
 
     used_alloc.free(used_alloc, *handle);
     *handle = NULL;
@@ -196,9 +196,9 @@ static void tarasque_engine_full_destroy_entity(tarasque_engine *handle, entity 
     command_queue_remove_commands_of(handle->commands, target, handle->alloc);
     
     entity_deparent(target);
-    entity_destroy_children(target, handle->alloc);
+    entity_destroy_children(target, handle, handle->alloc);
 
-    entity_destroy(&target, handle->alloc);
+    entity_destroy(&target, handle, handle->alloc);
 }
 
 /**
@@ -250,7 +250,7 @@ static void tarasque_engine_process_command_add_entity(tarasque_engine *handle, 
 
     if (found_parent) {
         // TODO : enforce unique entity identifier among children
-        new_entity = entity_create(cmd.id, cmd.template, handle->alloc);
+        new_entity = entity_create(cmd.id, cmd.template, handle, handle->alloc);
         entity_add_child(found_parent, new_entity, handle->alloc);
     } else {
         // TODO : log failure

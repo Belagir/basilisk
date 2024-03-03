@@ -22,9 +22,9 @@ typedef entity_template entity_template_copy;
 // -------------------------------------------------------------------------------------------------
 
 /*  */
-entity *entity_create(const identifier *id, entity_template_copy template, allocator alloc);
+entity *entity_create(const identifier *id, entity_template_copy template, tarasque_engine *handle, allocator alloc);
 /*  */
-void entity_destroy(entity **target, allocator alloc);
+void entity_destroy(entity **target, tarasque_engine *handle, allocator alloc);
 
 // -------------------------------------------------------------------------------------------------
 
@@ -33,7 +33,7 @@ void entity_add_child(entity *target, entity *new_child, allocator alloc);
 /*  */
 void entity_deparent(entity *target);
 /*  */
-void entity_destroy_children(entity *target, allocator alloc);
+void entity_destroy_children(entity *target, tarasque_engine *handle, allocator alloc);
 
 // -------------------------------------------------------------------------------------------------
 

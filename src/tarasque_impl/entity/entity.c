@@ -32,7 +32,7 @@ typedef struct entity {
  * @param alloc
  * @return
  */
-entity *entity_create(const identifier *id, entity_template_copy template, allocator alloc)
+entity *entity_create(const identifier *id, entity_template_copy template, tarasque_engine *handle, allocator alloc)
 {
     entity *new_entity = NULL;
 
@@ -47,7 +47,7 @@ entity *entity_create(const identifier *id, entity_template_copy template, alloc
         };
 
         if (new_entity->template.on_init) {
-            new_entity->template.on_init(new_entity->template.data, NULL);
+            new_entity->template.on_init(new_entity->template.data, handle);
         }
     }
 
@@ -60,14 +60,14 @@ entity *entity_create(const identifier *id, entity_template_copy template, alloc
  * @param target
  * @param alloc
  */
-void entity_destroy(entity **target, allocator alloc)
+void entity_destroy(entity **target, tarasque_engine *handle, allocator alloc)
 {
     if (!target || !*target) {
         return;
     }
 
     if ((*target)->template.on_deinit) {
-        (*target)->template.on_deinit((*target)->template.data, NULL);
+        (*target)->template.on_deinit((*target)->template.data, handle);
     }
 
     range_destroy_dynamic(alloc, &range_to_any((*target)->children));
@@ -120,7 +120,7 @@ void entity_deparent(entity *target)
  * @param target
  * @param alloc
  */
-void entity_destroy_children(entity *target, allocator alloc)
+void entity_destroy_children(entity *target, tarasque_engine *handle, allocator alloc)
 {
     entity_range *all_children = NULL;
 
@@ -130,7 +130,7 @@ void entity_destroy_children(entity *target, allocator alloc)
 
     all_children = entity_get_children(target, alloc);
     for (int i = (int) all_children->length - 1 ; i >= 0 ; i--) {
-        entity_destroy(all_children->data + i, alloc);
+        entity_destroy(all_children->data + i, handle, alloc);
     }
     range_destroy_dynamic(alloc, &range_to_any(all_children));
 
