@@ -48,6 +48,33 @@ command command_create_add_entity(const entity *source, const char *id_path, con
     return new_cmd;
 }
 
+/**
+ * @brief 
+ * 
+ * @param source 
+ * @param id_path 
+ * @param alloc 
+ * @return 
+ */
+command command_create_remove_entity(const entity *source, const char *id_path, allocator alloc)
+{
+    command new_cmd = { 0u };
+    
+    if (!source || !id_path) {
+        return (command) { .flavor = COMMAND_INVALID };
+    }
+
+    new_cmd = (command) {
+            .flavor = COMMAND_REMOVE_ENTITY,
+            .source = source,
+            .specific.remove_entity = {
+                    .id_path = path_from_cstring(id_path, alloc),
+            },
+    };
+
+    return new_cmd;
+}
+
 // -------------------------------------------------------------------------------------------------
 
 /**
@@ -68,7 +95,9 @@ void command_destroy(command *cmd, allocator alloc)
         path_destroy(&(cmd->specific.add_entity.id_path), alloc);
         entity_template_copy_destroy(&(cmd->specific.add_entity.template), alloc);
         break;
-
+    case COMMAND_REMOVE_ENTITY:
+        path_destroy(&(cmd->specific.remove_entity.id_path), alloc);
+        break;
     default:
         break;
     }

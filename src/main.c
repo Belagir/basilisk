@@ -12,7 +12,7 @@ static void dummy_entity_deinit(void *data, tarasque_engine *handle) {
 }
 
 static void dummy_entity_step(void *data, float elapsed_ms, tarasque_engine *handle) {
-    printf("dummy n°%d is doing something...\n", *(int *) data);
+    // printf("dummy n°%d is doing something...\n", *(int *) data);
 }
 
 static void dummy_setup(tarasque_engine *handle) {
@@ -37,6 +37,21 @@ static void dummy_setup(tarasque_engine *handle) {
             .on_deinit = &dummy_entity_deinit,
             .on_frame  = &dummy_entity_step
     });
+    tarasque_engine_add_entity(handle, "1", "4", (entity_template) { 
+            .data      = &(int) { 4 },
+            .data_size = sizeof(int),
+            .on_init   = &dummy_entity_init,
+            .on_deinit = &dummy_entity_deinit,
+            .on_frame  = &dummy_entity_step
+    });
+    tarasque_engine_add_entity(handle, "1/2/3", "5", (entity_template) { 
+            .data      = &(int) { 5 },
+            .data_size = sizeof(int),
+            .on_init   = &dummy_entity_init,
+            .on_deinit = &dummy_entity_deinit,
+            .on_frame  = &dummy_entity_step
+    });
+    tarasque_engine_remove_entity(handle, "1/2/3");
 }
 
 int main(void)

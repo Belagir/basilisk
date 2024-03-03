@@ -31,6 +31,8 @@ typedef struct tarasque_engine {
 static void tarasque_engine_process_command(tarasque_engine *handle, command cmd);
 /*  */
 static void tarasque_engine_process_command_add_entity(tarasque_engine *handle, command_add_entity cmd);
+/*  */
+static void tarasque_engine_process_command_remove_entity(tarasque_engine *handle, command_remove_entity cmd);
 
 /*  */
 static void tarasque_engine_frame_step_entities(tarasque_engine *handle, f32 elapsed_time);
@@ -95,9 +97,8 @@ void tarasque_engine_destroy(tarasque_engine **handle)
 
     used_alloc = (*handle)->alloc;
 
-    entity_destroy_children((*handle)->root_entity, used_alloc);
-
     command_queue_destroy(&(*handle)->commands, used_alloc);
+    entity_destroy_children((*handle)->root_entity, used_alloc);
     entity_destroy(&(*handle)->root_entity, used_alloc);
 
     used_alloc.free(used_alloc, *handle);
@@ -143,7 +144,7 @@ void tarasque_engine_run(tarasque_engine *handle, int fps) {
  * @param handle
  * @param str_path
  * @param str_id
- * @param
+ * @param template
  */
 void tarasque_engine_add_entity(tarasque_engine *handle, const char *str_path, const char *str_id, entity_template template)
 {
@@ -154,6 +155,22 @@ void tarasque_engine_add_entity(tarasque_engine *handle, const char *str_path, c
     }
 
     command_queue_append(handle->commands, command_create_add_entity(handle->root_entity, str_path, str_id, template, handle->alloc), handle->alloc);
+}
+
+/**
+ * @brief 
+ * 
+ * @param handle 
+ * @param str_path 
+ */
+void tarasque_engine_remove_entity(tarasque_engine *handle, const char *str_path)
+{
+    if (!handle || !str_path) {
+        // TODO : log failure
+        return;
+    }
+
+    command_queue_append(handle->commands, command_create_remove_entity(handle->root_entity, str_path, handle->alloc), handle->alloc);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -177,7 +194,9 @@ static void tarasque_engine_process_command(tarasque_engine *handle, command cmd
     case COMMAND_ADD_ENTITY:
         tarasque_engine_process_command_add_entity(handle, cmd.specific.add_entity);
         break;
-
+    case COMMAND_REMOVE_ENTITY:
+        tarasque_engine_process_command_remove_entity(handle, cmd.specific.remove_entity);
+        break;
     default:
         break;
     }
@@ -205,6 +224,29 @@ static void tarasque_engine_process_command_add_entity(tarasque_engine *handle, 
     if (found_parent) {
         new_entity = entity_create(cmd.id, cmd.template, handle->alloc);
         entity_add_child(found_parent, new_entity, handle->alloc);
+    }
+}
+
+/**
+ * @brief 
+ * 
+ * @param handle 
+ * @param cmd 
+ */
+static void tarasque_engine_process_command_remove_entity(tarasque_engine *handle, command_remove_entity cmd)
+{
+    entity *found_entity = NULL;
+
+    if (!handle) {
+        return;
+    }
+
+    found_entity = entity_get_child(handle->root_entity, cmd.id_path);
+
+    if (found_entity) {
+        entity_deparent(found_entity);
+        entity_destroy_children(found_entity, handle->alloc);
+        entity_destroy(&found_entity, handle->alloc);
     }
 }
 
