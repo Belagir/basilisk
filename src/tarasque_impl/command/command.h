@@ -112,4 +112,9 @@ command command_queue_pop_front(command_queue *queue);
 /*  */
 size_t command_queue_length(const command_queue *queue);
 
+// -------------------------------------------------------------------------------------------------
+
+/*  */
+void command_queue_remove_commands_of(command_queue *queue, entity *target, allocator alloc);
+
 #endif

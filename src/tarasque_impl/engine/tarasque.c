@@ -17,7 +17,7 @@ typedef struct tarasque_engine {
     command_queue *commands;
     // TODO : event_stack *events;
     entity *root_entity;
-    // TODO : event_broker *pub_sub
+    // TODO : event_broker *pub_sub;
 
     bool should_quit;
 
@@ -26,6 +26,9 @@ typedef struct tarasque_engine {
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
+
+/*  */
+static void tarasque_engine_full_destroy_entity(tarasque_engine *handle, entity *target);
 
 /*  */
 static void tarasque_engine_process_command(tarasque_engine *handle, command cmd);
@@ -89,7 +92,7 @@ tarasque_engine *tarasque_engine_create(void)
  */
 void tarasque_engine_destroy(tarasque_engine **handle)
 {
-    allocator used_alloc = make_system_allocator();
+    allocator used_alloc = { 0u };
 
     if (!handle || !*handle) {
         return;
@@ -178,6 +181,22 @@ void tarasque_engine_remove_entity(tarasque_engine *handle, const char *str_path
 // -------------------------------------------------------------------------------------------------
 
 /**
+ * @brief 
+ * 
+ * @param handle 
+ * @param target 
+ */
+static void tarasque_engine_full_destroy_entity(tarasque_engine *handle, entity *target)
+{
+    command_queue_remove_commands_of(handle->commands, target, handle->alloc);
+    
+    entity_deparent(target);
+    entity_destroy_children(target, handle->alloc);
+
+    entity_destroy(&target, handle->alloc);
+}
+
+/**
  * @brief
  *
  * @param handle
@@ -244,9 +263,7 @@ static void tarasque_engine_process_command_remove_entity(tarasque_engine *handl
     found_entity = entity_get_child(handle->root_entity, cmd.id_path);
 
     if (found_entity) {
-        entity_deparent(found_entity);
-        entity_destroy_children(found_entity, handle->alloc);
-        entity_destroy(&found_entity, handle->alloc);
+        tarasque_engine_full_destroy_entity(handle, found_entity);
     }
 }
 

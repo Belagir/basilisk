@@ -21,9 +21,9 @@ typedef struct entity_template {
     size_t data_size;
     void *data;
 
-    void (*on_init)(void *data, tarasque_engine *handle);
-    void (*on_deinit)(void *data, tarasque_engine *handle);
-    void (*on_frame)(void *data, float elapsed_ms, tarasque_engine *handle);
+    void (*on_init)(void *entity_data, tarasque_engine *handle);
+    void (*on_deinit)(void *entity_data, tarasque_engine *handle);
+    void (*on_frame)(void *entity_data, float elapsed_ms, tarasque_engine *handle);
 } entity_template;
 
 // -------------------------------------------------------------------------------------------------

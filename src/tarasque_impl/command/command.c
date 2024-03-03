@@ -205,3 +205,30 @@ size_t command_queue_length(const command_queue *queue)
 
     return queue->queue_impl->length;
 }
+
+// -------------------------------------------------------------------------------------------------
+
+/**
+ * @brief 
+ * 
+ * @param queue 
+ * @param target 
+ * @param alloc 
+ */
+void command_queue_remove_commands_of(command_queue *queue, entity *target, allocator alloc)
+{
+    size_t pos = 0u;
+
+    if (!queue || !target) {
+        return;
+    }
+
+    while (pos < queue->queue_impl->length) {
+        if (queue->queue_impl->data[pos].source == target) {
+            command_destroy(queue->queue_impl->data + pos, alloc);
+            range_remove(range_to_any(queue->queue_impl), pos);
+        } else {
+            pos += 1;
+        }
+    }
+}
