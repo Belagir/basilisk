@@ -31,6 +31,9 @@ path *path_from_cstring(const char *str, allocator alloc);
 void path_destroy(path **p, allocator alloc);
 
 /*  */
+void print_identifier(const identifier *id);
+
+/*  */
 void print_path(const path *p);
 
 /*  */

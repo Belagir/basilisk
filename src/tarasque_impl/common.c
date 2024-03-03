@@ -31,7 +31,7 @@ identifier *identifier_from_cstring(const char *str, allocator alloc)
         str_length += 1;
     }
 
-    new_identifier = range_create_dynamic_from(alloc, sizeof(*str), str_length + 1, str_length + 1, str);
+    new_identifier = range_create_dynamic_from(alloc, sizeof(*str), str_length, str_length, str);
     is_id_allowed = (range_count(range_to_any(new_identifier), &identifier_compare_character, &(const char) { ' ' },  0u) == 0u)
                  && (range_count(range_to_any(new_identifier), &identifier_compare_character, &(const char) { '\t' }, 0u) == 0u)
                  && (range_count(range_to_any(new_identifier), &identifier_compare_character, &(const char) { '/' },  0u) == 0u)
@@ -110,6 +110,22 @@ void path_destroy(path **p, allocator alloc)
 }
 
 /**
+ * @brief 
+ * 
+ * @param id 
+ */
+void print_identifier(const identifier *id)
+{
+    if (!id) {
+        return;
+    }
+
+    for (size_t i = 0u ; i < id->length ; i++) {
+        printf("%c", id->data[i]);
+    }
+}
+
+/**
  * @brief
  *
  * @param p
@@ -121,7 +137,7 @@ void print_path(const path *p)
     }
 
     for (size_t i = 0u ; i < p->length ; i++) {
-        printf("%s", p->data[i]->data);
+        print_identifier(p->data[i]);
         if ((i + 1) != p->length) {
             printf(" / ");
         }
