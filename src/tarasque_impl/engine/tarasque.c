@@ -186,6 +186,26 @@ void tarasque_engine_remove_entity(tarasque_engine *handle, const char *str_path
 
     command_queue_append(handle->commands, command_create_remove_entity(handle->root_entity, str_path, handle->alloc), handle->alloc);
 }
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+
+/**
+ * @brief 
+ * 
+ * @param handle 
+ * @param current_entity 
+ * @return tarasque_engine* 
+ */
+tarasque_engine *tarasque_engine_for(tarasque_engine *handle, entity *current_entity)
+{
+    if (!handle) {
+        return NULL;
+    }
+
+    handle->current_entity = current_entity;
+    return handle;
+}
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -319,7 +339,6 @@ static void tarasque_engine_frame_step_entities(tarasque_engine *handle, f32 ela
     }
 
     for (size_t i = 0u ; i < all_entities->length ; i++) {
-        handle->current_entity = all_entities->data[i];
         entity_step_frame(all_entities->data[i], elapsed_ms, handle);
     }
 

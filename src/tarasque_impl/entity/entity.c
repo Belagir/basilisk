@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 #include "entity.h"
+#include "../engine/tarasque_impl.h"
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -47,7 +48,7 @@ entity *entity_create(const identifier *id, entity_template_copy template, taras
         };
 
         if (new_entity->template.on_init) {
-            new_entity->template.on_init(new_entity->template.data, handle);
+            new_entity->template.on_init(new_entity->template.data, tarasque_engine_for(handle, new_entity));
         }
     }
 
@@ -67,7 +68,7 @@ void entity_destroy(entity **target, tarasque_engine *handle, allocator alloc)
     }
 
     if ((*target)->template.on_deinit) {
-        (*target)->template.on_deinit((*target)->template.data, handle);
+        (*target)->template.on_deinit((*target)->template.data, tarasque_engine_for(handle, *target));
     }
 
     range_destroy_dynamic(alloc, &range_to_any((*target)->children));
@@ -130,7 +131,7 @@ void entity_destroy_children(entity *target, tarasque_engine *handle, allocator 
 
     all_children = entity_get_children(target, alloc);
     for (int i = (int) all_children->length - 1 ; i >= 0 ; i--) {
-        entity_destroy(all_children->data + i, handle, alloc);
+        entity_destroy(all_children->data + i, tarasque_engine_for(handle, all_children->data[i]), alloc);
     }
     range_destroy_dynamic(alloc, &range_to_any(all_children));
 
@@ -221,7 +222,7 @@ void entity_step_frame(entity *target, f32 elapsed_ms, tarasque_engine *handle)
     }
 
     if (target->template.on_frame) {
-        target->template.on_frame(target->template.data, elapsed_ms, handle);
+        target->template.on_frame(target->template.data, elapsed_ms, tarasque_engine_for(handle, target));
     }
 }
 
