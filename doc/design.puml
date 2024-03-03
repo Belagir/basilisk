@@ -120,7 +120,7 @@ package command {
 
         + command command_create_add_entity(entity *source, char *id_path, char *id, engine_entity_template template, allocator alloc)
         + command command_create_remove_entity(entity *source, char *id_path, allocator alloc)
-        + command command_create_subscribe_to_event(entity *source, char *id_path, allocator alloc)
+        + command command_create_subscribe_to_event(entity *source, char *event_name, void (*callback)(void *entity_data, void *event_data), allocator alloc)
         + void command_destroy(command *cmd, allocator alloc)
     }
     engine_command::flavor -- engine_command_flavor

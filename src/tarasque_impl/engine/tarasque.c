@@ -37,6 +37,8 @@ static void tarasque_engine_process_command(tarasque_engine *handle, command cmd
 static void tarasque_engine_process_command_add_entity(tarasque_engine *handle, command_add_entity cmd);
 /*  */
 static void tarasque_engine_process_command_remove_entity(tarasque_engine *handle, command_remove_entity cmd);
+/*  */
+static void tarasque_engine_process_command_subscribe_to_event(tarasque_engine *handle, command_subscribe_to_event cmd);
 
 /*  */
 static void tarasque_engine_frame_step_entities(tarasque_engine *handle, f32 elapsed_time);
@@ -219,6 +221,9 @@ static void tarasque_engine_process_command(tarasque_engine *handle, command cmd
     case COMMAND_REMOVE_ENTITY:
         tarasque_engine_process_command_remove_entity(handle, cmd.specific.remove_entity);
         break;
+    case COMMAND_SUBSCRIBE_TO_EVENT:
+        tarasque_engine_process_command_subscribe_to_event(handle, cmd.specific.subscribe_to_event);
+        break;
     default:
         break;
     }
@@ -273,6 +278,17 @@ static void tarasque_engine_process_command_remove_entity(tarasque_engine *handl
     } else {
         // TODO : log failure
     }
+}
+
+/**
+ * @brief 
+ * 
+ * @param handle 
+ * @param cmd 
+ */
+static void tarasque_engine_process_command_subscribe_to_event(tarasque_engine *handle, command_subscribe_to_event cmd)
+{
+    // TODO 
 }
 
 /**

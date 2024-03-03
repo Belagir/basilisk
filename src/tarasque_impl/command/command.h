@@ -87,7 +87,7 @@ command command_create_add_entity(const entity *source, const char *id_path, con
 /*  */
 command command_create_remove_entity(const entity *source, const char *id_path, allocator alloc);
 /*  */
-command command_create_subscribe_to_event(const entity *source, const char *id_path, allocator alloc);
+command command_create_subscribe_to_event(entity *source, const char *event_name, void (*callback)(void *entity_data, void *event_data), allocator alloc);
 
 // -------------------------------------------------------------------------------------------------
 
