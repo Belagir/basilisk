@@ -168,7 +168,8 @@ void tarasque_engine_add_entity(tarasque_engine *handle, const char *str_path, c
         return;
     }
 
-    command_queue_append(handle->commands, command_create_add_entity(handle->root_entity, str_path, str_id, template, handle->alloc), handle->alloc);
+    command_queue_append(handle->commands, command_create_add_entity(handle->current_entity, str_path, str_id, template, handle->alloc), handle->alloc);
+    // TODO : log failure to create command
 }
 
 /**
@@ -184,8 +185,28 @@ void tarasque_engine_remove_entity(tarasque_engine *handle, const char *str_path
         return;
     }
 
-    command_queue_append(handle->commands, command_create_remove_entity(handle->root_entity, str_path, handle->alloc), handle->alloc);
+    command_queue_append(handle->commands, command_create_remove_entity(handle->current_entity, str_path, handle->alloc), handle->alloc);
+    // TODO : log failure to create command
 }
+
+/**
+ * @brief 
+ * 
+ * @param handle 
+ * @param str_id 
+ * @param callback 
+ */
+void tarasque_engine_subscribe_to_event(tarasque_engine *handle,  const char *str_id, void (*callback)(void *entity_data, void *event_data))
+{
+    if (!handle || !str_id) {
+        // TODO : log failure
+        return;
+    }
+
+    command_queue_append(handle->commands, command_create_subscribe_to_event(handle->current_entity, str_id, callback, handle->alloc), handle->alloc);
+    // TODO : log failure to create command
+}
+
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -314,7 +335,11 @@ static void tarasque_engine_process_command_remove_entity(tarasque_engine *handl
  */
 static void tarasque_engine_process_command_subscribe_to_event(tarasque_engine *handle, command_subscribe_to_event cmd)
 {
-    // TODO 
+    if (!handle) {
+        return;
+    }
+
+    event_broker_subscribe(handle->pub_sub, cmd.subscribed, cmd.target_event_name, cmd.callback, handle->alloc);
 }
 
 /**

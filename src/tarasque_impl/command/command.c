@@ -60,7 +60,7 @@ command command_create_remove_entity(const entity *source, const char *id_path, 
 {
     command new_cmd = { 0u };
     
-    if (!source || !id_path) {
+    if (!id_path) {
         return (command) { .flavor = COMMAND_INVALID };
     }
 

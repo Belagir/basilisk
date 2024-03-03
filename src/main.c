@@ -3,8 +3,13 @@
 
 #include <tarasque.h>
 
+static void dummy_entity_on_shout(void *data_dummy, void *data_shout) {
+    printf("heard a shout ......\n");
+}
+
 static void dummy_entity_init(void *data, tarasque_engine *handle) {
     printf("dummy n°%d initialized !\n", *(int *) data);
+    tarasque_engine_subscribe_to_event(handle, "shout", &dummy_entity_on_shout);
 }
 
 static void dummy_entity_deinit(void *data, tarasque_engine *handle) {
