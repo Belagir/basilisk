@@ -17,8 +17,10 @@
 typedef struct tarasque_engine {
     command_queue *commands;
     // TODO : event_stack *events;
-    entity *root_entity;
     event_broker *pub_sub;
+
+    entity *root_entity;
+    entity *current_entity;
 
     bool should_quit;
 
@@ -76,11 +78,15 @@ tarasque_engine *tarasque_engine_create(void)
 
     if (new_engine) {
         *new_engine = (tarasque_engine) {
-                .alloc = used_alloc,
                 .commands = command_queue_create(used_alloc),
-                .root_entity = entity_create(identifier_root, (entity_template) { 0u }, NULL, used_alloc),
                 .pub_sub = event_broker_create(used_alloc),
+
+                .root_entity = entity_create(identifier_root, (entity_template) { 0u }, NULL, used_alloc),
+                .current_entity = NULL,
+
                 .should_quit = false,
+
+                .alloc = used_alloc,
         };
     }
 
@@ -313,6 +319,7 @@ static void tarasque_engine_frame_step_entities(tarasque_engine *handle, f32 ela
     }
 
     for (size_t i = 0u ; i < all_entities->length ; i++) {
+        handle->current_entity = all_entities->data[i];
         entity_step_frame(all_entities->data[i], elapsed_ms, handle);
     }
 
