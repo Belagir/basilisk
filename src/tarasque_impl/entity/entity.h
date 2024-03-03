@@ -38,7 +38,7 @@ void entity_destroy_children(entity *target, allocator alloc);
 // -------------------------------------------------------------------------------------------------
 
 /*  */
-entity *entity_get_child(entity *target, path *id_path);
+entity *entity_get_child(entity *target, const path *id_path);
 /*  */
 entity_range *entity_get_children(entity *target, allocator alloc);
 

@@ -69,7 +69,7 @@ typedef struct command_subscribe_to_event {
  */
 typedef struct command {
     command_flavor flavor;
-    entity *source;
+    const entity *source;
     union {
         command_remove_entity remove_entity;
         command_add_entity add_entity;
@@ -83,11 +83,11 @@ typedef struct command {
 // -------------------------------------------------------------------------------------------------
 
 /*  */
-command command_create_add_entity(entity *source, char *id_path, char *id, entity_template template, allocator alloc);
+command command_create_add_entity(const entity *source, const char *id_path, const char *id, entity_template template, allocator alloc);
 /*  */
-command command_create_remove_entity(entity *source, char *id_path, allocator alloc);
+command command_create_remove_entity(const entity *source, const char *id_path, allocator alloc);
 /*  */
-command command_create_subscribe_to_event(entity *source, char *id_path, allocator alloc);
+command command_create_subscribe_to_event(const entity *source, const char *id_path, allocator alloc);
 
 // -------------------------------------------------------------------------------------------------
 
@@ -110,6 +110,6 @@ void command_queue_append(command_queue *queue, command cmd, allocator alloc);
 /*  */
 command command_queue_pop_front(command_queue *queue);
 /*  */
-size_t command_queue_length(command_queue *queue);
+size_t command_queue_length(const command_queue *queue);
 
 #endif

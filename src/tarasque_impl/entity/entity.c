@@ -144,13 +144,13 @@ void entity_destroy_children(entity *target, allocator alloc)
  * @param id_path
  * @return
  */
-entity *entity_get_child(entity *target, path *id_path)
+entity *entity_get_child(entity *target, const path *id_path)
 {
     entity *visited_entity = NULL;
     size_t pos_next_entity = 0u;
     size_t pos_path = 0u;
     bool found_next_entity = false;
-    identifier **current_path_identifier = NULL;
+    identifier * const* current_path_identifier = NULL;
 
     if (!target) {
         return NULL;

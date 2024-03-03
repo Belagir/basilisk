@@ -27,7 +27,7 @@ typedef struct command_queue {
  * @param alloc
  * @return
  */
-command command_create_add_entity(entity *source, char *id_path, char *id, entity_template template, allocator alloc)
+command command_create_add_entity(const entity *source, const char *id_path, const char *id, entity_template template, allocator alloc)
 {
     command new_cmd = { 0u };
 
@@ -168,7 +168,7 @@ command command_queue_pop_front(command_queue *queue)
  * @param queue
  * @return
  */
-size_t command_queue_length(command_queue *queue)
+size_t command_queue_length(const command_queue *queue)
 {
     if (!queue || !queue->queue_impl) {
         return 0u;

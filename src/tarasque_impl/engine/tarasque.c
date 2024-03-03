@@ -145,7 +145,7 @@ void tarasque_engine_run(tarasque_engine *handle, int fps) {
  * @param str_id
  * @param
  */
-void tarasque_engine_add_entity(tarasque_engine *handle, char *str_path, char *str_id, entity_template template)
+void tarasque_engine_add_entity(tarasque_engine *handle, const char *str_path, const char *str_id, entity_template template)
 {
 
     if (!handle || !str_path || !str_id) {

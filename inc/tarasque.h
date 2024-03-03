@@ -45,6 +45,6 @@ void tarasque_engine_quit(tarasque_engine *handle);
 // -------------------------------------------------------------------------------------------------
 
 /*  */
-void tarasque_engine_add_entity(tarasque_engine *handle, char *str_path, char *str_id, entity_template template);
+void tarasque_engine_add_entity(tarasque_engine *handle, const char *str_path, const char *str_id, entity_template template);
 
 #endif
