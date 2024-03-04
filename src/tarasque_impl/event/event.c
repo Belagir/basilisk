@@ -21,6 +21,22 @@ typedef struct subscription {
 
 // -------------------------------------------------------------------------------------------------
 
+typedef struct event {
+    identifier *name;
+
+    size_t data_size;
+    void *data;
+} event;
+
+// -------------------------------------------------------------------------------------------------
+
+typedef struct event_stacked {
+    entity *source;
+    event ev;
+} event_stacked;
+
+// -------------------------------------------------------------------------------------------------
+
 /**
  * @brief
  *
@@ -28,6 +44,12 @@ typedef struct subscription {
 typedef struct event_broker {
     range(subscription) *subs;
 } event_broker;
+
+// -------------------------------------------------------------------------------------------------
+
+typedef struct event_stack {
+    range(event_stacked) *stack_impl;
+} event_stack;
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -87,6 +109,49 @@ void event_broker_destroy(event_broker **broker, allocator alloc)
     alloc.free(alloc, *broker);
 
     *broker = NULL;
+}
+
+// -------------------------------------------------------------------------------------------------
+
+/**
+ * @brief
+ *
+ * @param alloc
+ * @return
+ */
+event_stack *event_stack_create(allocator alloc)
+{
+    event_stack *new_stack = NULL;
+
+    new_stack = alloc.malloc(alloc, sizeof(*new_stack));
+
+    if (new_stack) {
+        *new_stack = (event_stack) {
+                .stack_impl = range_create_dynamic(alloc, sizeof(*(new_stack->stack_impl->data)), TARASQUE_COLLECTIONS_START_SIZE),
+        };
+    }
+
+    return new_stack;
+}
+
+/**
+ * @brief
+ *
+ * @param stack
+ * @param alloc
+ */
+void event_stack_destroy(event_stack **stack, allocator alloc)
+{
+    if (!stack || !*stack) {
+        return;
+    }
+
+    // TODO : destroy remaining events
+
+    range_destroy_dynamic(alloc, &range_to_any((*stack)->stack_impl));
+
+    alloc.free(alloc, *stack);
+    *stack = NULL;
 }
 
 // -------------------------------------------------------------------------------------------------

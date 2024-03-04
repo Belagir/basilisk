@@ -16,7 +16,7 @@
  */
 typedef struct tarasque_engine {
     command_queue *commands;
-    // TODO : event_stack *events;
+    event_stack *events;
     event_broker *pub_sub;
 
     entity *root_entity;
@@ -79,6 +79,7 @@ tarasque_engine *tarasque_engine_create(void)
     if (new_engine) {
         *new_engine = (tarasque_engine) {
                 .commands = command_queue_create(used_alloc),
+                .events = event_stack_create(used_alloc),
                 .pub_sub = event_broker_create(used_alloc),
 
                 .root_entity = entity_create(identifier_root, (entity_template) { 0u }, NULL, used_alloc),
@@ -111,7 +112,9 @@ void tarasque_engine_destroy(tarasque_engine **handle)
     used_alloc = (*handle)->alloc;
 
     event_broker_destroy(&(*handle)->pub_sub, used_alloc);
+    event_stack_destroy(&(*handle)->events, used_alloc);
     command_queue_destroy(&(*handle)->commands, used_alloc);
+
     entity_destroy_children((*handle)->root_entity, NULL, used_alloc);
     entity_destroy(&(*handle)->root_entity, NULL, used_alloc);
 

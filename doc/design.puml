@@ -151,9 +151,9 @@ package command {
 
 package event {
     struct engine_subscription as "subscription" {
-        + identifier *target_event_name
-        ..
         + entity *subscribed
+        ..
+        + identifier *target_event_name
         + {field} void (*callback)(void *entity_data, void *event_data)
         __
     }
@@ -190,8 +190,8 @@ package event {
     ' ------------------------------------------------------------------------------
 
     struct engine_event_stacked as "event_stacked" {
-        + event ev
         + entity *source
+        + event ev
         __
     }
     engine_event_stacked::source --o "0..1" engine_entity
