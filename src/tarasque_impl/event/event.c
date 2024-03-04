@@ -21,18 +21,9 @@ typedef struct subscription {
 
 // -------------------------------------------------------------------------------------------------
 
-typedef struct event {
-    identifier *name;
-
-    size_t data_size;
-    void *data;
-} event;
-
-// -------------------------------------------------------------------------------------------------
-
 typedef struct event_stacked {
     entity *source;
-    event ev;
+    event_copy ev;
 } event_stacked;
 
 // -------------------------------------------------------------------------------------------------
@@ -63,6 +54,14 @@ static void subscription_destroy(subscription *sub, allocator alloc);
 
 /* */
 static bool subscription_matches(subscription sub, const identifier *event_name, entity *subscribed, void (*callback)(void *entity_data, void *event_data));
+
+// -------------------------------------------------------------------------------------------------
+
+/* */
+static event_copy event_copy_create(const event source, allocator alloc);
+
+/* */
+static void event_copy_destroy(event_copy *ev, allocator alloc);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -146,7 +145,9 @@ void event_stack_destroy(event_stack **stack, allocator alloc)
         return;
     }
 
-    // TODO : destroy remaining events
+    for (size_t i = 0u ; i < (*stack)->stack_impl->length ; i++) {
+        event_copy_destroy(&(*stack)->stack_impl->data[i].ev, alloc);
+    }
 
     range_destroy_dynamic(alloc, &range_to_any((*stack)->stack_impl));
 
@@ -208,6 +209,47 @@ void event_broker_unsubscribe(event_broker *broker, entity *target, identifier *
             target_index += 1u;
         }
     }
+}
+
+/**
+ * @brief
+ *
+ * @param stack
+ * @param source
+ * @param ev
+ * @param alloc
+ */
+void event_stack_push(event_stack *stack, entity *source, event ev, allocator alloc)
+{
+    event_copy copy = { 0u };
+
+    if (!stack || !source || !ev.name) {
+        return;
+    }
+
+    copy = event_copy_create(ev, alloc);
+    stack->stack_impl = range_ensure_capacity(alloc, range_to_any(stack->stack_impl), 1);
+    range_insert_value(range_to_any(stack->stack_impl), stack->stack_impl->length, &copy);
+}
+
+/**
+ * @brief
+ *
+ * @param stack
+ * @return
+ */
+event_copy event_stack_pop(event_stack *stack)
+{
+    event_copy returned_event = { 0u };
+
+    if (!stack || (stack->stack_impl->length == 0u)) {
+        return (event_copy) { 0u };
+    }
+
+    returned_event = stack->stack_impl->data[stack->stack_impl->length - 1u].ev;
+    range_remove(range_to_any(stack->stack_impl), stack->stack_impl->length - 1u);
+
+    return returned_event;
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -276,4 +318,45 @@ static bool subscription_matches(subscription sub, const identifier *event_name,
     matches_callback = (!callback) || (callback == sub.callback);
 
     return matches_name && matches_entity && matches_callback;
+}
+
+/**
+ * @brief
+ *
+ * @param source
+ * @param alloc
+ * @return
+ */
+static event_copy event_copy_create(const event source, allocator alloc)
+{
+    event_copy copy = (event_copy) {
+            .name = range_create_dynamic_from_copy_of(alloc, range_to_any(source.name)),
+    };
+
+    if (source.data && (source.data_size > 0u)) {
+        copy.data = alloc.malloc(alloc, source.data_size);
+        bytewise_copy(copy.data, source.data, source.data_size);
+        copy.data_size = source.data_size;
+    }
+
+    return copy;
+}
+
+/**
+ * @brief
+ *
+ * @param ev
+ * @param alloc
+ */
+static void event_copy_destroy(event_copy *ev, allocator alloc)
+{
+    if (!ev) {
+        return;
+    }
+
+    if (ev->data) {
+        alloc.free(alloc, ev->data);
+    }
+
+    *ev = (event_copy) { 0u };
 }

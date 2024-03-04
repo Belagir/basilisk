@@ -189,13 +189,25 @@ package event {
 
     ' ------------------------------------------------------------------------------
 
+    struct engine_event_copy as "event_copy"  {
+        == typedef of ==
+        event
+        __
+        + event_copy event_copy_create(event template, allocator alloc)
+        + void event_copy_destroy(event_copy *template, allocator alloc)
+    }
+    note bottom of engine_event_copy : used to signal memory allocation
+    engine_event_copy <--> engine_event
+
+    ' ------------------------------------------------------------------------------
+
     struct engine_event_stacked as "event_stacked" {
         + entity *source
-        + event ev
+        + event_copy ev
         __
     }
     engine_event_stacked::source --o "0..1" engine_entity
-    engine_event_stacked::ev --* "1" engine_event
+    engine_event_stacked::ev --* "1" engine_event_copy
 
     ' ------------------------------------------------------------------------------
 
@@ -206,7 +218,7 @@ package event {
         + void event_stack_destroy(event_stack **stack, allocator alloc)
         ..
         + void event_stack_push(event_stack *stack, entity *source, event ev, allocator alloc)
-        + event event_stack_pop(event_stack *stack)
+        + engine_event_copy event_stack_pop(event_stack *stack)
     }
     engine_event_stack::stack --* "0..*" engine_event_stacked
 }
