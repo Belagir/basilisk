@@ -27,8 +27,6 @@ typedef struct event {
     void *data;
 } event;
 
-typedef event event_copy;
-
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -55,15 +53,24 @@ void event_broker_subscribe(event_broker *broker, entity *subscribed, identifier
 /*  */
 void event_broker_unsubscribe(event_broker *broker, entity *target, identifier *target_event_name, void (*callback)(void *entity_data, void *event_data), allocator alloc);
 
+/*  */
+void event_broker_publish(event_broker *broker, event ev);
+
 // -------------------------------------------------------------------------------------------------
 
 /*  */
-void event_stack_push(event_stack *stack, entity *source, event ev, allocator alloc);
+void event_stack_push(event_stack *stack, entity *source, const char *str_event_name, size_t event_data_size, const void *event_data, allocator alloc);
 
 /*  */
-event_copy event_stack_pop(event_stack *stack);
+event event_stack_pop(event_stack *stack);
 
 /*  */
-void event_stack_remove_events_from(event_stack *stack, entity *source, allocator alloc);
+void event_stack_remove_events_of(event_stack *stack, entity *source, allocator alloc);
+
+/*  */
+size_t event_stack_length(const event_stack *stack);
+
+/* */
+void event_destroy(event *ev, allocator alloc);
 
 #endif

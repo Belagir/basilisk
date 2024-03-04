@@ -42,6 +42,8 @@ static void tarasque_engine_process_command_remove_entity(tarasque_engine *handl
 /*  */
 static void tarasque_engine_process_command_subscribe_to_event(tarasque_engine *handle, command_subscribe_to_event cmd);
 
+static void tarasque_engine_process_event(tarasque_engine *handle, event processed_event);
+
 /*  */
 static void tarasque_engine_frame_step_entities(tarasque_engine *handle, f32 elapsed_time);
 
@@ -145,6 +147,10 @@ void tarasque_engine_run(tarasque_engine *handle, int fps) {
             tarasque_engine_process_command(handle, command_queue_pop_front(handle->commands));
         }
 
+        while (event_stack_length(handle->events) > 0u) {
+            tarasque_engine_process_event(handle, event_stack_pop(handle->events));
+        }
+
         tarasque_engine_frame_step_entities(handle, (f32) frame_delay);
 
         (void) nanosleep(&(struct timespec) { .tv_nsec = (long) (frame_delay * 1000000.f) }, NULL);
@@ -210,6 +216,31 @@ void tarasque_engine_subscribe_to_event(tarasque_engine *handle,  const char *st
     // TODO : log failure to create command
 }
 
+/**
+ * @brief
+ *
+ * @param handle
+ * @param str_event_name
+ * @param event_data_size
+ * @param event_data
+ * @param is_detached
+ */
+void tarasque_engine_stack_event(tarasque_engine *handle, const char *str_event_name, size_t event_data_size, void *event_data, bool is_detached)
+{
+    entity *source_entity = NULL;
+
+    if (!handle || !str_event_name) {
+        // TODO : log failure
+        return;
+    }
+
+    if (!is_detached) {
+        source_entity = handle->current_entity;
+    }
+
+    event_stack_push(handle->events, source_entity, str_event_name, event_data_size, event_data, handle->alloc);
+}
+
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -253,12 +284,14 @@ static void tarasque_engine_full_destroy_entity(tarasque_engine *handle, entity 
 
     all_children = entity_get_children(target, handle->alloc);
     for (size_t i = 0u ; i < all_children->length ; i++) {
-        command_queue_remove_commands_of(handle->commands, (all_children->data[i]), handle->alloc);
-        event_broker_unsubscribe(handle->pub_sub, (all_children->data[i]), NULL, NULL, handle->alloc);
+        event_stack_remove_events_of(handle->events, all_children->data[i], handle->alloc);
+        command_queue_remove_commands_of(handle->commands, all_children->data[i], handle->alloc);
+        event_broker_unsubscribe(handle->pub_sub, all_children->data[i], NULL, NULL, handle->alloc);
         entity_destroy(&(all_children->data[i]), handle, handle->alloc);
     }
     range_destroy_dynamic(handle->alloc, &range_to_any(all_children));
 
+    event_stack_remove_events_of(handle->events, target, handle->alloc);
     command_queue_remove_commands_of(handle->commands, target, handle->alloc);
     event_broker_unsubscribe(handle->pub_sub, target, NULL, NULL, handle->alloc);
     entity_destroy(&target, handle, handle->alloc);
@@ -368,6 +401,23 @@ static void tarasque_engine_process_command_subscribe_to_event(tarasque_engine *
     }
 
     event_broker_subscribe(handle->pub_sub, cmd.subscribed, cmd.target_event_name, cmd.callback, handle->alloc);
+}
+
+/**
+ * @brief
+ *
+ * @param handle
+ * @param processed_event
+ */
+static void tarasque_engine_process_event(tarasque_engine *handle, event processed_event)
+{
+    if (!handle) {
+        return;
+    }
+
+    // ...
+
+    event_destroy(&processed_event, handle->alloc);
 }
 
 /**

@@ -9,13 +9,15 @@ static void dummy_entity_deinit(void *data, tarasque_engine *handle);
 static void dummy_entity_step(void *data, float elapsed_ms, tarasque_engine *handle);
 
 static void dummy_entity_on_shout(void *data_dummy, void *data_shout) {
-    printf("heard a shout ......\n");
+    printf("%d heard a shout : %d ......\n", *(int *) data_dummy, *(int *) data_shout);
 }
 
 static void dummy_entity_init(void *data, tarasque_engine *handle) {
     printf("dummy n°%d initialized !\n", *(int *) data);
     tarasque_engine_subscribe_to_event(handle, "shout", &dummy_entity_on_shout);
-    tarasque_engine_remove_entity(handle, "");
+    if (*(int *) data == 2) {
+        tarasque_engine_stack_event(handle, "shout", sizeof(int), &(int) { 42 }, false);
+    }
 }
 
 static void dummy_entity_deinit(void *data, tarasque_engine *handle) {
