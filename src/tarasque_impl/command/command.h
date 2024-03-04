@@ -69,7 +69,7 @@ typedef struct command_subscribe_to_event {
  */
 typedef struct command {
     command_flavor flavor;
-    const entity *source;
+    entity *source;
     union {
         command_remove_entity remove_entity;
         command_add_entity add_entity;
@@ -83,9 +83,9 @@ typedef struct command {
 // -------------------------------------------------------------------------------------------------
 
 /*  */
-command command_create_add_entity(const entity *source, const char *id_path, const char *id, entity_template template, allocator alloc);
+command command_create_add_entity(entity *source, const char *id_path, const char *id, entity_template template, allocator alloc);
 /*  */
-command command_create_remove_entity(const entity *source, const char *id_path, allocator alloc);
+command command_create_remove_entity(entity *source, const char *id_path, allocator alloc);
 /*  */
 command command_create_subscribe_to_event(entity *source, const char *event_name, void (*callback)(void *entity_data, void *event_data), allocator alloc);
 

@@ -13,9 +13,9 @@
  *
  */
 typedef struct subscription {
-    identifier *target_event_name;
-
     entity *subscribed;
+
+    identifier *target_event_name;
     void (*callback)(void *entity_data, void *event_data);
 } subscription;
 
@@ -26,7 +26,7 @@ typedef struct subscription {
  *
  */
 typedef struct event_broker {
-    range(subscription *) *subs;
+    range(subscription) *subs;
 } event_broker;
 
 // -------------------------------------------------------------------------------------------------
@@ -34,13 +34,13 @@ typedef struct event_broker {
 // -------------------------------------------------------------------------------------------------
 
 /*  */
-static subscription *subscription_create(entity *subscribed, identifier *target_event_name, void (*callback)(void *entity_data, void *event_data), allocator alloc);
+static subscription subscription_create(entity *subscribed, identifier *target_event_name, void (*callback)(void *entity_data, void *event_data), allocator alloc);
 
 /*  */
-static void subscription_destroy(subscription **sub, allocator alloc);
+static void subscription_destroy(subscription *sub, allocator alloc);
 
 /* */
-static bool subscription_matches(subscription *sub, const identifier *event_name, entity *subscribed, void (*callback)(void *entity_data, void *event_data));
+static bool subscription_matches(subscription sub, const identifier *event_name, entity *subscribed, void (*callback)(void *entity_data, void *event_data));
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -102,18 +102,15 @@ void event_broker_destroy(event_broker **broker, allocator alloc)
  */
 void event_broker_subscribe(event_broker *broker, entity *subscribed, identifier *target_event_name, void (*callback)(void *entity_data, void *event_data), allocator alloc)
 {
-    subscription *new_sub = NULL;
+    subscription new_sub = { 0u };
 
     if (!broker) {
         return;
     }
 
     new_sub = subscription_create(subscribed, target_event_name, callback, alloc);
-
-    if (new_sub) {
-        broker->subs = range_ensure_capacity(alloc, range_to_any(broker->subs), 1);
-        sorted_range_insert_in(range_to_any(broker->subs), &identifier_compare_tripleref, &new_sub);
-    }
+    broker->subs = range_ensure_capacity(alloc, range_to_any(broker->subs), 1);
+    sorted_range_insert_in(range_to_any(broker->subs), &identifier_compare_tripleref, &new_sub);
 }
 
 /**
@@ -128,17 +125,16 @@ void event_broker_subscribe(event_broker *broker, entity *subscribed, identifier
 void event_broker_unsubscribe(event_broker *broker, entity *target, identifier *target_event_name, void (*callback)(void *entity_data, void *event_data), allocator alloc)
 {
     size_t target_index = 0u;
-    identifier **searched_event_name = &target_event_name;
 
     if (!broker || !target) {
         return;
     }
 
-    if (!sorted_range_find_in(range_to_any(broker->subs), &identifier_compare_tripleref, &searched_event_name, &target_index)) {
+    if (!sorted_range_find_in(range_to_any(broker->subs), &identifier_compare_tripleref, &target, &target_index)) {
         return;
     }
 
-    while ((target_index < broker->subs->length) && (broker->subs->data[target_index]->subscribed == target)) {
+    while ((target_index < broker->subs->length) && (broker->subs->data[target_index].subscribed == target)) {
 
         if (subscription_matches(broker->subs->data[target_index], target_event_name, target, callback)) {
             subscription_destroy(broker->subs->data + target_index, alloc);
@@ -162,23 +158,19 @@ void event_broker_unsubscribe(event_broker *broker, entity *target, identifier *
  * @param alloc
  * @return
  */
-static subscription *subscription_create(entity *subscribed, identifier *target_event_name, void (*callback)(void *entity_data, void *event_data), allocator alloc)
+static subscription subscription_create(entity *subscribed, identifier *target_event_name, void (*callback)(void *entity_data, void *event_data), allocator alloc)
 {
-    subscription *new_sub = NULL;
+    subscription new_sub = { 0u };
 
     if (!subscribed || !target_event_name || !callback) {
-        return NULL;
+        return (subscription) { 0u };
     }
 
-    new_sub = alloc.malloc(alloc, sizeof(*new_sub));
-
-    if (new_sub) {
-        *new_sub = (subscription) {
-                .target_event_name = range_create_dynamic_from_copy_of(alloc, range_to_any(target_event_name)),
-                .subscribed = subscribed,
-                .callback = callback,
-        };
-    }
+    new_sub = (subscription) {
+            .target_event_name = range_create_dynamic_from_copy_of(alloc, range_to_any(target_event_name)),
+            .subscribed = subscribed,
+            .callback = callback,
+    };
 
     return new_sub;
 }
@@ -189,16 +181,14 @@ static subscription *subscription_create(entity *subscribed, identifier *target_
  * @param sub
  * @param alloc
  */
-static void subscription_destroy(subscription **sub, allocator alloc)
+static void subscription_destroy(subscription *sub, allocator alloc)
 {
-    if (!sub || !*sub) {
+    if (!sub) {
         return;
     }
 
-    range_destroy_dynamic(alloc, &range_to_any((*sub)->target_event_name));
-
-    alloc.free(alloc, *sub);
-    *sub = NULL;
+    range_destroy_dynamic(alloc, &range_to_any(sub->target_event_name));
+    *sub = (subscription) { 0u };
 }
 
 /**
@@ -210,19 +200,15 @@ static void subscription_destroy(subscription **sub, allocator alloc)
  * @param callback
  * @return
  */
-static bool subscription_matches(subscription *sub, const identifier *event_name, entity *subscribed, void (*callback)(void *entity_data, void *event_data))
+static bool subscription_matches(subscription sub, const identifier *event_name, entity *subscribed, void (*callback)(void *entity_data, void *event_data))
 {
     bool matches_name     = false;
     bool matches_entity   = false;
     bool matches_callback = false;
 
-    if (!sub) {
-        return false;
-    }
-
-    matches_name     = (!event_name) || (identifier_compare(event_name, sub->target_event_name) == 0);
-    matches_entity   = (!subscribed) || (subscribed == sub->subscribed);
-    matches_callback = (!callback) || (callback == sub->callback);
+    matches_name     = (!event_name) || (identifier_compare(event_name, sub.target_event_name) == 0);
+    matches_entity   = (!subscribed) || (subscribed == sub.subscribed);
+    matches_callback = (!callback) || (callback == sub.callback);
 
     return matches_name && matches_entity && matches_callback;
 }

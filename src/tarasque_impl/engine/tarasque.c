@@ -36,9 +36,9 @@ static void tarasque_engine_full_destroy_entity(tarasque_engine *handle, entity 
 /*  */
 static void tarasque_engine_process_command(tarasque_engine *handle, command cmd);
 /*  */
-static void tarasque_engine_process_command_add_entity(tarasque_engine *handle, command_add_entity cmd);
+static void tarasque_engine_process_command_add_entity(tarasque_engine *handle, entity *subject, command_add_entity cmd);
 /*  */
-static void tarasque_engine_process_command_remove_entity(tarasque_engine *handle, command_remove_entity cmd);
+static void tarasque_engine_process_command_remove_entity(tarasque_engine *handle, entity *subject, command_remove_entity cmd);
 /*  */
 static void tarasque_engine_process_command_subscribe_to_event(tarasque_engine *handle, command_subscribe_to_event cmd);
 
@@ -240,12 +240,24 @@ tarasque_engine *tarasque_engine_for(tarasque_engine *handle, entity *current_en
  */
 static void tarasque_engine_full_destroy_entity(tarasque_engine *handle, entity *target)
 {
-    command_queue_remove_commands_of(handle->commands, target, handle->alloc);
-    event_broker_unsubscribe(handle->pub_sub, target, NULL, NULL, handle->alloc);
+    entity_range *all_children = NULL;
+
+    if (!handle || !target) {
+        return;
+    }
 
     entity_deparent(target);
-    entity_destroy_children(target, handle, handle->alloc);
 
+    all_children = entity_get_children(target, handle->alloc);
+    for (size_t i = 0u ; i < all_children->length ; i++) {
+        command_queue_remove_commands_of(handle->commands, (all_children->data[i]), handle->alloc);
+        event_broker_unsubscribe(handle->pub_sub, (all_children->data[i]), NULL, NULL, handle->alloc);
+        entity_destroy(&(all_children->data[i]), handle, handle->alloc);
+    }
+    range_destroy_dynamic(handle->alloc, &range_to_any(all_children));
+
+    command_queue_remove_commands_of(handle->commands, target, handle->alloc);
+    event_broker_unsubscribe(handle->pub_sub, target, NULL, NULL, handle->alloc);
     entity_destroy(&target, handle, handle->alloc);
 }
 
@@ -257,17 +269,23 @@ static void tarasque_engine_full_destroy_entity(tarasque_engine *handle, entity 
  */
 static void tarasque_engine_process_command(tarasque_engine *handle, command cmd)
 {
+    entity *subject = NULL;
+
     if (!handle) {
         return;
     }
 
-    switch (cmd.flavor)
-    {
+    subject = cmd.source;
+    if (!subject) {
+        subject = handle->root_entity;
+    }
+
+    switch (cmd.flavor) {
     case COMMAND_ADD_ENTITY:
-        tarasque_engine_process_command_add_entity(handle, cmd.specific.add_entity);
+        tarasque_engine_process_command_add_entity(handle, subject, cmd.specific.add_entity);
         break;
     case COMMAND_REMOVE_ENTITY:
-        tarasque_engine_process_command_remove_entity(handle, cmd.specific.remove_entity);
+        tarasque_engine_process_command_remove_entity(handle, subject, cmd.specific.remove_entity);
         break;
     case COMMAND_SUBSCRIBE_TO_EVENT:
         tarasque_engine_process_command_subscribe_to_event(handle, cmd.specific.subscribe_to_event);
@@ -285,7 +303,7 @@ static void tarasque_engine_process_command(tarasque_engine *handle, command cmd
  * @param handle
  * @param cmd
  */
-static void tarasque_engine_process_command_add_entity(tarasque_engine *handle, command_add_entity cmd)
+static void tarasque_engine_process_command_add_entity(tarasque_engine *handle, entity *subject, command_add_entity cmd)
 {
     entity *new_entity = NULL;
     entity *found_parent = NULL;
@@ -294,7 +312,7 @@ static void tarasque_engine_process_command_add_entity(tarasque_engine *handle, 
         return;
     }
 
-    found_parent = entity_get_child(handle->root_entity, cmd.id_path);
+    found_parent = entity_get_child(subject, cmd.id_path);
 
     if (found_parent) {
         // TODO : enforce unique entity identifier among children
@@ -311,7 +329,7 @@ static void tarasque_engine_process_command_add_entity(tarasque_engine *handle, 
  * @param handle
  * @param cmd
  */
-static void tarasque_engine_process_command_remove_entity(tarasque_engine *handle, command_remove_entity cmd)
+static void tarasque_engine_process_command_remove_entity(tarasque_engine *handle, entity *subject, command_remove_entity cmd)
 {
     entity *found_entity = NULL;
 
@@ -319,13 +337,19 @@ static void tarasque_engine_process_command_remove_entity(tarasque_engine *handl
         return;
     }
 
-    found_entity = entity_get_child(handle->root_entity, cmd.id_path);
+    found_entity = entity_get_child(subject, cmd.id_path);
 
-    if (found_entity) {
-        tarasque_engine_full_destroy_entity(handle, found_entity);
-    } else {
+    if (found_entity == handle->root_entity) {
         // TODO : log failure
+        return;
     }
+
+    if (!found_entity) {
+        // TODO : log failure
+        return;
+    }
+
+    tarasque_engine_full_destroy_entity(handle, found_entity);
 }
 
 /**

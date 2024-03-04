@@ -3,6 +3,11 @@
 
 #include <tarasque.h>
 
+static void dummy_entity_on_shout(void *data_dummy, void *data_shout);
+static void dummy_entity_init(void *data, tarasque_engine *handle);
+static void dummy_entity_deinit(void *data, tarasque_engine *handle);
+static void dummy_entity_step(void *data, float elapsed_ms, tarasque_engine *handle);
+
 static void dummy_entity_on_shout(void *data_dummy, void *data_shout) {
     printf("heard a shout ......\n");
 }
@@ -10,6 +15,7 @@ static void dummy_entity_on_shout(void *data_dummy, void *data_shout) {
 static void dummy_entity_init(void *data, tarasque_engine *handle) {
     printf("dummy n°%d initialized !\n", *(int *) data);
     tarasque_engine_subscribe_to_event(handle, "shout", &dummy_entity_on_shout);
+    tarasque_engine_remove_entity(handle, "");
 }
 
 static void dummy_entity_deinit(void *data, tarasque_engine *handle) {
@@ -35,28 +41,6 @@ static void dummy_setup(tarasque_engine *handle) {
             .on_deinit = &dummy_entity_deinit,
             .on_frame  = &dummy_entity_step
     });
-    tarasque_engine_add_entity(handle, "1/2", "3", (entity_template) {
-            .data      = &(int) { 3 },
-            .data_size = sizeof(int),
-            .on_init   = &dummy_entity_init,
-            .on_deinit = &dummy_entity_deinit,
-            .on_frame  = &dummy_entity_step
-    });
-    tarasque_engine_add_entity(handle, "1", "4", (entity_template) {
-            .data      = &(int) { 4 },
-            .data_size = sizeof(int),
-            .on_init   = &dummy_entity_init,
-            .on_deinit = &dummy_entity_deinit,
-            .on_frame  = &dummy_entity_step
-    });
-    tarasque_engine_add_entity(handle, "1/2/3", "5", (entity_template) {
-            .data      = &(int) { 5 },
-            .data_size = sizeof(int),
-            .on_init   = &dummy_entity_init,
-            .on_deinit = &dummy_entity_deinit,
-            .on_frame  = &dummy_entity_step
-    });
-    tarasque_engine_remove_entity(handle, "1/2/3");
 }
 
 int main(void)
