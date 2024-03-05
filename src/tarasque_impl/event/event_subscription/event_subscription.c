@@ -7,26 +7,6 @@
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-/**
- * @brief
- *
- */
-typedef struct event_subscription { entity *subscribed; void (*callback)(void *entity_data, void *event_data); } event_subscription;
-
-/**
- * @brief
- *
- */
-typedef struct event_subscription_list{
-    identifier *event_name;
-
-    range(event_subscription) *subscription_list;
-} event_subscription_list;
-
-// -------------------------------------------------------------------------------------------------
-// -------------------------------------------------------------------------------------------------
-// -------------------------------------------------------------------------------------------------
-
 static i32 event_subscription_compare(const void *lhs, const void *rhs);
 
 // -------------------------------------------------------------------------------------------------
@@ -40,22 +20,18 @@ static i32 event_subscription_compare(const void *lhs, const void *rhs);
  * @param alloc
  * @return
  */
-event_subscription_list *event_subscription_list_create(identifier *event_name, allocator alloc)
+event_subscription_list event_subscription_list_create(identifier *event_name, allocator alloc)
 {
-    event_subscription_list *new_list = NULL;
+    event_subscription_list new_list = { 0u };
 
     if (!event_name) {
-        return NULL;
+        return (event_subscription_list) { 0u };
     }
 
-    new_list = alloc.malloc(alloc, sizeof(*new_list));
-
-    if (new_list) {
-        *new_list = (event_subscription_list) {
+    new_list = (event_subscription_list) {
             .event_name = range_create_dynamic_from_copy_of(alloc, range_to_any(event_name)),
-            .subscription_list = range_create_dynamic(alloc, sizeof(*(new_list->subscription_list->data)), TARASQUE_COLLECTIONS_START_SIZE),
-        };
-    }
+            .subscription_list = range_create_dynamic(alloc, sizeof(*(new_list.subscription_list->data)), TARASQUE_COLLECTIONS_START_SIZE),
+    };
 
     return new_list;
 }
@@ -66,17 +42,16 @@ event_subscription_list *event_subscription_list_create(identifier *event_name, 
  * @param list
  * @param alloc
  */
-void event_subscription_list_destroy(event_subscription_list **list, allocator alloc)
+void event_subscription_list_destroy(event_subscription_list *list, allocator alloc)
 {
-    if (!list || !*list) {
+    if (!list) {
         return;
     }
 
-    range_destroy_dynamic(alloc, &range_to_any((*list)->event_name));
-    range_destroy_dynamic(alloc, &range_to_any((*list)->subscription_list));
+    range_destroy_dynamic(alloc, &range_to_any(list->event_name));
+    range_destroy_dynamic(alloc, &range_to_any(list->subscription_list));
 
-    alloc.free(alloc, *list);
-    *list = NULL;
+    *list = (event_subscription_list) { 0u };
 }
 
 // -------------------------------------------------------------------------------------------------

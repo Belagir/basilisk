@@ -10,18 +10,31 @@
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-/*  */
-typedef struct event_subscription_list event_subscription_list;
+/**
+ * @brief
+ *
+ */
+typedef struct event_subscription { entity *subscribed; void (*callback)(void *entity_data, void *event_data); } event_subscription;
+
+/**
+ * @brief
+ *
+ */
+typedef struct event_subscription_list{
+    identifier *event_name;
+
+    range(event_subscription) *subscription_list;
+} event_subscription_list;
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
 /*  */
-event_subscription_list *event_subscription_list_create(identifier *event_name, allocator alloc);
+event_subscription_list event_subscription_list_create(identifier *event_name, allocator alloc);
 
 /*  */
-void event_subscription_list_destroy(event_subscription_list **list, allocator alloc);
+void event_subscription_list_destroy(event_subscription_list *list, allocator alloc);
 
 // -------------------------------------------------------------------------------------------------
 
