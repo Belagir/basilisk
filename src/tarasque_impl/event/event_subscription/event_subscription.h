@@ -47,7 +47,7 @@ void event_subscription_list_remove(event_subscription_list *list, entity *subsc
 // -------------------------------------------------------------------------------------------------
 
 /*  */
-void event_subscription_list_publish(event_subscription_list *list, event *ev);
+void event_subscription_list_publish(event_subscription_list *list, event ev);
 
 /*  */
 size_t event_subscription_list_length(const event_subscription_list *list);

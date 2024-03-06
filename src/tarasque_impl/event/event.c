@@ -142,10 +142,19 @@ void event_stack_destroy(event_stack **stack, allocator alloc)
  */
 void event_broker_subscribe(event_broker *broker, entity *subscribed, identifier *target_event_name, void (*callback)(void *entity_data, void *event_data), allocator alloc)
 {
+    size_t list_pos = 0u;
+    event_subscription_list created_list = { 0u };
+
     if (!broker) {
         return;
     }
 
+    if (!sorted_range_find_in(range_to_any(broker->subs), &identifier_compare, &target_event_name, &list_pos)) {
+        created_list = event_subscription_list_create(target_event_name, alloc);
+        list_pos = sorted_range_insert_in(range_to_any(broker->subs), &identifier_compare, &created_list);
+    }
+
+    event_subscription_list_append(broker->subs->data + list_pos, subscribed, callback);
 }
 
 /**
@@ -159,11 +168,37 @@ void event_broker_subscribe(event_broker *broker, entity *subscribed, identifier
  */
 void event_broker_unsubscribe(event_broker *broker, entity *target, identifier *target_event_name, void (*callback)(void *entity_data, void *event_data), allocator alloc)
 {
-    if (!broker || !target) {
+    size_t list_pos = 0u;
+
+    if (!broker || !target || !target_event_name || !callback) {
         return;
     }
 
+    if (sorted_range_find_in(range_to_any(broker->subs), &identifier_compare, &target_event_name, &list_pos)) {
+        event_subscription_list_remove(broker->subs->data + list_pos, target, callback);
+    }
 }
+
+/**
+ * @brief
+ *
+ * @param broker
+ * @param ev
+ */
+void event_broker_publish(event_broker *broker, event ev)
+{
+    size_t list_pos = 0u;
+
+    if (!broker) {
+        return;
+    }
+
+    if (sorted_range_find_in(range_to_any(broker->subs), &identifier_compare, &(ev.name), &list_pos)) {
+        // event_subscription_list_publish(broker->subs->data + list_pos, ev);
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
 
 /**
  * @brief
