@@ -44,7 +44,7 @@ entity *entity_create(const identifier *id, entity_core_copy template, tarasque_
                 .id = range_create_dynamic_from_copy_of(alloc, range_to_any(id)),
                 .parent = NULL,
                 .children = range_create_dynamic(alloc, sizeof(*new_entity->children->data), TARASQUE_COLLECTIONS_START_SIZE),
-                .template = entity_template_copy_create(template, alloc),
+                .template = entity_core_copy_create(template, alloc),
         };
 
         if (new_entity->template.on_init) {
@@ -73,7 +73,7 @@ void entity_destroy(entity **target, tarasque_engine *handle, allocator alloc)
 
     range_destroy_dynamic(alloc, &range_to_any((*target)->children));
     range_destroy_dynamic(alloc, &range_to_any((*target)->id));
-    entity_template_copy_destroy(&(*target)->template, alloc);
+    entity_core_copy_destroy(&(*target)->template, alloc);
 
     alloc.free(alloc, *target);
     *target = NULL;
@@ -253,7 +253,7 @@ void entity_send_event(entity *target, void (*callback)(void *entity_data, void 
  * @param alloc
  * @return
  */
-entity_core_copy entity_template_copy_create(entity_core template, allocator alloc)
+entity_core_copy entity_core_copy_create(entity_core template, allocator alloc)
 {
     entity_core_copy copy = {
             .on_init = template.on_init,
@@ -276,7 +276,7 @@ entity_core_copy entity_template_copy_create(entity_core template, allocator all
  * @param
  * @param alloc
  */
-void entity_template_copy_destroy(entity_core_copy *template, allocator alloc)
+void entity_core_copy_destroy(entity_core_copy *template, allocator alloc)
 {
     if (!template) {
         return;

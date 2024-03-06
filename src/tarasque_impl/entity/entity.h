@@ -55,8 +55,8 @@ void entity_send_event(entity *target, void (*callback)(void *entity_data, void 
 // -------------------------------------------------------------------------------------------------
 
 /*  */
-entity_core_copy entity_template_copy_create(entity_core template, allocator alloc);
+entity_core_copy entity_core_copy_create(entity_core template, allocator alloc);
 /*  */
-void entity_template_copy_destroy(entity_core_copy *template, allocator alloc);
+void entity_core_copy_destroy(entity_core_copy *template, allocator alloc);
 
 #endif

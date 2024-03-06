@@ -1,4 +1,13 @@
-
+/**
+ * @file command.h
+ * @author gabriel ()
+ * @brief Header to access an interface to manages commands carrying information to modify the engine instance's data.
+ * @version 0.1
+ * @date 2024-03-06
+ *
+ * @copyright Copyright (c) 2024
+ *
+ */
 #ifndef __COMMAND_H__
 #define __COMMAND_H__
 
@@ -9,7 +18,7 @@
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-/*  */
+/* Opaque type to a FIFO collection of command objects. */
 typedef struct command_queue command_queue;
 
 // -------------------------------------------------------------------------------------------------
@@ -17,14 +26,13 @@ typedef struct command_queue command_queue;
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief
- *
+ * @brief Possible types of commands that exist.
  */
 typedef enum command_flavor {
-    COMMAND_INVALID,
-    COMMAND_ADD_ENTITY,
-    COMMAND_REMOVE_ENTITY,
-    COMMAND_SUBSCRIBE_TO_EVENT,
+    COMMAND_INVALID,                /// flags an error value
+    COMMAND_ADD_ENTITY,             /// flags a command to add an entity
+    COMMAND_REMOVE_ENTITY,          /// flags a command to remove an entity
+    COMMAND_SUBSCRIBE_TO_EVENT,     /// flags a command to subscribe an entity to an event
 } command_flavor;
 
 // -------------------------------------------------------------------------------------------------

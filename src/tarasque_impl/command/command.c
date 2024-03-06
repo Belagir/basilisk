@@ -41,7 +41,7 @@ command command_create_add_entity(entity *source, const char *id_path, const cha
             .specific.add_entity = {
                     .id = identifier_from_cstring(id, alloc),
                     .id_path = path_from_cstring(id_path, alloc),
-                    .template = entity_template_copy_create(template, alloc),
+                    .template = entity_core_copy_create(template, alloc),
              },
     };
 
@@ -122,7 +122,7 @@ void command_destroy(command *cmd, allocator alloc)
     case COMMAND_ADD_ENTITY:
         range_destroy_dynamic(alloc, &range_to_any(cmd->specific.add_entity.id));
         path_destroy(&(cmd->specific.add_entity.id_path), alloc);
-        entity_template_copy_destroy(&(cmd->specific.add_entity.template), alloc);
+        entity_core_copy_destroy(&(cmd->specific.add_entity.template), alloc);
         break;
 
     case COMMAND_REMOVE_ENTITY:
