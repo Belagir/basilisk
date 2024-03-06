@@ -44,10 +44,7 @@ identifier *identifier_from_cstring(const char *str, allocator alloc)
     }
 
     new_identifier = range_create_dynamic_from(alloc, sizeof(*str), str_length, str_length, str);
-    is_id_allowed = (range_count(range_to_any(new_identifier), &identifier_compare_character, &(const char) { ' ' },  0u) == 0u)
-                 && (range_count(range_to_any(new_identifier), &identifier_compare_character, &(const char) { '\t' }, 0u) == 0u)
-                 && (range_count(range_to_any(new_identifier), &identifier_compare_character, &(const char) { '/' },  0u) == 0u)
-                 && (range_count(range_to_any(new_identifier), &identifier_compare_character, &(const char) { '\n' }, 0u) == 0u);
+    is_id_allowed = (range_count(range_to_any(new_identifier), &identifier_compare_character, &(const char) { '/' },  0u) == 0u);
 
     return new_identifier;
 }

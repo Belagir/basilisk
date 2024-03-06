@@ -2,7 +2,7 @@
  * @file tarasque.h
  * @author gabriel ()
  * @brief This is the main header containing the interface to the tarasque engine. This is normally
- * all the user needs to create an instance of the engine, add entities and organize interaction
+ * all the user needs to create an instance of the engine, add entities and organize interactions
  * between them.
  *
  * @version 0.1
@@ -20,7 +20,7 @@
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-/* Opaque type of an engine handle. Those are used to carray around references to the engine's data. */
+/* Opaque type of an engine handle. Those are used to carry around references to the engine's data. */
 typedef struct tarasque_engine tarasque_engine;
 
 // -------------------------------------------------------------------------------------------------
@@ -35,11 +35,11 @@ typedef struct entity_core {
     functions that take the containing struct type. */
     void *data;
 
-    /** Function ran on the entity-specific data by the engine when it is first created. */
+    /** Function ran on the entity-specific data when it is first created. */
     void (*on_init)(void *entity_data, tarasque_engine *handle);
-    /** Function ran on the entity-specific data by the engine when it is destroyed. */
+    /** Function ran on the entity-specific data when it is destroyed. */
     void (*on_deinit)(void *entity_data, tarasque_engine *handle);
-    /** Function ran on the entity-specific data by the engine each frame. */
+    /** Function ran on the entity-specific data each frame. */
     void (*on_frame)(void *entity_data, float elapsed_ms, tarasque_engine *handle);
 } entity_core;
 
@@ -62,14 +62,14 @@ void tarasque_engine_quit(tarasque_engine *handle);
 
 // -------------------------------------------------------------------------------------------------
 
-/* From an entity, adds a pending command to add another entity to the game tree. */
+/* From an entity callback or not, adds a pending command to add another entity to the game tree. */
 void tarasque_engine_add_entity(tarasque_engine *handle, const char *str_path, const char *str_id, entity_core template);
-/* From an entity, adds a pending operation to remove an entity from the game tree. */
+/* From an entity callback or not, adds a pending operation to remove an entity from the game tree. */
 void tarasque_engine_remove_entity(tarasque_engine *handle, const char *str_path);
 
-/* From an entity, adds a pending operation to subscribe a callback to an event by the event's name. */
-void tarasque_engine_subscribe_to_event(tarasque_engine *handle, const char *str_id, void (*callback)(void *entity_data, void *event_data));
-/* From an entity, or detached from it, send an event to subscribed entities. */
+/* From an entity callback and only, adds a pending operation to subscribe a callback to an event by the event's name. */
+void tarasque_engine_subscribe_to_event(tarasque_engine *handle, const char *str_event_name, void (*callback)(void *entity_data, void *event_data));
+/* From an entity or not, detached from it or not, sends an event to subscribed entities. */
 void tarasque_engine_stack_event(tarasque_engine *handle, const char *str_event_name, size_t event_data_size, void *event_data, bool is_detached);
 
 #endif
