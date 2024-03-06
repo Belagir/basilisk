@@ -68,7 +68,7 @@ void tarasque_engine_add_entity(tarasque_engine *handle, const char *str_path, c
 void tarasque_engine_remove_entity(tarasque_engine *handle, const char *str_path);
 
 /* From an entity, adds a pending operation to subscribe a callback to an event by the event's name. */
-void tarasque_engine_subscribe_to_event(tarasque_engine *handle, const char *str_id, void (*callback)(void *entity_data, void *event_data));
+void tarasque_engine_subscribe_to_event(tarasque_engine *handle, const char *str_event_name, void (*callback)(void *entity_data, void *event_data));
 /* From an entity, or detached from it, send an event to subscribed entities. */
 void tarasque_engine_stack_event(tarasque_engine *handle, const char *str_event_name, size_t event_data_size, void *event_data, bool is_detached);
 
