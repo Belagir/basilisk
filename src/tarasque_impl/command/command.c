@@ -1,3 +1,13 @@
+/**
+ * @file command.c
+ * @author gabriel
+ * @brief Implementation file for all that is related to commands sent to the engine.
+ * @version 0.1
+ * @date 2024-03-06
+ *
+ * @copyright Copyright (c) 2024
+ *
+ */
 
 #include "command.h"
 
@@ -6,10 +16,10 @@
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief
- *
+ * @brief Command queue data details.
  */
 typedef struct command_queue {
+    /** Range of commands. */
     range(command) *queue_impl;
 } command_queue;
 
@@ -18,14 +28,14 @@ typedef struct command_queue {
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief
+ * @brief Creates a command to add an entity in the game tree later.
  *
- * @param source
- * @param id_path
- * @param id
- * @param
- * @param alloc
- * @return
+ * @param[in] source Entity that sent the command.
+ * @param[in] id_path Zero-terminated string (copied) representing a path of entities names separated by '/'.
+ * @param[in] id Zero-terminated string (copied) representing the name of the new entity.
+ * @param[in] template User-defined data for the entity.
+ * @param[inout] alloc Allocator used for the allocation of the command.
+ * @return a fresh command to be queued.
  */
 command command_create_add_entity(entity *source, const char *id_path, const char *id, entity_core template, allocator alloc)
 {
@@ -49,12 +59,12 @@ command command_create_add_entity(entity *source, const char *id_path, const cha
 }
 
 /**
- * @brief
+ * @brief Creates a command to remove an entity from the game tree later.
  *
- * @param source
- * @param id_path
- * @param alloc
- * @return
+ * @param[in] source Entity that sent the command.
+ * @param[in] id_path Zero-terminated string (copied) representing a path of entities names separated by '/'.
+ * @param[inout] alloc Allocator used for the allocation of the command.
+ * @return A fresh command to be queued.
  */
 command command_create_remove_entity(entity *source, const char *id_path, allocator alloc)
 {
@@ -76,12 +86,13 @@ command command_create_remove_entity(entity *source, const char *id_path, alloca
 }
 
 /**
- * @brief
+ * @brief Creates a command to subscribe an entity to some event.
  *
- * @param source
- * @param id_path
- * @param alloc
- * @return
+ * @param[in] source Entity that sent the command.
+ * @param[in] event_name Name of the event the entity subscribes its callback to.
+ * @param[in] callback Registered callback.
+ * @param[inout] alloc Allocator used for the allocation of the command.
+ * @return A fresh command to be queued.
  */
 command command_create_subscribe_to_event(entity *source, const char *event_name, void (*callback)(void *entity_data, void *event_data), allocator alloc)
 {
@@ -107,10 +118,10 @@ command command_create_subscribe_to_event(entity *source, const char *event_name
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief
+ * @brief Releases the memory held by a command and zero-out its contents.
  *
- * @param cmd
- * @param alloc
+ * @param[inout] cmd Destroyed command.
+ * @param[inout] alloc Allocator used for the destruction of the command.
  */
 void command_destroy(command *cmd, allocator alloc)
 {
@@ -131,6 +142,7 @@ void command_destroy(command *cmd, allocator alloc)
 
     case COMMAND_SUBSCRIBE_TO_EVENT:
         range_destroy_dynamic(alloc, &range_to_any(cmd->specific.subscribe_to_event.target_event_name));
+        break;
 
     default:
         break;

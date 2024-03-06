@@ -136,7 +136,7 @@ tarasque_engine *tarasque_engine_create(void)
 /**
  * @brief Destroys memory held by an engine instance, releasing all memory held by it and nullifying the given pointer.
  *
- * @param handle double pointer to an engine instance.
+ * @param[inout] handle double pointer to an engine instance.
  */
 void tarasque_engine_destroy(tarasque_engine **handle)
 {
@@ -168,8 +168,8 @@ void tarasque_engine_destroy(tarasque_engine **handle)
  * During a frame, the engine will process all commands describing pending operations, then unwind the
  * event stack until it is empty, and finaly step all entities from the root of the tree to its leafs.
  *
- * @param handle Engine instance.
- * @param fps Target frequency of the main loop.
+ * @param[inout] handle Engine instance.
+ * @param[in] fps Target frequency of the main loop.
  */
 void tarasque_engine_run(tarasque_engine *handle, int fps) {
     f64 frame_delay = { 0. };
@@ -202,7 +202,7 @@ void tarasque_engine_run(tarasque_engine *handle, int fps) {
  * @brief Flags the engine to quit on the next frame.
  * The current frame will still finish before quitting.
  *
- * @param handle Engine instance.
+ * @param[inout] handle Engine instance.
  */
 void tarasque_engine_quit(tarasque_engine *handle)
 {
@@ -223,10 +223,10 @@ void tarasque_engine_quit(tarasque_engine *handle)
  * under which the callback was registered. If this entity is removed before the operation is done, the
  * command is also removed.
  *
- * @param handle Engine instance.
- * @param str_path String (copied) describing a '/'-delimited path to an entity that will be the parent of the new entity.
- * @param str_id New entity's name (copied), must be unique in respect to its siblings and not contain the character '/'.
- * @param template Basic entity information (copied).
+ * @param[inout] handle Engine instance.
+ * @param[in] str_path String (copied) describing a '/'-delimited path to an entity that will be the parent of the new entity.
+ * @param[in] str_id New entity's name (copied), must be unique in respect to its siblings and not contain the character '/'.
+ * @param[in] template Basic entity information (copied).
  */
 void tarasque_engine_add_entity(tarasque_engine *handle, const char *str_path, const char *str_id, entity_core template)
 {
@@ -246,8 +246,8 @@ void tarasque_engine_add_entity(tarasque_engine *handle, const char *str_path, c
  * under which the callback was registered. If this entity is removed before the operation is done, the
  * command is also removed.
  *
- * @param handle Engine instance.
- * @param str_path tring (copied) describing a '/'-delimited path to the removeed entity.
+ * @param[inout] handle Engine instance.
+ * @param[in] str_path tring (copied) describing a '/'-delimited path to the removeed entity.
  */
 void tarasque_engine_remove_entity(tarasque_engine *handle, const char *str_path)
 {
@@ -265,9 +265,9 @@ void tarasque_engine_remove_entity(tarasque_engine *handle, const char *str_path
  * This function can only be called from an entity's registered callback. If this entity is removed
  * before the operation is done, the command is also removed.
  *
- * @param handle Engine instance.
- * @param str_event_name Name (copied) of the event the entity wants to subscribe a callback to.
- * @param callback Pointer to the callback that will receive the entity's data and event data.
+ * @param[inout] handle Engine instance.
+ * @param[in] str_event_name Name (copied) of the event the entity wants to subscribe a callback to.
+ * @param[in] callback Pointer to the callback that will receive the entity's data and event data.
  */
 void tarasque_engine_subscribe_to_event(tarasque_engine *handle,  const char *str_event_name, void (*callback)(void *entity_data, void *event_data))
 {
@@ -283,11 +283,11 @@ void tarasque_engine_subscribe_to_event(tarasque_engine *handle,  const char *st
 /**
  * @brief Immediately stacks a named event to be sent to all entities registered to the event's name.
  *
- * @param handle Engine instance.
- * @param str_event_name Name (copied) of the event stacked.
- * @param event_data_size Event's specific data size in bytes.
- * @param event_data Event's specific data (copied).
- * @param is_detached if set, the event will not be removed if the entity that sent it is removed itself.
+ * @param[inout] handle Engine instance.
+ * @param[in] str_event_name Name (copied) of the event stacked.
+ * @param[in] event_data_size Event's specific data size in bytes.
+ * @param[in] event_data Event's specific data (copied).
+ * @param[in] is_detached if set, the event will not be removed if the entity that sent it is removed itself.
  */
 void tarasque_engine_stack_event(tarasque_engine *handle, const char *str_event_name, size_t event_data_size, void *event_data, bool is_detached)
 {
@@ -312,8 +312,8 @@ void tarasque_engine_stack_event(tarasque_engine *handle, const char *str_event_
 /**
  * @brief Sets the current entity of the engine to some value and returns the updated engine instance.
  *
- * @param handle Engine instance.
- * @param current_entity New current entity.
+ * @param[inout] handle Engine instance.
+ * @param[in] current_entity New current entity.
  * @return tarasque_engine*
  */
 tarasque_engine *tarasque_engine_for(tarasque_engine *handle, entity *current_entity)
@@ -335,8 +335,8 @@ tarasque_engine *tarasque_engine_for(tarasque_engine *handle, entity *current_en
  * Additionally of removing the entities from the tree, it will remove all relevant events, subscriptions
  * and commands linked to the entities. All of the entities memory is released.
  *
- * @param handle Engine handle.
- * @param target Entity to remove along its children.
+ * @param[inout] handle Engine handle.
+ * @param[inout] target Entity to remove along its children.
  */
 static void tarasque_engine_full_destroy_entity(tarasque_engine *handle, entity *target)
 {
@@ -368,8 +368,8 @@ static void tarasque_engine_full_destroy_entity(tarasque_engine *handle, entity 
 /**
  * @brief Processes a command to change the engine's state. The command will be destroyed.
  *
- * @param handle Engine handle.
- * @param cmd Command to process.
+ * @param[inout] handle Engine handle.
+ * @param[inout] cmd Command to process.
  */
 static void tarasque_engine_process_command(tarasque_engine *handle, command cmd)
 {
@@ -404,9 +404,9 @@ static void tarasque_engine_process_command(tarasque_engine *handle, command cmd
 /**
  * @brief Processes a command trusted to be a command to add an entity to the game tree at some position.
  *
- * @param handle Engine handle.
- * @param subject Entity that sent the command.
- * @param cmd Command containing the addition data.
+ * @param[inout] handle Engine handle.
+ * @param[in] subject Entity that sent the command.
+ * @param[in] cmd Command containing the addition data.
  */
 static void tarasque_engine_process_command_add_entity(tarasque_engine *handle, entity *subject, command_add_entity cmd)
 {
@@ -431,9 +431,9 @@ static void tarasque_engine_process_command_add_entity(tarasque_engine *handle, 
 /**
  * @brief Processes a command trusted to be a command to remove an entity at some position in the game tree.
  *
- * @param handle Engine handle.
- * @param subject Entity that sent the command.
- * @param cmd Command containing the removal data.
+ * @param[inout] handle Engine handle.
+ * @param[in] subject Entity that sent the command.
+ * @param[in] cmd Command containing the removal data.
  */
 static void tarasque_engine_process_command_remove_entity(tarasque_engine *handle, entity *subject, command_remove_entity cmd)
 {
@@ -461,9 +461,9 @@ static void tarasque_engine_process_command_remove_entity(tarasque_engine *handl
 /**
  * @brief Processes a command trusted to be a command to subscribe an entity to an event name.
  *
- * @param handle Engine handle.
- * @param subject Entity that sent the command.
- * @param cmd Command containing the subscribtion data.
+ * @param[inout] handle Engine handle.
+ * @param[in] subject Entity that sent the command.
+ * @param[in] cmd Command containing the subscribtion data.
  */
 static void tarasque_engine_process_command_subscribe_to_event(tarasque_engine *handle, command_subscribe_to_event cmd)
 {
@@ -479,8 +479,8 @@ static void tarasque_engine_process_command_subscribe_to_event(tarasque_engine *
 /**
  * @brief Sends an event to all entities registered to the event's name. The event is destroyed.
  *
- * @param handle Engine handle.
- * @param processed_event Event sent to entities.
+ * @param[inout] handle Engine handle.
+ * @param[inout] processed_event Event sent to entities.
  */
 static void tarasque_engine_process_event(tarasque_engine *handle, event processed_event)
 {
@@ -499,8 +499,8 @@ static void tarasque_engine_process_event(tarasque_engine *handle, event process
  * @brief Invoques all on_frame() callbacks found in the game tree's entities, from the root of the tree
  * to the leafs.
  *
- * @param handle Engine handle.
- * @param elapsed_time milliseconds elapsed since the last time this function was executed.
+ * @param[inout] handle Engine handle.
+ * @param[in] elapsed_time milliseconds elapsed since the last time this function was executed.
  */
 static void tarasque_engine_frame_step_entities(tarasque_engine *handle, f32 elapsed_ms)
 {
