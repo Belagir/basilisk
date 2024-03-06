@@ -15,14 +15,14 @@ typedef struct entity entity;
 typedef range(entity *) entity_range;
 
 /*  */
-typedef entity_template entity_template_copy;
+typedef entity_core entity_core_copy;
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
 /*  */
-entity *entity_create(const identifier *id, entity_template_copy template, tarasque_engine *handle, allocator alloc);
+entity *entity_create(const identifier *id, entity_core_copy template, tarasque_engine *handle, allocator alloc);
 /*  */
 void entity_destroy(entity **target, tarasque_engine *handle, allocator alloc);
 
@@ -55,8 +55,8 @@ void entity_send_event(entity *target, void (*callback)(void *entity_data, void 
 // -------------------------------------------------------------------------------------------------
 
 /*  */
-entity_template_copy entity_template_copy_create(entity_template template, allocator alloc);
+entity_core_copy entity_template_copy_create(entity_core template, allocator alloc);
 /*  */
-void entity_template_copy_destroy(entity_template_copy *template, allocator alloc);
+void entity_template_copy_destroy(entity_core_copy *template, allocator alloc);
 
 #endif

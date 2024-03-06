@@ -27,7 +27,7 @@ typedef struct command_queue {
  * @param alloc
  * @return
  */
-command command_create_add_entity(entity *source, const char *id_path, const char *id, entity_template template, allocator alloc)
+command command_create_add_entity(entity *source, const char *id_path, const char *id, entity_core template, allocator alloc)
 {
     command new_cmd = { 0u };
 

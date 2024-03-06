@@ -18,7 +18,7 @@ typedef struct entity {
     entity *parent;
     entity_range *children;
 
-    entity_template_copy template;
+    entity_core_copy template;
 } entity;
 
 // -------------------------------------------------------------------------------------------------
@@ -33,7 +33,7 @@ typedef struct entity {
  * @param alloc
  * @return
  */
-entity *entity_create(const identifier *id, entity_template_copy template, tarasque_engine *handle, allocator alloc)
+entity *entity_create(const identifier *id, entity_core_copy template, tarasque_engine *handle, allocator alloc)
 {
     entity *new_entity = NULL;
 
@@ -253,9 +253,9 @@ void entity_send_event(entity *target, void (*callback)(void *entity_data, void 
  * @param alloc
  * @return
  */
-entity_template_copy entity_template_copy_create(entity_template template, allocator alloc)
+entity_core_copy entity_template_copy_create(entity_core template, allocator alloc)
 {
-    entity_template_copy copy = {
+    entity_core_copy copy = {
             .on_init = template.on_init,
             .on_deinit = template.on_deinit,
             .on_frame = template.on_frame,
@@ -276,7 +276,7 @@ entity_template_copy entity_template_copy_create(entity_template template, alloc
  * @param
  * @param alloc
  */
-void entity_template_copy_destroy(entity_template_copy *template, allocator alloc)
+void entity_template_copy_destroy(entity_core_copy *template, allocator alloc)
 {
     if (!template) {
         return;
@@ -286,5 +286,5 @@ void entity_template_copy_destroy(entity_template_copy *template, allocator allo
         alloc.free(alloc, template->data);
     }
 
-    *template = (entity_template_copy) { 0u };
+    *template = (entity_core_copy) { 0u };
 }

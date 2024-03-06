@@ -29,14 +29,14 @@ static void dummy_entity_step(void *data, float elapsed_ms, tarasque_engine *han
 }
 
 static void dummy_setup(tarasque_engine *handle) {
-    tarasque_engine_add_entity(handle, "", "1", (entity_template) {
+    tarasque_engine_add_entity(handle, "", "1", (entity_core) {
             .data      = &(int) { 1 },
             .data_size = sizeof(int),
             .on_init   = &dummy_entity_init,
             .on_deinit = &dummy_entity_deinit,
             .on_frame  = &dummy_entity_step
     });
-    tarasque_engine_add_entity(handle, "1", "2", (entity_template) {
+    tarasque_engine_add_entity(handle, "1", "2", (entity_core) {
             .data      = &(int) { 2 },
             .data_size = sizeof(int),
             .on_init   = &dummy_entity_init,

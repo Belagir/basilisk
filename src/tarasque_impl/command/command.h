@@ -46,7 +46,7 @@ typedef struct command_remove_entity {
 typedef struct command_add_entity {
     path *id_path;
     identifier *id;
-    entity_template_copy template;
+    entity_core_copy template;
 } command_add_entity;
 
 // -------------------------------------------------------------------------------------------------
@@ -83,7 +83,7 @@ typedef struct command {
 // -------------------------------------------------------------------------------------------------
 
 /*  */
-command command_create_add_entity(entity *source, const char *id_path, const char *id, entity_template template, allocator alloc);
+command command_create_add_entity(entity *source, const char *id_path, const char *id, entity_core template, allocator alloc);
 /*  */
 command command_create_remove_entity(entity *source, const char *id_path, allocator alloc);
 /*  */

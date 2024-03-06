@@ -84,7 +84,7 @@ tarasque_engine *tarasque_engine_create(void)
                 .events = event_stack_create(used_alloc),
                 .pub_sub = event_broker_create(used_alloc),
 
-                .root_entity = entity_create(identifier_root, (entity_template) { 0u }, NULL, used_alloc),
+                .root_entity = entity_create(identifier_root, (entity_core) { 0u }, NULL, used_alloc),
                 .current_entity = NULL,
 
                 .should_quit = false,
@@ -124,6 +124,8 @@ void tarasque_engine_destroy(tarasque_engine **handle)
     *handle = NULL;
 }
 
+// -------------------------------------------------------------------------------------------------
+
 /**
  * @brief
  *
@@ -157,6 +159,20 @@ void tarasque_engine_run(tarasque_engine *handle, int fps) {
     } while (!handle->should_quit);
 }
 
+/**
+ * @brief
+ *
+ * @param handle
+ */
+void tarasque_engine_quit(tarasque_engine *handle)
+{
+    if (!handle) {
+        return;
+    }
+
+    handle->should_quit = true;
+}
+
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -169,7 +185,7 @@ void tarasque_engine_run(tarasque_engine *handle, int fps) {
  * @param str_id
  * @param template
  */
-void tarasque_engine_add_entity(tarasque_engine *handle, const char *str_path, const char *str_id, entity_template template)
+void tarasque_engine_add_entity(tarasque_engine *handle, const char *str_path, const char *str_id, entity_core template)
 {
 
     if (!handle || !str_path || !str_id) {
