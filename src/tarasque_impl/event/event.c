@@ -194,7 +194,7 @@ void event_broker_publish(event_broker *broker, event ev)
     }
 
     if (sorted_range_find_in(range_to_any(broker->subs), &identifier_compare, &(ev.name), &list_pos)) {
-        // event_subscription_list_publish(broker->subs->data + list_pos, ev);
+        event_subscription_list_publish(broker->subs->data + list_pos, ev);
     }
 }
 

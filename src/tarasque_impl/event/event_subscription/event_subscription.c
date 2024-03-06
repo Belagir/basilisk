@@ -89,6 +89,30 @@ void event_subscription_list_remove(event_subscription_list *list, entity *subsc
 }
 
 // -------------------------------------------------------------------------------------------------
+
+/**
+ * @brief
+ *
+ * @param list
+ * @param ev
+ */
+void event_subscription_list_publish(event_subscription_list *list, event ev)
+{
+    event_subscription tmp_sub = { 0u };
+
+    if (!list) {
+        return;
+    }
+
+    for (size_t i = 0u ; i < list->subscription_list->length ; i++) {
+        tmp_sub = list->subscription_list->data[i];
+        if (tmp_sub.callback) {
+            entity_send_event(tmp_sub.subscribed, tmp_sub.callback, ev.data);
+        }
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
 size_t event_subscription_list_length(const event_subscription_list *list)
 {
     if (!list) {

@@ -44,7 +44,11 @@ entity_range *entity_get_children(entity *target, allocator alloc);
 
 // -------------------------------------------------------------------------------------------------
 
+/*  */
 void entity_step_frame(entity *target, f32 elapsed_ms, tarasque_engine *handle);
+
+/*  */
+void entity_send_event(entity *target, void (*callback)(void *entity_data, void *event_data), void *event_data);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------

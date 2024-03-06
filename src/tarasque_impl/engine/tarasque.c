@@ -415,7 +415,7 @@ static void tarasque_engine_process_event(tarasque_engine *handle, event process
         return;
     }
 
-    // ...
+    event_broker_publish(handle->pub_sub, processed_event);
 
     event_destroy(&processed_event, handle->alloc);
 }

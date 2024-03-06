@@ -226,6 +226,22 @@ void entity_step_frame(entity *target, f32 elapsed_ms, tarasque_engine *handle)
     }
 }
 
+/**
+ * @brief
+ *
+ * @param target
+ * @param callback
+ * @param event_data
+ */
+void entity_send_event(entity *target, void (*callback)(void *entity_data, void *event_data), void *event_data)
+{
+    if (!target || !callback) {
+        return;
+    }
+
+    callback(target->template.data, event_data);
+}
+
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
