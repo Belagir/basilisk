@@ -58,6 +58,9 @@ void event_subscription_list_append(event_subscription_list *list, entity *subsc
 /* Removes an entry from the callback list. */
 void event_subscription_list_remove(event_subscription_list *list, entity *subscribed, void (*callback)(void *entity_data, void *event_data));
 
+/* Removes all entries tied to some entity. */
+void event_subscription_list_remove_all_from(event_subscription_list *list, entity *subscribed);
+
 // -------------------------------------------------------------------------------------------------
 
 /* Publishes an event to a callback list. The event is trusted to be of the right name as the one of the list. */

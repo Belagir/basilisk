@@ -352,14 +352,16 @@ static void tarasque_engine_full_destroy_entity(tarasque_engine *handle, entity 
     for (size_t i = 0u ; i < all_children->length ; i++) {
         event_stack_remove_events_of(handle->events, all_children->data[i], handle->alloc);
         command_queue_remove_commands_of(handle->commands, all_children->data[i], handle->alloc);
-        event_broker_unsubscribe(handle->pub_sub, all_children->data[i], NULL, NULL, handle->alloc);
+        event_broker_unsubscribe_from_all(handle->pub_sub, all_children->data[i], handle->alloc);
+
         entity_destroy(&(all_children->data[i]), handle, handle->alloc);
     }
     range_destroy_dynamic(handle->alloc, &range_to_any(all_children));
 
     event_stack_remove_events_of(handle->events, target, handle->alloc);
     command_queue_remove_commands_of(handle->commands, target, handle->alloc);
-    event_broker_unsubscribe(handle->pub_sub, target, NULL, NULL, handle->alloc);
+    event_broker_unsubscribe_from_all(handle->pub_sub, target, handle->alloc);
+
     entity_destroy(&target, handle, handle->alloc);
 }
 

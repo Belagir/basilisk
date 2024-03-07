@@ -54,6 +54,9 @@ void event_broker_subscribe(event_broker *broker, entity *subscribed, identifier
 /*  */
 void event_broker_unsubscribe(event_broker *broker, entity *target, identifier *target_event_name, void (*callback)(void *entity_data, void *event_data), allocator alloc);
 
+/* */
+void event_broker_unsubscribe_from_all(event_broker *broker, entity *target, allocator alloc);
+
 /*  */
 void event_broker_publish(event_broker *broker, event ev);
 

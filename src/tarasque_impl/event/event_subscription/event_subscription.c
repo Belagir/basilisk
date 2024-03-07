@@ -100,6 +100,29 @@ void event_subscription_list_remove(event_subscription_list *list, entity *subsc
     sorted_range_remove_from(range_to_any(list->subscription_list), &event_subscription_compare, &(event_subscription) { .subscribed = subscribed, .callback = callback, });
 }
 
+/**
+ * @brief Removes all entries that are linked to an entity.
+ *
+ * @param[inout] list List containing the elements to remove.
+ * @param[in] subscribed Entity that subscribed a (some) callback(s).
+ */
+void event_subscription_list_remove_all_from(event_subscription_list *list, entity *subscribed)
+{
+    size_t subs_index = 0u;
+
+    if (!list || !subscribed) {
+        return;
+    }
+
+    if (!sorted_range_find_in(range_to_any(list->subscription_list), &event_subscription_compare, &(event_subscription) { .subscribed = subscribed, .callback = NULL, }, &subs_index)) {
+        return;
+    }
+
+    while ((subs_index < list->subscription_list->length) && (list->subscription_list->data[subs_index].subscribed == subscribed)) {
+        range_remove(range_to_any(list->subscription_list), subs_index);
+    }
+}
+
 // -------------------------------------------------------------------------------------------------
 
 /**

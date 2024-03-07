@@ -183,6 +183,24 @@ void event_broker_unsubscribe(event_broker *broker, entity *target, identifier *
  * @brief
  *
  * @param broker
+ * @param target
+ * @param alloc
+ */
+void event_broker_unsubscribe_from_all(event_broker *broker, entity *target, allocator alloc)
+{
+    if (!broker || !target) {
+        return;
+    }
+
+    for (size_t i = 0u ; i < broker->subs->length ; i++) {
+        event_subscription_list_remove_all_from(broker->subs->data + i, target);
+    }
+}
+
+/**
+ * @brief
+ *
+ * @param broker
  * @param ev
  */
 void event_broker_publish(event_broker *broker, event ev)
