@@ -1,4 +1,13 @@
-
+/**
+ * @file event_subscription.c
+ * @author gabriel ()
+ * @brief Implementation file related to all that touches to event callback lists.
+ * @version 0.1
+ * @date 2024-03-07
+ *
+ * @copyright Copyright (c) 2024
+ *
+ */
 #include "event_subscription.h"
 
 #include <ustd/sorting.h>
@@ -7,6 +16,7 @@
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
+/* Compares two event subscriptions to order the entries in the list. */
 static i32 event_subscription_compare(const void *lhs, const void *rhs);
 
 // -------------------------------------------------------------------------------------------------
@@ -14,11 +24,11 @@ static i32 event_subscription_compare(const void *lhs, const void *rhs);
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief
+ * @brief Creates a new list of entity/callback pairs tied to an event name.
  *
- * @param event_name
- * @param alloc
- * @return
+ * @param[in] event_name Name (copied) of the event the callbacks should receive.
+ * @param[inout] alloc Allocator used for the creation of the list.
+ * @return event_subscription_list
  */
 event_subscription_list event_subscription_list_create(identifier *event_name, allocator alloc)
 {
@@ -37,10 +47,10 @@ event_subscription_list event_subscription_list_create(identifier *event_name, a
 }
 
 /**
- * @brief
+ * @brief Destroys a list of subscriptions and all its contents, zero-ing out the contents of the struct.
  *
- * @param list
- * @param alloc
+ * @param[inout] list List to remove from memory.
+ * @param[inout] alloc Allocator used to release the memory.
  */
 void event_subscription_list_destroy(event_subscription_list *list, allocator alloc)
 {
@@ -57,11 +67,12 @@ void event_subscription_list_destroy(event_subscription_list *list, allocator al
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief
+ * @brief Inserts a entity / callback pair in the list to receive events under thje list's event name.
  *
- * @param list
- * @param subscribed
- * @param callback
+ * @param[inout] list List receiving the new pair.
+ * @param[in] subscribed Entity subscribing a callback to the event.
+ * @param[in] callback Function called to receive the event.
+ * @param[inout] alloc Allocator used to eventually extend the list.
  */
 void event_subscription_list_append(event_subscription_list *list, entity *subscribed, void (*callback)(void *entity_data, void *event_data), allocator alloc)
 {
@@ -74,11 +85,11 @@ void event_subscription_list_append(event_subscription_list *list, entity *subsc
 }
 
 /**
- * @brief
+ * @brief Removes an entry from the list.
  *
- * @param list
- * @param subscribed
- * @param callback
+ * @param[inout] list List containing the element to remove.
+ * @param[in] subscribed Entity that subscribed a callback.
+ * @param[in] callback Callback previously registered.
  */
 void event_subscription_list_remove(event_subscription_list *list, entity *subscribed, void (*callback)(void *entity_data, void *event_data))
 {
@@ -92,10 +103,11 @@ void event_subscription_list_remove(event_subscription_list *list, entity *subsc
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief
+ * @brief Sends an event to the list. The name of the event is not checked to match the one expected by the list.
+ * All callbacks of the list are called, receiving their entity data and the event data.
  *
- * @param list
- * @param ev
+ * @param[in] list List containing the callbacks.
+ * @param[inout] ev Event sent to the list.
  */
 void event_subscription_list_publish(event_subscription_list *list, event ev)
 {
@@ -113,7 +125,12 @@ void event_subscription_list_publish(event_subscription_list *list, event ev)
     }
 }
 
-// -------------------------------------------------------------------------------------------------
+/**
+ * @brief Returns the number of callbacks in the list.
+ *
+ * @param[in] list Examined list.
+ * @return size_t
+ */
 size_t event_subscription_list_length(const event_subscription_list *list)
 {
     if (!list) {
