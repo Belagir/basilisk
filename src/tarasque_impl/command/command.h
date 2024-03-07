@@ -14,6 +14,10 @@
 #include "../common.h"
 #include "../entity/entity.h"
 
+// TODO : change how commands are queued to unify with how events manage it.
+// The user should not be able to create commands having to queue them, with queueing operation being the only place
+// in the codebase where an object assumes ownership of another instead of copying it.
+
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -29,7 +33,7 @@ typedef struct command_queue command_queue;
  * @brief Possible types of commands that exist.
  */
 typedef enum command_flavor {
-    COMMAND_INVALID,                /// flags an error value
+    COMMAND_INVALID = 0,            /// flags an error value
     COMMAND_ADD_ENTITY,             /// flags a command to add an entity
     COMMAND_REMOVE_ENTITY,          /// flags a command to remove an entity
     COMMAND_SUBSCRIBE_TO_EVENT,     /// flags a command to subscribe an entity to an event

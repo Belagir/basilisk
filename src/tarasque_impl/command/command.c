@@ -156,10 +156,10 @@ void command_destroy(command *cmd, allocator alloc)
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief
+ * @brief Creates a new command queue on the heap and returns a pointer to it.
  *
- * @param alloc
- * @return
+ * @param[inout] alloc Allocator used for the memory queue allocation.
+ * @return command_queue *
  */
 command_queue *command_queue_create(allocator alloc)
 {
@@ -177,10 +177,10 @@ command_queue *command_queue_create(allocator alloc)
 }
 
 /**
- * @brief
+ * @brief Destroys a previously allocated command queue and nullifies the passed pointer.
  *
- * @param queue
- * @param alloc
+ * @param[inout] queue Target destroyed queue.
+ * @param[inout] alloc Allocator used to release the memory.
  */
 void command_queue_destroy(command_queue **queue, allocator alloc)
 {
@@ -200,12 +200,11 @@ void command_queue_destroy(command_queue **queue, allocator alloc)
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief
+ * @brief Adds a command at the end of a queue. The queue assumes ownership of the command.
  *
- * @param queue
- * @param source
- * @param cmd
- * @param alloc
+ * @param[inout] queue Command queue to be extended.
+ * @param[in] cmd Queued command.
+ * @param[inout] alloc Allocator used to ensure the queue has enough memory space.
  */
 void command_queue_append(command_queue *queue, command cmd, allocator alloc)
 {
@@ -218,9 +217,9 @@ void command_queue_append(command_queue *queue, command cmd, allocator alloc)
 }
 
 /**
- * @brief
+ * @brief Returns the command at the front of a queue, i.e. the oldest command. The command is removed from the queue.
  *
- * @param queue
+ * @param[inout] queue Target command queue.
  * @return command
  */
 command command_queue_pop_front(command_queue *queue)
@@ -238,9 +237,9 @@ command command_queue_pop_front(command_queue *queue)
 }
 
 /**
- * @brief
+ * @brief Returns the number of commands stored in the queue.
  *
- * @param queue
+ * @param[in] queue Queue examined.
  * @return
  */
 size_t command_queue_length(const command_queue *queue)
@@ -255,11 +254,11 @@ size_t command_queue_length(const command_queue *queue)
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief
+ * @brief Destroys and removes all commands that have as source some specific entity.
  *
- * @param queue
- * @param target
- * @param alloc
+ * @param[inout] queue Traget queue.
+ * @param[in] target Entity the function must remove commands of.
+ * @param[inout] alloc Allocator used for the commands destruction.
  */
 void command_queue_remove_commands_of(command_queue *queue, entity *target, allocator alloc)
 {
