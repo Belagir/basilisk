@@ -60,7 +60,7 @@ typedef struct command_add_entity {
     /** Name of the new identifier. */
     identifier *id;
     /** Entity user data. */
-    entity_core_copy template;
+    entity_user_data_copy user_data;
 } command_add_entity;
 
 // -------------------------------------------------------------------------------------------------
@@ -104,7 +104,7 @@ typedef struct command {
 // -------------------------------------------------------------------------------------------------
 
 /* Creates a command to add an entity. */
-command command_create_add_entity(entity *source, const char *id_path, const char *id, entity_core template, allocator alloc);
+command command_create_add_entity(entity *source, const char *id_path, const char *id, entity_user_data user_data, allocator alloc);
 /* Creates a command to remove an entity. */
 command command_create_remove_entity(entity *source, const char *id_path, allocator alloc);
 /* Creates a command to subscribe an entity and a callback to an event. */

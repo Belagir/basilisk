@@ -119,7 +119,7 @@ tarasque_engine *tarasque_engine_create(void)
                 .events = event_stack_create(used_alloc),
                 .pub_sub = event_broker_create(used_alloc),
 
-                .root_entity = entity_create(identifier_root, (entity_core) { 0u }, NULL, used_alloc),
+                .root_entity = entity_create(identifier_root, (entity_user_data) { 0u }, NULL, used_alloc),
                 .current_entity = NULL,
 
                 .should_quit = false,
@@ -226,9 +226,9 @@ void tarasque_engine_quit(tarasque_engine *handle)
  * @param[inout] handle Engine instance.
  * @param[in] str_path String (copied) describing a '/'-delimited path to an entity that will be the parent of the new entity.
  * @param[in] str_id New entity's name (copied), must be unique in respect to its siblings and not contain the character '/'.
- * @param[in] template Basic entity information (copied).
+ * @param[in] user_data Basic entity information (copied).
  */
-void tarasque_engine_add_entity(tarasque_engine *handle, const char *str_path, const char *str_id, entity_core template)
+void tarasque_engine_add_entity(tarasque_engine *handle, const char *str_path, const char *str_id, entity_user_data user_data)
 {
 
     if (!handle || !str_path || !str_id) {
@@ -236,7 +236,7 @@ void tarasque_engine_add_entity(tarasque_engine *handle, const char *str_path, c
         return;
     }
 
-    command_queue_append(handle->commands, command_create_add_entity(handle->current_entity, str_path, str_id, template, handle->alloc), handle->alloc);
+    command_queue_append(handle->commands, command_create_add_entity(handle->current_entity, str_path, str_id, user_data, handle->alloc), handle->alloc);
     // TODO : log failure to create command
 }
 
@@ -421,7 +421,7 @@ static void tarasque_engine_process_command_add_entity(tarasque_engine *handle, 
 
     if (found_parent) {
         // TODO : enforce unique entity identifier among children
-        new_entity = entity_create(cmd.id, cmd.template, handle, handle->alloc);
+        new_entity = entity_create(cmd.id, cmd.user_data, handle, handle->alloc);
         entity_add_child(found_parent, new_entity, handle->alloc);
     } else {
         // TODO : log failure

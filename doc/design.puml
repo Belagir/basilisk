@@ -4,7 +4,7 @@
 ' ------------------------------------------------------------------------------
 
 package main_header {
-    struct engine_entity_core as "entity_core" {
+    struct engine_entity_user_data as "entity_user_data" {
         + void *data
         + size_t data_size
         ..
@@ -37,15 +37,15 @@ package identifier {
 ' ------------------------------------------------------------------------------
 
 package entity {
-    struct engine_entity_core_copy as "entity_core_copy"  {
+    struct engine_entity_user_data_copy as "entity_user_data_copy"  {
         == typedef of ==
-        entity_core
+        entity_user_data
         __
-        + entity_core_copy entity_template_copy_create(entity_core template, allocator alloc)
-        + void entity_template_copy_destroy(entity_core_copy *template, allocator alloc)
+        + entity_user_data_copy entity_user_data_copy_create(entity_user_data user_data, allocator alloc)
+        + void entity_user_data_copy_destroy(entity_user_data_copy *user_data, allocator alloc)
     }
-    note bottom of engine_entity_core_copy : used to signal memory allocation
-    engine_entity_core_copy <--> engine_entity_core
+    note bottom of engine_entity_user_data_copy : used to signal memory allocation
+    engine_entity_user_data_copy <--> engine_entity_user_data
 
     ' ------------------------------------------------------------------------------
 
@@ -54,9 +54,9 @@ package entity {
         - entity *parent
         - {field} range(entity *) *children
         ..
-        - entity_core_copy template
+        - entity_user_data_copy user_data
         __
-        + entity *entity_create(identifier *id, entity_core_copy template, tarasque_engine *handle, allocator alloc)
+        + entity *entity_create(identifier *id, entity_user_data_copy user_data, tarasque_engine *handle, allocator alloc)
         + void entity_destroy(entity **target, tarasque_engine *handle, allocator alloc)
         ..
         + void entity_add_child(entity *target, entity *new_child, allocator alloc)
@@ -69,7 +69,7 @@ package entity {
         void entity_step_frame(entity *target, f32 elapsed_ms, tarasque_engine *handle)
         void entity_send_event(entity *target, void (*callback)(void *entity_data, void *event_data), void *event_data)
     }
-    engine_entity::template --* "1" engine_entity_core_copy
+    engine_entity::user_data --* "1" engine_entity_user_data_copy
     engine_entity::id --* "1" identifier
 }
 
@@ -81,9 +81,9 @@ package command {
     struct engine_command_add_entity as "command_add_entity" {
         + path *id_path
         + identifier *id
-        + entity_core_copy template
+        + entity_user_data_copy user_data
     }
-    engine_command_add_entity::template --* "1" engine_entity_core_copy
+    engine_command_add_entity::user_data --* "1" engine_entity_user_data_copy
     engine_command_add_entity::id_path --* "1" path
     engine_command_add_entity::id --* "1" identifier
 
@@ -123,7 +123,7 @@ package command {
         + entity *source
         + union { command_add_entity, command_remove_entity, engine_command_subscribe_to_event } cmd
         __
-        + command command_create_add_entity(entity *source, const char *id_path, const char *id, engine_entity_core template, allocator alloc)
+        + command command_create_add_entity(entity *source, const char *id_path, const char *id, engine_entity_user_data user_data, allocator alloc)
         + command command_create_remove_entity(entity *source, const char *id_path, allocator alloc)
         + command command_create_subscribe_to_event(entity *source, const char *event_name, void (*callback)(void *entity_data, void *event_data), allocator alloc)
         ..
@@ -254,7 +254,7 @@ package main_header {
         + void tarasque_engine_run(tarasque_engine *handle, int fps)
         + void tarasque_engine_quit(tarasque_engine *handle)
         ..
-        + void tarasque_engine_add_entity(tarasque_engine *handle, const char *str_path, const char *str_id, entity_core template)
+        + void tarasque_engine_add_entity(tarasque_engine *handle, const char *str_path, const char *str_id, entity_user_data user_data)
         + void tarasque_engine_remove_entity(tarasque_engine *handle, const char *str_path)
         ..
         + void tarasque_engine_subscribe_to_event(tarasque_engine *handle, const char *str_event_name, void (*callback)(void *entity_data, void *event_data))

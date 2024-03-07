@@ -28,7 +28,7 @@ typedef struct tarasque_engine tarasque_engine;
 /**
  * @brief Data representing the key components of an entity.
  */
-typedef struct entity_core {
+typedef struct entity_user_data {
     /** Size, in bytes, of the entity's specific data. */
     size_t data_size;
     /** Pointer (can be null) to some entity-specific data. This data is copied to the engine by
@@ -41,7 +41,7 @@ typedef struct entity_core {
     void (*on_deinit)(void *entity_data, tarasque_engine *handle);
     /** Function ran on the entity-specific data each frame. */
     void (*on_frame)(void *entity_data, float elapsed_ms, tarasque_engine *handle);
-} entity_core;
+} entity_user_data;
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -63,7 +63,7 @@ void tarasque_engine_quit(tarasque_engine *handle);
 // -------------------------------------------------------------------------------------------------
 
 /* From an entity callback or not, adds a pending command to add another entity to the game tree. */
-void tarasque_engine_add_entity(tarasque_engine *handle, const char *str_path, const char *str_id, entity_core template);
+void tarasque_engine_add_entity(tarasque_engine *handle, const char *str_path, const char *str_id, entity_user_data user_data);
 /* From an entity callback or not, adds a pending operation to remove an entity from the game tree. */
 void tarasque_engine_remove_entity(tarasque_engine *handle, const char *str_path);
 

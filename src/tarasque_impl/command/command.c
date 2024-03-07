@@ -33,11 +33,11 @@ typedef struct command_queue {
  * @param[in] source Entity that sent the command.
  * @param[in] id_path Zero-terminated string (copied) representing a path of entities names separated by '/'.
  * @param[in] id Zero-terminated string (copied) representing the name of the new entity.
- * @param[in] template User-defined data for the entity.
+ * @param[in] user_data User-defined data for the entity.
  * @param[inout] alloc Allocator used for the allocation of the command.
  * @return a fresh command to be queued.
  */
-command command_create_add_entity(entity *source, const char *id_path, const char *id, entity_core template, allocator alloc)
+command command_create_add_entity(entity *source, const char *id_path, const char *id, entity_user_data user_data, allocator alloc)
 {
     command new_cmd = { 0u };
 
@@ -51,7 +51,7 @@ command command_create_add_entity(entity *source, const char *id_path, const cha
             .specific.add_entity = {
                     .id = identifier_from_cstring(id, alloc),
                     .id_path = path_from_cstring(id_path, alloc),
-                    .template = entity_core_copy_create(template, alloc),
+                    .user_data = entity_user_data_copy_create(user_data, alloc),
              },
     };
 
@@ -89,7 +89,7 @@ command command_create_remove_entity(entity *source, const char *id_path, alloca
  * @brief Creates a command to subscribe an entity to some event.
  *
  * @param[in] source Entity that sent the command.
- * @param[in] event_name Name of the event the entity subscribes its callback to.
+ * @param[in] event_name Name (copied) of the event the entity subscribes its callback to.
  * @param[in] callback Registered callback.
  * @param[inout] alloc Allocator used for the allocation of the command.
  * @return A fresh command to be queued.
@@ -133,7 +133,7 @@ void command_destroy(command *cmd, allocator alloc)
     case COMMAND_ADD_ENTITY:
         range_destroy_dynamic(alloc, &range_to_any(cmd->specific.add_entity.id));
         path_destroy(&(cmd->specific.add_entity.id_path), alloc);
-        entity_core_copy_destroy(&(cmd->specific.add_entity.template), alloc);
+        entity_user_data_copy_destroy(&(cmd->specific.add_entity.user_data), alloc);
         break;
 
     case COMMAND_REMOVE_ENTITY:
