@@ -63,12 +63,13 @@ void event_subscription_list_destroy(event_subscription_list *list, allocator al
  * @param subscribed
  * @param callback
  */
-void event_subscription_list_append(event_subscription_list *list, entity *subscribed, void (*callback)(void *entity_data, void *event_data))
+void event_subscription_list_append(event_subscription_list *list, entity *subscribed, void (*callback)(void *entity_data, void *event_data), allocator alloc)
 {
     if (!list || !subscribed || !callback) {
         return;
     }
 
+    list->subscription_list = range_ensure_capacity(alloc, range_to_any(list->subscription_list), 1);
     sorted_range_insert_in(range_to_any(list->subscription_list), &event_subscription_compare, &(event_subscription) { .subscribed = subscribed, .callback = callback, });
 }
 

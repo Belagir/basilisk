@@ -154,7 +154,7 @@ void event_broker_subscribe(event_broker *broker, entity *subscribed, identifier
         list_pos = sorted_range_insert_in(range_to_any(broker->subs), &identifier_compare, &created_list);
     }
 
-    event_subscription_list_append(broker->subs->data + list_pos, subscribed, callback);
+    event_subscription_list_append(broker->subs->data + list_pos, subscribed, callback, alloc);
 }
 
 /**

@@ -39,7 +39,7 @@ void event_subscription_list_destroy(event_subscription_list *list, allocator al
 // -------------------------------------------------------------------------------------------------
 
 /*  */
-void event_subscription_list_append(event_subscription_list *list, entity *subscribed, void (*callback)(void *entity_data, void *event_data));
+void event_subscription_list_append(event_subscription_list *list, entity *subscribed, void (*callback)(void *entity_data, void *event_data), allocator alloc);
 
 /*  */
 void event_subscription_list_remove(event_subscription_list *list, entity *subscribed, void (*callback)(void *entity_data, void *event_data));
