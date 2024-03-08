@@ -57,7 +57,7 @@ entity *entity_create(const identifier *id, entity_user_data_copy user_data, tar
         *new_entity = (entity) {
                 .id = range_create_dynamic_from_copy_of(alloc, range_to_any(id)),
                 .parent = NULL,
-                .children = range_create_dynamic(alloc, sizeof(*new_entity->children->data), TARASQUE_COLLECTIONS_START_SIZE),
+                .children = range_create_dynamic(alloc, sizeof(*new_entity->children->data), TARASQUE_COLLECTIONS_START_LENGTH),
                 .user_data = entity_user_data_copy_create(user_data, alloc),
         };
 

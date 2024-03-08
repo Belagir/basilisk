@@ -169,7 +169,7 @@ command_queue *command_queue_create(allocator alloc)
 
     if (new_queue) {
         *new_queue = (command_queue) {
-            .queue_impl = range_create_dynamic(alloc, sizeof(*new_queue->queue_impl->data), TARASQUE_COLLECTIONS_START_SIZE),
+            .queue_impl = range_create_dynamic(alloc, sizeof(*new_queue->queue_impl->data), TARASQUE_COLLECTIONS_START_LENGTH),
         };
     }
 

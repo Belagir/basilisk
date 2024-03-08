@@ -1,4 +1,13 @@
-
+/**
+ * @file event.c
+ * @author gabriel ()
+ * @brief Implemetation details for the event system.
+ * @version 0.1
+ * @date 2024-03-08
+ *
+ * @copyright Copyright (c) 2024
+ *
+ */
 #include <ustd/sorting.h>
 
 #include "../entity/entity.h"
@@ -9,24 +18,33 @@
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
+/**
+ * @brief Stores an event linked to an entity that stacked it.
+ */
 typedef struct event_stacked {
+    /** Entity that stacked the event. Might be NULL. */
     entity *source;
+    /** Actual event. */
     event ev;
 } event_stacked;
 
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief
- *
+ * @brief Maintains lists of callbacks subscribed to events.
  */
 typedef struct event_broker {
+    /** Collection of all lists of subscriptions. */
     range(event_subscription_list) *subs;
 } event_broker;
 
 // -------------------------------------------------------------------------------------------------
 
+/**
+ * @brief Stacks events top be retreived later.
+ */
 typedef struct event_stack {
+    /** Actual stack implementation with a range. */
     range(event_stacked) *stack_impl;
 } event_stack;
 
@@ -34,7 +52,7 @@ typedef struct event_stack {
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-/* */
+/* Allocates an event from some user adta and a name. */
 static event event_create(const char *str_event_name, size_t event_data_size, const void *event_data, allocator alloc);
 
 // -------------------------------------------------------------------------------------------------
@@ -42,10 +60,10 @@ static event event_create(const char *str_event_name, size_t event_data_size, co
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief
+ * @brief Allocates a new event broker to subscribe pairs of entities and callbacks to event names.
  *
- * @param alloc
- * @return
+ * @param[inout] alloc Allocator used for the creation.
+ * @return event_broker *
  */
 event_broker *event_broker_create(allocator alloc)
 {
@@ -55,7 +73,7 @@ event_broker *event_broker_create(allocator alloc)
 
     if (new_broker) {
         *new_broker = (event_broker) {
-                .subs = range_create_dynamic(alloc, sizeof(*new_broker->subs->data), TARASQUE_COLLECTIONS_START_SIZE),
+                .subs = range_create_dynamic(alloc, sizeof(*new_broker->subs->data), TARASQUE_COLLECTIONS_START_LENGTH),
         };
     }
 
@@ -63,10 +81,10 @@ event_broker *event_broker_create(allocator alloc)
 }
 
 /**
- * @brief
+ * @brief Releases the memory taken by an event broker and nullifies the pointer passed.
  *
- * @param broker
- * @param alloc
+ * @param[inout] broker Object to destroy.
+ * @param[inout] alloc Allocator used for the memory free.
  */
 void event_broker_destroy(event_broker **broker, allocator alloc)
 {
@@ -87,10 +105,10 @@ void event_broker_destroy(event_broker **broker, allocator alloc)
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief
+ * @brief Allocates a new event stack to store events.
  *
- * @param alloc
- * @return
+ * @param[inout] alloc Allocator used for the creation.
+ * @return event_stack *
  */
 event_stack *event_stack_create(allocator alloc)
 {
@@ -100,7 +118,7 @@ event_stack *event_stack_create(allocator alloc)
 
     if (new_stack) {
         *new_stack = (event_stack) {
-                .stack_impl = range_create_dynamic(alloc, sizeof(*(new_stack->stack_impl->data)), TARASQUE_COLLECTIONS_START_SIZE),
+                .stack_impl = range_create_dynamic(alloc, sizeof(*(new_stack->stack_impl->data)), TARASQUE_COLLECTIONS_START_LENGTH),
         };
     }
 
@@ -108,10 +126,10 @@ event_stack *event_stack_create(allocator alloc)
 }
 
 /**
- * @brief
+ * @brief Releases the memory taken by an event stack and nullifies the pointer passed to it.
  *
- * @param stack
- * @param alloc
+ * @param[inout] stack Object destroyed.
+ * @param[inout] alloc Allocator used for the free.
  */
 void event_stack_destroy(event_stack **stack, allocator alloc)
 {
@@ -132,13 +150,14 @@ void event_stack_destroy(event_stack **stack, allocator alloc)
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief
+ * @brief Subscribes an entity and its callback to an event name.
+ * When an event of this name will be published to the broker, the callback will be executed, receiving as arguments the entity data and event data.
  *
- * @param brkr
- * @param subscribed
- * @param target_event_name
- * @param callback
- * @param alloc
+ * @param[inout] broker Broker to store the subscription.
+ * @param[in] subscribed Entity that adds the subscription.
+ * @param[in] target_event_name Event the entity subscribes the callback to.
+ * @param[in] callback Callback subscribed under the event.
+ * @param[inout] alloc Allocator to use for eventual list creation or extension.
  */
 void event_broker_subscribe(event_broker *broker, entity *subscribed, identifier *target_event_name, void (*callback)(void *entity_data, void *event_data), allocator alloc)
 {
@@ -158,13 +177,13 @@ void event_broker_subscribe(event_broker *broker, entity *subscribed, identifier
 }
 
 /**
- * @brief
+ * @brief Removes an entity and its callback from a subscription to an event.
  *
- * @param broker
- * @param target
- * @param target_event_name
- * @param callback
- * @param alloc
+ * @param[inout] broker Broker currently storing the subscription.
+ * @param[in] target Entity that subscribed the callback.
+ * @param[in] target_event_name Event the callback is subscribed to.
+ * @param[in] callback Callback previously subscribed to the event.
+ * @param[inout] alloc Allocator used for the eventual list deletion.
  */
 void event_broker_unsubscribe(event_broker *broker, entity *target, identifier *target_event_name, void (*callback)(void *entity_data, void *event_data), allocator alloc)
 {
@@ -176,15 +195,16 @@ void event_broker_unsubscribe(event_broker *broker, entity *target, identifier *
 
     if (sorted_range_find_in(range_to_any(broker->subs), &identifier_compare, &target_event_name, &list_pos)) {
         event_subscription_list_remove(broker->subs->data + list_pos, target, callback);
+        // TODO : delete list if empty.
     }
 }
 
 /**
- * @brief
+ * @brief Removes all subscription that link back to some entity.
  *
- * @param broker
- * @param target
- * @param alloc
+ * @param[inout] broker Broker currently storing the subscriptions.
+ * @param[in] target Entity that might have subscribed callbacks.
+ * @param[inout] alloc Allocator used for the eventual list deletion.
  */
 void event_broker_unsubscribe_from_all(event_broker *broker, entity *target, allocator alloc)
 {
@@ -195,13 +215,14 @@ void event_broker_unsubscribe_from_all(event_broker *broker, entity *target, all
     for (size_t i = 0u ; i < broker->subs->length ; i++) {
         event_subscription_list_remove_all_from(broker->subs->data + i, target);
     }
+    // TODO : delete lists that are empty.
 }
 
 /**
- * @brief
+ * @brief Publishes an event to all registered callbacks  that subscribed to its name.
  *
- * @param broker
- * @param ev
+ * @param[inout] broker Target broker.
+ * @param[in] ev event sent to the callbacks.
  */
 void event_broker_publish(event_broker *broker, event ev)
 {
@@ -219,14 +240,14 @@ void event_broker_publish(event_broker *broker, event ev)
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief
+ * @brief Creates and pushes an event on top of the stack.
  *
- * @param stack
- * @param source
- * @param str_event_name
- * @param event_data_size
- * @param event_data
- * @param alloc
+ * @param[inout] stack Target stack to populate.
+ * @param[in] source Entity adding the event.
+ * @param[in] str_event_name Null-terminated string (copied) of the name of the event.
+ * @param[in] event_data_size Size, in bytes, of the event's data.
+ * @param[in] event_data Event's data (copied) to stack.
+ * @param[inout] alloc Allocator used for the copies and eventual stack extension.
  */
 void event_stack_push(event_stack *stack, entity *source, const char *str_event_name, size_t event_data_size, const void *event_data, allocator alloc)
 {
@@ -243,10 +264,10 @@ void event_stack_push(event_stack *stack, entity *source, const char *str_event_
 }
 
 /**
- * @brief
+ * @brief Removes the newest event from the stack and returns it.
  *
- * @param stack
- * @return
+ * @param[inout] stack Stack to pop.
+ * @return event
  */
 event event_stack_pop(event_stack *stack)
 {
@@ -263,11 +284,11 @@ event event_stack_pop(event_stack *stack)
 }
 
 /**
- * @brief
+ * @brief Removes all avents from the stack that were sent by some entity.
  *
- * @param stack
- * @param source
- * @param alloc
+ * @param[inout] stack Stack to modify.
+ * @param[in] source Entity that might have stacked events.
+ * @param[inout] alloc Allocator used to release memory taken by the events.
  */
 void event_stack_remove_events_of(event_stack *stack, entity *source, allocator alloc)
 {
@@ -287,9 +308,9 @@ void event_stack_remove_events_of(event_stack *stack, entity *source, allocator 
 }
 
 /**
- * @brief
+ * @brief Returns the number of stacked events.
  *
- * @param stack
+ * @param[in] stack Examined stack.
  * @return size_t
  */
 size_t event_stack_length(const event_stack *stack)
@@ -302,10 +323,10 @@ size_t event_stack_length(const event_stack *stack)
 }
 
 /**
- * @brief
+ * @brief Releases memory taken by an event and nullifies the pointer given to it.
  *
- * @param ev
- * @param alloc
+ * @param[inout] ev Target event to destroy.
+ * @param[inout] alloc Allocator used for the free.
  */
 void event_destroy(event *ev, allocator alloc)
 {
@@ -327,11 +348,13 @@ void event_destroy(event *ev, allocator alloc)
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief
+ * @brief Creates an event from user data.
  *
- * @param source
- * @param alloc
- * @return
+ * @param[in] str_event_name Name of the event.
+ * @param[in] event_data_size Number of bytes taken by the event data.
+ * @param[in] event_data Pointer to some foreign event data.
+ * @param[inout] alloc Allocor used for the copies.
+ * @return event
  */
 static event event_create(const char *str_event_name, size_t event_data_size, const void *event_data, allocator alloc)
 {

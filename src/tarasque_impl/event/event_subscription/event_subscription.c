@@ -40,7 +40,7 @@ event_subscription_list event_subscription_list_create(identifier *event_name, a
 
     new_list = (event_subscription_list) {
             .event_name = range_create_dynamic_from_copy_of(alloc, range_to_any(event_name)),
-            .subscription_list = range_create_dynamic(alloc, sizeof(*(new_list.subscription_list->data)), TARASQUE_COLLECTIONS_START_SIZE),
+            .subscription_list = range_create_dynamic(alloc, sizeof(*(new_list.subscription_list->data)), TARASQUE_COLLECTIONS_START_LENGTH),
     };
 
     return new_list;
