@@ -46,8 +46,7 @@ typedef struct entity {
  * @param[inout] alloc Allocator used for the creation of the entity.
  * @return entity *
  */
-// TODO : remove the on_init call from here and put it into its own function
-entity *entity_create(const identifier *id, entity_user_data_copy user_data, tarasque_engine *handle, allocator alloc)
+entity *entity_create(const identifier *id, entity_user_data_copy user_data, allocator alloc)
 {
     entity *new_entity = NULL;
 
@@ -60,10 +59,6 @@ entity *entity_create(const identifier *id, entity_user_data_copy user_data, tar
                 .children = range_create_dynamic(alloc, sizeof(*new_entity->children->data), TARASQUE_COLLECTIONS_START_LENGTH),
                 .user_data = entity_user_data_copy_create(user_data, alloc),
         };
-
-        if (new_entity->user_data.on_init) {
-            new_entity->user_data.on_init(new_entity->user_data.data, tarasque_engine_for(handle, new_entity));
-        }
     }
 
     return new_entity;
@@ -74,18 +69,12 @@ entity *entity_create(const identifier *id, entity_user_data_copy user_data, tar
  * Calling this function might leave children or a parent with dangling pointers : use with entity_deparent() and entity_destroy_children().
  *
  * @param[inout] target Entity to destroy.
- * @param[inout] handle Handle to the engine instance to allow the created entity to.
  * @param[inout] alloc Allocator used to release memory.
  */
-// TODO : remove the on_deinit call from here and put it into its own function
-void entity_destroy(entity **target, tarasque_engine *handle, allocator alloc)
+void entity_destroy(entity **target, allocator alloc)
 {
     if (!target || !*target) {
         return;
-    }
-
-    if ((*target)->user_data.on_deinit) {
-        (*target)->user_data.on_deinit((*target)->user_data.data, tarasque_engine_for(handle, *target));
     }
 
     range_destroy_dynamic(alloc, &range_to_any((*target)->children));
@@ -137,11 +126,9 @@ void entity_deparent(entity *target)
  * Each child entity is destroyed before its parent.
  *
  * @param[inout] target Entity the children are destroyed from.
- * @param[inout] handle Engine handle passed to the entities on_deinit() callback.
  * @param[inout] alloc Allocator used to release the memory of the children entities.
  */
-// TODO : remove the on_deinit call from here and put it into its own function
-void entity_destroy_children(entity *target, tarasque_engine *handle, allocator alloc)
+void entity_destroy_children(entity *target, allocator alloc)
 {
     entity_range *all_children = NULL;
 
@@ -151,7 +138,7 @@ void entity_destroy_children(entity *target, tarasque_engine *handle, allocator 
 
     all_children = entity_get_children(target, alloc);
     for (int i = (int) all_children->length - 1 ; i >= 0 ; i--) {
-        entity_destroy(all_children->data + i, tarasque_engine_for(handle, all_children->data[i]), alloc);
+        entity_destroy(all_children->data + i, alloc);
     }
     range_destroy_dynamic(alloc, &range_to_any(all_children));
 
@@ -250,9 +237,9 @@ void entity_step_frame(entity *target, f32 elapsed_ms, tarasque_engine *handle)
 /**
  * @brief Calls an arbitrary event callback over an entity.
  *
- * @param target Target entity.
- * @param callback Event callback.
- * @param event_data Event data passed to the callback.
+ * @param[inout] target Target entity.
+ * @param[in] callback Event callback.
+ * @param[inout] event_data Event data passed to the callback.
  */
 void entity_send_event(entity *target, void (*callback)(void *entity_data, void *event_data), void *event_data)
 {
@@ -261,6 +248,40 @@ void entity_send_event(entity *target, void (*callback)(void *entity_data, void 
     }
 
     callback(target->user_data.data, event_data);
+}
+
+/**
+ * @brief Calls the `.on_init()` callback of some entity, if it exists.
+ *
+ * @param[inout] target Target entity.
+ * @param[in] handle Engine handle so the user code can modify the state of the engine.
+ */
+void entity_init(entity *target, tarasque_engine *handle)
+{
+    if (!target) {
+        return;
+    }
+
+    if (target->user_data.on_init) {
+        target->user_data.on_init(target->user_data.data, tarasque_engine_for(handle, target));
+    }
+}
+
+/**
+ * @brief Calls the `.on_deinit()` callback of some entity, if it exists.
+ *
+ * @param[inout] target Target entity.
+ * @param[in] handle Engine handle so the user code can modify the state of the engine.
+ */
+void entity_deinit(entity *target, tarasque_engine *handle)
+{
+    if (!target) {
+        return;
+    }
+
+    if (target->user_data.on_deinit) {
+        target->user_data.on_deinit(target->user_data.data, tarasque_engine_for(handle, target));
+    }
 }
 
 // -------------------------------------------------------------------------------------------------
