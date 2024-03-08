@@ -1,4 +1,13 @@
-
+/**
+ * @file common.c
+ * @author gabriel ()
+ * @brief Implemetation details of common utilities.
+ * @version 0.1
+ * @date 2024-03-08
+ *
+ * @copyright Copyright (c) 2024
+ *
+ */
 #include <stdio.h>
 
 #include "common.h"
@@ -23,11 +32,11 @@ static i32 identifier_compare_character(const void *lhs, const void *rhs);
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief
+ * @brief Allocates an identifier that copies the contents of a NULL-terminated string.
  *
- * @param str
- * @param alloc
- * @return
+ * @param[in] str NULL-terminated string to copy
+ * @param[inout] alloc Allocator used for the copy.
+ * @return identifier *
  */
 identifier *identifier_from_cstring(const char *str, allocator alloc)
 {
@@ -50,11 +59,11 @@ identifier *identifier_from_cstring(const char *str, allocator alloc)
 }
 
 /**
- * @brief
+ * @brief Allocates a path from a NULL-terminated string of names separated by '/'.
  *
- * @param str
- * @param alloc
- * @return
+ * @param[in] str NULL-terminated string to copy
+ * @param[inout] alloc Allocator used for the copy.
+ * @return path *
  */
 path *path_from_cstring(const char *str, allocator alloc)
 {
@@ -99,10 +108,10 @@ path *path_from_cstring(const char *str, allocator alloc)
 }
 
 /**
- * @brief
+ * @brief Utility to bulk remove indentifiers stored in a path.
  *
- * @param path
- * @param alloc
+ * @param[in] path Path to destroy.
+ * @param[inout] alloc Allocator used for the free.
  */
 void path_destroy(path **p, allocator alloc)
 {
@@ -121,7 +130,7 @@ void path_destroy(path **p, allocator alloc)
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief
+ * @brief Prints an indentifier to stdout.
  *
  * @param id
  */
@@ -137,7 +146,7 @@ void print_identifier(const identifier *id)
 }
 
 /**
- * @brief
+ * @brief Prints a path to stdout.
  *
  * @param p
  */
@@ -159,13 +168,13 @@ void print_path(const path *p)
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief
+ * @brief Compares two identifiers hidden between two indirections (such as a double pointer to an entity, that stores an identifier -- that is always accessed through a pointer since it is an incomplete type)
  *
  * @param lhs
  * @param rhs
  * @return i32
  */
-i32 identifier_compare_tripleref(const void *lhs, const void *rhs)
+i32 identifier_compare_doubleref(const void *lhs, const void *rhs)
 {
     // FIXME : triple pointer ???  because the comparator must receive a pointer to whatever is stored in the range, ie a pointer to an entity, that holds a pointer to an identifier........
     identifier **name_lhs = { *(identifier ***) lhs };
@@ -175,7 +184,7 @@ i32 identifier_compare_tripleref(const void *lhs, const void *rhs)
 }
 
 /**
- * @brief
+ * @brief Compares two identifiers.
  *
  * @param lhs
  * @param rhs

@@ -28,12 +28,12 @@
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief
+ * @brief String of characters representing a name.
  */
 typedef range(const char) identifier;
 
 /**
- * @brief
+ * @brief Array of identifiers representing a path of entities.
  */
 typedef range(identifier *) path;
 
@@ -41,36 +41,36 @@ typedef range(identifier *) path;
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-/*  */
+/* Allocates an identifier that copies the contents of a NULL-terminated string. */
 identifier *identifier_from_cstring(const char *str, allocator alloc);
 
-/*  */
+/* Allocates a path from a NULL-terminated string of names separated by '/'. */
 path *path_from_cstring(const char *str, allocator alloc);
 
-/*  */
+/* Utility to bulk remove indentifiers stored in a path. */
 void path_destroy(path **p, allocator alloc);
 
 // -------------------------------------------------------------------------------------------------
 
-/*  */
+/* Prints an indentifier to stdout. */
 void print_identifier(const identifier *id);
 
-/*  */
+/* Prints a path to stdout. */
 void print_path(const path *p);
 
 // -------------------------------------------------------------------------------------------------
 
-/*  */
-i32 identifier_compare_tripleref(const void *lhs, const void *rhs);
+/* Compares two identifiers hidden between two indirections. */
+i32 identifier_compare_doubleref(const void *lhs, const void *rhs);
 
-/*  */
+/* Compares two identifiers. */
 i32 identifier_compare(const void *lhs, const void *rhs);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-/*  */
+/* Constant used to quickly access the unique identifier of the root entity. */
 extern const identifier *const identifier_root;
 
 #endif

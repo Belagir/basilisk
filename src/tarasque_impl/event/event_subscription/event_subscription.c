@@ -174,7 +174,7 @@ static i32 event_subscription_compare(const void *lhs, const void *rhs)
     event_subscription *sub_lhs = (event_subscription *) lhs;
     event_subscription *sub_rhs = (event_subscription *) rhs;
 
-    event_name_cmp = identifier_compare_tripleref(sub_lhs, sub_rhs);
+    event_name_cmp = identifier_compare_doubleref(sub_lhs, sub_rhs);
 
     if ((event_name_cmp == 0) && sub_lhs->callback && sub_rhs->callback) {
         return (((uintptr_t) sub_lhs->callback) > ((uintptr_t) sub_rhs->callback)) - (((uintptr_t) sub_lhs->callback) < ((uintptr_t) sub_rhs->callback));
