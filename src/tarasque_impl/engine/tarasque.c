@@ -573,7 +573,7 @@ static void tarasque_engine_frame_step_entities(tarasque_engine *handle, f32 ela
         return;
     }
 
-    // TODO : children collections should be updated on entities change, not every frame
+    // TODO (low priority because of possible big impact on implementation) : children collections should be updated on entities change, not every frame
     all_entities = entity_get_children(handle->root_entity, handle->alloc);
 
     if (!all_entities) {

@@ -55,6 +55,9 @@ typedef struct event_stack {
 /* Allocates an event from some user adta and a name. */
 static event event_create(const char *str_event_name, size_t event_data_size, const void *event_data, allocator alloc);
 
+/* Removes all subcriptions with zero callacks registered. */
+static void event_broker_cleanup_empty_subscriptions(event_broker *broker, allocator alloc);
+
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -193,10 +196,7 @@ void event_broker_unsubscribe(event_broker *broker, entity *target, identifier *
         return;
     }
 
-    if (sorted_range_find_in(range_to_any(broker->subs), &identifier_compare, &target_event_name, &list_pos)) {
-        event_subscription_list_remove(broker->subs->data + list_pos, target, callback);
-        // TODO : delete list if empty.
-    }
+    event_broker_cleanup_empty_subscriptions(broker, alloc);
 }
 
 /**
@@ -208,6 +208,8 @@ void event_broker_unsubscribe(event_broker *broker, entity *target, identifier *
  */
 void event_broker_unsubscribe_from_all(event_broker *broker, entity *target, allocator alloc)
 {
+    size_t pos = 0u;
+
     if (!broker || !target) {
         return;
     }
@@ -215,7 +217,8 @@ void event_broker_unsubscribe_from_all(event_broker *broker, entity *target, all
     for (size_t i = 0u ; i < broker->subs->length ; i++) {
         event_subscription_list_remove_all_from(broker->subs->data + i, target);
     }
-    // TODO : delete lists that are empty.
+
+    event_broker_cleanup_empty_subscriptions(broker, alloc);
 }
 
 /**
@@ -369,4 +372,28 @@ static event event_create(const char *str_event_name, size_t event_data_size, co
     }
 
     return new_event;
+}
+
+/**
+ * @brief
+ *
+ * @param broker
+ * @param alloc
+ */
+static void event_broker_cleanup_empty_subscriptions(event_broker *broker, allocator alloc)
+{
+    size_t pos = 0u;
+
+    if (!broker) {
+        return;
+    }
+
+    while (pos < broker->subs->length) {
+        if (broker->subs->data[pos].subscription_list->length == 0u) {
+            event_subscription_list_destroy(broker->subs->data + pos, alloc);
+            range_remove(range_to_any(broker->subs), pos);
+        } else {
+            pos += 1u;
+        }
+    }
 }

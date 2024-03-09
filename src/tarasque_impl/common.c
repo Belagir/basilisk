@@ -171,7 +171,7 @@ void print_path(const path *p)
  */
 i32 identifier_compare_doubleref(const void *lhs, const void *rhs)
 {
-    // FIXME : triple pointer ???  because the comparator must receive a pointer to whatever is stored in the range, ie a pointer to an entity, that holds a pointer to an identifier........
+    // FIXME (low priority because of possible big impact on implementation) : triple pointer ???  because the comparator must receive a pointer to whatever is stored in the range, ie a pointer to an entity, that holds a pointer to an identifier........
     identifier **name_lhs = { *(identifier ***) lhs };
     identifier **name_rhs = { *(identifier ***) rhs };
 
