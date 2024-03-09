@@ -16,6 +16,8 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include <ustd/logging.h>
+
 #include "../common.h"
 
 #include "../command/command.h"
@@ -32,6 +34,8 @@
  * to any engine-owned memory.
  */
 typedef struct tarasque_engine {
+    /** Logger object to communicate to the outside world. */
+    logger *logger;
     /** Command queue containing pending operations that will change the state of other collections. */
     command_queue *commands;
     /** Stack of events sent from entities to other entities. */
@@ -115,6 +119,8 @@ tarasque_engine *tarasque_engine_create(void)
 
     if (new_engine) {
         *new_engine = (tarasque_engine) {
+                .logger = logger_create(stdout, LOGGER_ON_DESTROY_DO_NOTHING),
+
                 .commands = command_queue_create(used_alloc),
                 .events = event_stack_create(used_alloc),
                 .pub_sub = event_broker_create(used_alloc),
@@ -126,6 +132,8 @@ tarasque_engine *tarasque_engine_create(void)
 
                 .alloc = used_alloc,
         };
+
+        logger_log(new_engine->logger, LOGGER_SEVERITY_INFO, "Engine is ready.\n");
     }
 
     signal(SIGINT, &cockatrice_engine_int_handler);
@@ -154,6 +162,11 @@ void tarasque_engine_destroy(tarasque_engine **handle)
 
     tarasque_engine_full_destroy_entity((*handle), (*handle)->root_entity);
 
+    logger_log((*handle)->logger, LOGGER_SEVERITY_INFO, "Engine shutting down.\n");
+
+
+    logger_destroy(&(*handle)->logger);
+
     used_alloc.free(used_alloc, *handle);
     *handle = NULL;
 }
@@ -179,6 +192,8 @@ void tarasque_engine_run(tarasque_engine *handle, int fps) {
 
     handle->should_quit = false;
     frame_delay = 1000. / (f64) fps;
+
+    logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Starting the main loop at %d fps..\n", fps);
 
     do {
         handle->should_quit = (shared_interrupt_flag == 1);
@@ -229,14 +244,25 @@ void tarasque_engine_quit(tarasque_engine *handle)
  */
 void tarasque_engine_add_entity(tarasque_engine *handle, const char *str_path, const char *str_id, entity_user_data user_data)
 {
+    command cmd = { 0u };
 
-    if (!handle || !str_path || !str_id) {
-        // TODO : log failure
+    if (!handle) {
         return;
     }
 
-    command_queue_append(handle->commands, command_create_add_entity(handle->current_entity, str_path, str_id, user_data, handle->alloc), handle->alloc);
-    // TODO : log failure to create command
+    if (!str_path || !str_id) {
+        logger_log(handle->logger, LOGGER_SEVERITY_WARN, "Invalid name (%s) or path (%s) to query an entity addition.\n", str_id, str_path);
+        return;
+    }
+
+    cmd = command_create_add_entity(handle->current_entity, str_path, str_id, user_data, handle->alloc);
+
+    if (cmd.flavor == COMMAND_INVALID) {
+        logger_log(handle->logger, LOGGER_SEVERITY_WARN, "Failed to create command to add an entity (name : %s ; path : %s).\n", str_id, str_path);
+        return;
+    }
+
+    command_queue_append(handle->commands, cmd, handle->alloc);
 }
 
 /**
@@ -250,13 +276,25 @@ void tarasque_engine_add_entity(tarasque_engine *handle, const char *str_path, c
  */
 void tarasque_engine_remove_entity(tarasque_engine *handle, const char *str_path)
 {
-    if (!handle || !str_path) {
-        // TODO : log failure
+    command cmd = { 0u };
+
+    if (!handle) {
         return;
     }
 
-    command_queue_append(handle->commands, command_create_remove_entity(handle->current_entity, str_path, handle->alloc), handle->alloc);
-    // TODO : log failure to create command
+    if (!str_path) {
+        logger_log(handle->logger, LOGGER_SEVERITY_WARN, "Invalid path (%s) to query an entity removal.\n", str_path);
+        return;
+    }
+
+    cmd = command_create_remove_entity(handle->current_entity, str_path, handle->alloc);
+
+    if (cmd.flavor == COMMAND_INVALID) {
+        logger_log(handle->logger, LOGGER_SEVERITY_WARN, "Failed to create command to remove an entity (path : %s).\n", str_path);
+        return;
+    }
+
+    command_queue_append(handle->commands, cmd, handle->alloc);
 }
 
 /**
@@ -270,13 +308,25 @@ void tarasque_engine_remove_entity(tarasque_engine *handle, const char *str_path
  */
 void tarasque_engine_subscribe_to_event(tarasque_engine *handle,  const char *str_event_name, void (*callback)(void *entity_data, void *event_data))
 {
-    if (!handle || !str_event_name) {
-        // TODO : log failure
+    command cmd = { 0u };
+
+    if (!handle) {
         return;
     }
 
-    command_queue_append(handle->commands, command_create_subscribe_to_event(handle->current_entity, str_event_name, callback, handle->alloc), handle->alloc);
-    // TODO : log failure to create command
+    if (!str_event_name || !callback) {
+        logger_log(handle->logger, LOGGER_SEVERITY_WARN, "Invalid event name (%s) or callback pointer (%#010x) to query a subscription.\n", str_event_name, callback);
+        return;
+    }
+
+    cmd = command_create_subscribe_to_event(handle->current_entity, str_event_name, callback, handle->alloc);
+
+    if (cmd.flavor == COMMAND_INVALID) {
+        logger_log(handle->logger, LOGGER_SEVERITY_WARN, "Failed to create command to add an event subscription (event name : %s, callback pointer %#010x).\n", str_event_name, callback);
+        return;
+    }
+
+    command_queue_append(handle->commands, cmd, handle->alloc);
 }
 
 /**
@@ -292,8 +342,12 @@ void tarasque_engine_stack_event(tarasque_engine *handle, const char *str_event_
 {
     entity *source_entity = NULL;
 
-    if (!handle || !str_event_name) {
-        // TODO : log failure
+    if (!handle) {
+        return;
+    }
+
+    if (!str_event_name) {
+        logger_log(handle->logger, LOGGER_SEVERITY_WARN, "Invalid event name (%s) to stack it.\n", str_event_name);
         return;
     }
 
@@ -423,10 +477,11 @@ static void tarasque_engine_process_command_add_entity(tarasque_engine *handle, 
     if (found_parent) {
         // TODO : enforce unique entity identifier among children
         new_entity = entity_create(cmd.id, cmd.user_data, handle->alloc);
+        logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Adding entity.\n");
         entity_add_child(found_parent, new_entity, handle->alloc);
         entity_init(new_entity, handle);
     } else {
-        // TODO : log failure
+        logger_log(handle->logger, LOGGER_SEVERITY_WARN, "Could not find parent\n");
     }
 }
 
@@ -448,15 +503,16 @@ static void tarasque_engine_process_command_remove_entity(tarasque_engine *handl
     found_entity = entity_get_child(subject, cmd.id_path);
 
     if (found_entity == handle->root_entity) {
-        // TODO : log failure
+        logger_log(handle->logger, LOGGER_SEVERITY_WARN, "Cannot remove root entity.\n");
         return;
     }
 
     if (!found_entity) {
-        // TODO : log failure
+        logger_log(handle->logger, LOGGER_SEVERITY_WARN, "Could not find entity to remove.\n");
         return;
     }
 
+    logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Removing entity.\n");
     tarasque_engine_full_destroy_entity(handle, found_entity);
 }
 
@@ -474,6 +530,7 @@ static void tarasque_engine_process_command_subscribe_to_event(tarasque_engine *
     }
 
     event_broker_subscribe(handle->pub_sub, cmd.subscribed, cmd.target_event_name, cmd.callback, handle->alloc);
+    logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Entity subscribed to event.\n");
 }
 
 // -------------------------------------------------------------------------------------------------
