@@ -477,7 +477,7 @@ static void tarasque_engine_process_command_add_entity(tarasque_engine *handle, 
     if (found_parent) {
         // TODO : enforce unique entity identifier among children
         new_entity = entity_create(cmd.id, cmd.user_data, handle->alloc);
-        logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Adding entity.\n");
+        logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Adding entity \"%s\".\n", entity_get_name(new_entity)->data);
         entity_add_child(found_parent, new_entity, handle->alloc);
         entity_init(new_entity, handle);
     } else {
@@ -508,11 +508,11 @@ static void tarasque_engine_process_command_remove_entity(tarasque_engine *handl
     }
 
     if (!found_entity) {
-        logger_log(handle->logger, LOGGER_SEVERITY_WARN, "Could not find entity to remove.\n");
+        logger_log(handle->logger, LOGGER_SEVERITY_WARN, "Could not find entity \"%s\" to remove.\n", entity_get_name(subject)->data);
         return;
     }
 
-    logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Removing entity.\n");
+    logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Removing entity \"%s\".\n", entity_get_name(subject)->data);
     tarasque_engine_full_destroy_entity(handle, found_entity);
 }
 
@@ -529,8 +529,8 @@ static void tarasque_engine_process_command_subscribe_to_event(tarasque_engine *
         return;
     }
 
+    logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Entity \"%s\" subscribing callback %#010x to event \"%s\".\n", entity_get_name(cmd.subscribed)->data, cmd.callback, cmd.target_event_name->data);
     event_broker_subscribe(handle->pub_sub, cmd.subscribed, cmd.target_event_name, cmd.callback, handle->alloc);
-    logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Entity subscribed to event.\n");
 }
 
 // -------------------------------------------------------------------------------------------------

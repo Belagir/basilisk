@@ -54,6 +54,9 @@ entity *entity_get_child(entity *target, const path *id_path);
 /* Returns an allocated range of all children of an entity, recursively. */
 entity_range *entity_get_children(entity *target, allocator alloc);
 
+/* Returns the name of an entity. */
+const identifier *entity_get_name(const entity *target);
+
 // -------------------------------------------------------------------------------------------------
 
 /* Execute the on_frame() callback tied to an entity. */

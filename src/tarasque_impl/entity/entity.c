@@ -217,6 +217,21 @@ entity_range *entity_get_children(entity *target, allocator alloc)
 }
 
 /**
+ * @brief
+ *
+ * @param target
+ * @return
+ */
+const identifier *entity_get_name(const entity *target)
+{
+    if (!target) {
+        return NULL;
+    }
+
+    return target->id;
+}
+
+/**
  * @brief Calls the `.on_frame()` callback of some entity, if it exists.
  *
  * @param[inout] target Target entity.
