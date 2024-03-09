@@ -213,11 +213,11 @@ static i32 identifier_compare_character(const void *lhs, const void *rhs)
 }
 
 /**
- * @brief
+ * @brief Creates an indentifier from a araw string with some control over the output.
  *
- * @param str
- * @param alloc
- * @param keep_terminator
+ * @param[in] str Source null terminated string.
+ * @param[inout] alloc Allocator used to create the identifier and to copy the source string.
+ * @param[in] keep_terminator If enabled, the identifier will contain the terminating character the string '\0'.
  * @return
  */
 static identifier *identifier_create_base(const char *str, allocator alloc, bool keep_terminator)

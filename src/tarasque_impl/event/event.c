@@ -375,10 +375,10 @@ static event event_create(const char *str_event_name, size_t event_data_size, co
 }
 
 /**
- * @brief
+ * @brief Removes all empty subscriptions (subscription lists with zero callbacks registered) from an event broker object.
  *
- * @param broker
- * @param alloc
+ * @param[inout] broker Target broker to clean.
+ * @param[inout] alloc Allocator used to destroy the empty subscription lists.
  */
 static void event_broker_cleanup_empty_subscriptions(event_broker *broker, allocator alloc)
 {

@@ -173,11 +173,11 @@ entity *entity_get_child(entity *target, const path *id_path)
 }
 
 /**
- * @brief
+ * @brief Returns a direct child of an entity, by name, if it exists.
  *
- * @param target
- * @param id_path
- * @return
+ * @param[in] target Target parent entity.
+ * @param[in] id_path Name of the searched child entity.
+ * @return entity *
  */
 entity *entity_get_direct_child(entity *target, const identifier *id)
 {
@@ -228,10 +228,10 @@ entity_range *entity_get_children(entity *target, allocator alloc)
 }
 
 /**
- * @brief
+ * @brief Returns a reference to the name of an entity.
  *
- * @param target
- * @return
+ * @param[in] target Target entity.
+ * @return const identifier *
  */
 const identifier *entity_get_name(const entity *target)
 {
