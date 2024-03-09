@@ -162,7 +162,7 @@ void tarasque_engine_destroy(tarasque_engine **handle)
 
     tarasque_engine_full_destroy_entity((*handle), (*handle)->root_entity);
 
-    logger_log((*handle)->logger, LOGGER_SEVERITY_INFO, "Engine shutting down.\n");
+    logger_log((*handle)->logger, LOGGER_SEVERITY_INFO, "Engine shut down.\n");
 
 
     logger_destroy(&(*handle)->logger);
@@ -193,7 +193,7 @@ void tarasque_engine_run(tarasque_engine *handle, int fps) {
     handle->should_quit = false;
     frame_delay = 1000. / (f64) fps;
 
-    logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Starting the main loop at %d fps..\n", fps);
+    logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Started the main loop at %d fps..\n", fps);
 
     do {
         handle->should_quit = (shared_interrupt_flag == 1);
@@ -347,7 +347,7 @@ void tarasque_engine_stack_event(tarasque_engine *handle, const char *str_event_
     }
 
     if (!str_event_name) {
-        logger_log(handle->logger, LOGGER_SEVERITY_WARN, "Invalid event name (%s) to stack it.\n", str_event_name);
+        logger_log(handle->logger, LOGGER_SEVERITY_ERRO, "Invalid event name (%s).\n", str_event_name);
         return;
     }
 
@@ -474,15 +474,19 @@ static void tarasque_engine_process_command_add_entity(tarasque_engine *handle, 
 
     found_parent = entity_get_child(subject, cmd.id_path);
 
-    if (found_parent) {
-        // TODO : enforce unique entity identifier among children
-        new_entity = entity_create(cmd.id, cmd.user_data, handle->alloc);
-        logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Adding entity \"%s\".\n", entity_get_name(new_entity)->data);
-        entity_add_child(found_parent, new_entity, handle->alloc);
-        entity_init(new_entity, handle);
-    } else {
-        logger_log(handle->logger, LOGGER_SEVERITY_WARN, "Could not find parent\n");
+    if (!found_parent) {
+        logger_log(handle->logger, LOGGER_SEVERITY_ERRO, "Could not find parent to add entity \"%s\".\n", cmd.id->data);
+        return;
+
+    } else if (entity_get_direct_child(found_parent, cmd.id) != NULL) {
+        logger_log(handle->logger, LOGGER_SEVERITY_ERRO, "Parent \"%s\" already has child named \"%s\".\n", entity_get_name(found_parent)->data, cmd.id->data);
+        return;
     }
+
+    new_entity = entity_create(cmd.id, cmd.user_data, handle->alloc);
+    entity_add_child(found_parent, new_entity, handle->alloc);
+    entity_init(new_entity, handle);
+    logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Added entity \"%s\" under parent \"%s\".\n", entity_get_name(new_entity)->data, entity_get_name(found_parent)->data);
 }
 
 /**
@@ -503,7 +507,7 @@ static void tarasque_engine_process_command_remove_entity(tarasque_engine *handl
     found_entity = entity_get_child(subject, cmd.id_path);
 
     if (found_entity == handle->root_entity) {
-        logger_log(handle->logger, LOGGER_SEVERITY_WARN, "Cannot remove root entity.\n");
+        logger_log(handle->logger, LOGGER_SEVERITY_ERRO, "Cannot remove root entity.\n");
         return;
     }
 
@@ -512,8 +516,8 @@ static void tarasque_engine_process_command_remove_entity(tarasque_engine *handl
         return;
     }
 
-    logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Removing entity \"%s\".\n", entity_get_name(subject)->data);
     tarasque_engine_full_destroy_entity(handle, found_entity);
+    logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Removed entity \"%s\".\n", entity_get_name(subject)->data);
 }
 
 /**
@@ -529,8 +533,8 @@ static void tarasque_engine_process_command_subscribe_to_event(tarasque_engine *
         return;
     }
 
-    logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Entity \"%s\" subscribing callback %#010x to event \"%s\".\n", entity_get_name(cmd.subscribed)->data, cmd.callback, cmd.target_event_name->data);
     event_broker_subscribe(handle->pub_sub, cmd.subscribed, cmd.target_event_name, cmd.callback, handle->alloc);
+    logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Entity \"%s\" subscribed callback %#010x to event \"%s\".\n", entity_get_name(cmd.subscribed)->data, cmd.callback, cmd.target_event_name->data);
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -155,10 +155,7 @@ void entity_destroy_children(entity *target, allocator alloc)
 entity *entity_get_child(entity *target, const path *id_path)
 {
     entity *visited_entity = NULL;
-    size_t pos_next_entity = 0u;
     size_t pos_path = 0u;
-    bool found_next_entity = false;
-    identifier * const* current_path_identifier = NULL;
 
     if (!target) {
         return NULL;
@@ -167,24 +164,38 @@ entity *entity_get_child(entity *target, const path *id_path)
     }
 
     visited_entity = target;
-    found_next_entity = true;
-    while (found_next_entity && (pos_path < id_path->length)) {
-        current_path_identifier = &id_path->data[pos_path];
-
-        found_next_entity = sorted_range_find_in(
-                range_to_any(visited_entity->children),
-                &identifier_compare_doubleref,
-                &current_path_identifier,
-                &pos_next_entity);
-
-        if (found_next_entity) {
-            visited_entity = visited_entity->children->data[pos_next_entity];
-            pos_path += 1;
-        }
+    while (visited_entity && (pos_path < id_path->length)) {
+        visited_entity = entity_get_direct_child(visited_entity, id_path->data[pos_path]);
+        pos_path += (size_t) (visited_entity != NULL);
     }
 
-    if (found_next_entity) {
-        return visited_entity;
+    return visited_entity;
+}
+
+/**
+ * @brief
+ *
+ * @param target
+ * @param id_path
+ * @return
+ */
+entity *entity_get_direct_child(entity *target, const identifier *id)
+{
+    bool found_child = false;
+    size_t pos_child = 0u;
+
+    if (!target || !id) {
+        return NULL;
+    }
+
+    found_child = sorted_range_find_in(
+            range_to_any(target->children),
+            &identifier_compare_doubleref,
+            &(const identifier **) { &id },
+            &pos_child);
+
+    if (found_child) {
+        return target->children->data[pos_child];
     }
     return NULL;
 }

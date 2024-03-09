@@ -50,7 +50,11 @@ void entity_destroy_children(entity *target, allocator alloc);
 // -------------------------------------------------------------------------------------------------
 
 /* Finds a child of an entity. */
-entity *entity_get_child(entity *target, const path *id_path);
+entity *entity_get_child(entity *target, const path *id);
+/* Find a child that is directly under an entity. */
+entity *entity_get_direct_child(entity *target, const identifier *id_path);
+
+
 /* Returns an allocated range of all children of an entity, recursively. */
 entity_range *entity_get_children(entity *target, allocator alloc);
 

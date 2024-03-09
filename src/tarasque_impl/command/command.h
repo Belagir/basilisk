@@ -14,10 +14,6 @@
 #include "../common.h"
 #include "../entity/entity.h"
 
-// TODO : change how commands are queued to unify with how events manage it.
-// The user should not be able to create commands having to queue them, with queueing operation being the only place
-// in the codebase where an object assumes ownership of another instead of copying it.
-
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
