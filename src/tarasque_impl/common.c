@@ -16,7 +16,6 @@
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-
 static const range(const char, 1) identifier_root_impl = range_create_static_fit(const char, {'\0'});
 const identifier *const identifier_root = (const identifier *const) &identifier_root_impl;
 
@@ -26,6 +25,9 @@ const identifier *const identifier_root = (const identifier *const) &identifier_
 
 /*  */
 static i32 identifier_compare_character(const void *lhs, const void *rhs);
+
+/*  */
+static identifier *identifier_create_base(const char *str, allocator alloc, bool keep_terminator);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -40,22 +42,14 @@ static i32 identifier_compare_character(const void *lhs, const void *rhs);
  */
 identifier *identifier_from_cstring(const char *str, allocator alloc)
 {
-    size_t str_length = 0u;
-    identifier *new_identifier = NULL;
-    bool is_id_allowed = false;
+    identifier *new_id = identifier_create_base(str, alloc, true);
+    bool is_id_allowed = (range_count(range_to_any(new_id), &identifier_compare_character, &(const char) { '/' },  0u) == 0u);
 
-    if (!str) {
-        return NULL;
+    if (!is_id_allowed) {
+        range_destroy_dynamic(alloc, &range_to_any(new_id));
     }
 
-    while (str[str_length] != '\0') {
-        str_length += 1;
-    }
-
-    new_identifier = range_create_dynamic_from(alloc, sizeof(*str), str_length, str_length, str);
-    is_id_allowed = (range_count(range_to_any(new_identifier), &identifier_compare_character, &(const char) { '/' },  0u) == 0u);
-
-    return new_identifier;
+    return new_id;
 }
 
 /**
@@ -78,7 +72,7 @@ path *path_from_cstring(const char *str, allocator alloc)
     }
 
     // allocating read data & output data
-    source_string = identifier_from_cstring(str, alloc);
+    source_string = identifier_create_base(str, alloc, false);
     new_path = range_create_dynamic(alloc, sizeof(*new_path->data), TARASQUE_COLLECTIONS_START_LENGTH);
 
     // search for tokens
@@ -89,8 +83,9 @@ path *path_from_cstring(const char *str, allocator alloc)
                 &(const char) { '/' },
                 end_of_token + 1);
 
-        if (start_of_token != end_of_token) {
-            token = range_create_dynamic_from_subrange_of(alloc, range_to_any(source_string), start_of_token, end_of_token);
+        if (start_of_token < end_of_token) {
+            token = range_create_dynamic_from(alloc, sizeof(*token->data), (end_of_token - start_of_token) + 1u, (end_of_token - start_of_token), source_string->data + start_of_token);
+            range_insert_value(range_to_any(token), token->length, &(const char) { '\0' });
 
             if (token) {
                 new_path = range_ensure_capacity(alloc, range_to_any(new_path), 1);
@@ -215,4 +210,32 @@ static i32 identifier_compare_character(const void *lhs, const void *rhs)
     const char c_rhs = { *(const char *) rhs };
 
     return (c_lhs > c_rhs) - (c_lhs < c_rhs);
+}
+
+/**
+ * @brief
+ *
+ * @param str
+ * @param alloc
+ * @param keep_terminator
+ * @return
+ */
+static identifier *identifier_create_base(const char *str, allocator alloc, bool keep_terminator)
+{
+    size_t str_length = 0u;
+    identifier *new_identifier = NULL;
+
+    if (!str) {
+        return NULL;
+    }
+
+    while (str[str_length] != '\0') {
+        str_length += 1;
+    }
+
+    str_length += (size_t) keep_terminator;
+
+    new_identifier = range_create_dynamic_from(alloc, sizeof(*str), str_length, str_length, str);
+
+    return new_identifier;
 }
