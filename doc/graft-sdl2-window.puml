@@ -1,0 +1,26 @@
+@startuml SDL window graft
+
+
+package SDL2_Window_Graft as "SDL2 Window Graft" {
+    <> root
+
+    () SDL as "SDL Context"
+    note right of SDL : manages the essential\nSDL library lifetime calls
+
+    () SDL_Window as "SDL Window"
+    note right of SDL_Window : manages the\nwindow lifetime
+
+    () SDL_Event as "SDL Event Relay"
+    note bottom of SDL_Event : sends SDL events\ncaptured by the window\nthrough the engine
+
+    () Render_Manager as "Render Manager"
+    note bottom of Render_Manager : Sends draw events\nentities can respond to
+
+    root -down- SDL
+        SDL -down- SDL_Window
+            SDL_Window -down- SDL_Event
+            SDL_Window -down- Render_Manager
+}
+
+
+@enduml
