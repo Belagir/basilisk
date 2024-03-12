@@ -8,7 +8,7 @@ int main(void)
 {
     tarasque_engine *handle = tarasque_engine_create();
 
-    tarasque_engine_add_entity(handle, "", "SDL Window Graft", graft_sdl2_window);
+    graft_sdl_window(handle, "", (graft_sdl_window_args) { 0u });
 
     tarasque_engine_run(handle, 60);
 

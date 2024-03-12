@@ -13,7 +13,6 @@
  */
 typedef struct graft_entity_sdl_window_data {
     SDL_Window *window;
-    SDL_Renderer *render;
 } graft_entity_sdl_window_data;
 
 // -------------------------------------------------------------------------------------------------
@@ -46,7 +45,6 @@ static void graft_entity_sdl_window_init(void *self_data, tarasque_engine *handl
 
     // TODO : inject configuration to this call
     window_data->window = SDL_CreateWindow("window", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1200, 800, 0);
-    window_data->render = SDL_CreateRenderer(window_data->window, -1, 0);
 }
 
 /**
@@ -64,7 +62,6 @@ static void graft_entity_sdl_window_deinit(void *self_data, tarasque_engine *han
         return;
     }
 
-    SDL_DestroyRenderer(window_data->render);
     SDL_DestroyWindow(window_data->window);
 }
 
