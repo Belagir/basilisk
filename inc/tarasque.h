@@ -67,6 +67,8 @@ void tarasque_engine_add_entity(tarasque_engine *handle, const char *str_path, c
 /* From an entity callback or not, adds a pending operation to remove an entity from the game tree. */
 void tarasque_engine_remove_entity(tarasque_engine *handle, const char *str_path);
 
+void tarasque_engine_graft(tarasque_engine *handle, const char *str_path, const char *str_id, void (*graft_procedure)(tarasque_engine *handle, void *graft_args), void *graft_args);
+
 /* From an entity callback and only, adds a pending operation to subscribe a callback to an event by the event's name. */
 void tarasque_engine_subscribe_to_event(tarasque_engine *handle, const char *str_event_name, void (*callback)(void *entity_data, void *event_data));
 /* From an entity or not, detached from it or not, sends an event to subscribed entities. */

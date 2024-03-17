@@ -6,8 +6,14 @@
 
 #include <tarasque.h>
 
-typedef struct graft_sdl_window_args { const char *title; int width; int height; uint32_t flags; } graft_sdl_window_args;
+typedef struct graft_sdl_window_args {
+    const char *title;
+    size_t x, y;
+    size_t w, h;
+    SDL_WindowFlags win_flags;
+    SDL_RendererFlags renderer_flags;
+} graft_sdl_window_args;
 
-void graft_sdl_window(tarasque_engine *handle, const char *path, graft_sdl_window_args args);
+void graft_sdl_window(tarasque_engine *handle, void *graft_args);
 
 #endif
