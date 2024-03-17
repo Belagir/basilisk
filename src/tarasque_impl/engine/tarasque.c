@@ -69,6 +69,8 @@ static void tarasque_engine_full_destroy_entity(tarasque_engine *handle, entity 
 static void tarasque_engine_process_command(tarasque_engine *handle, command cmd);
 /* Processes a specific command to add an entity in the engine, changing the state of the game tree. */
 static void tarasque_engine_process_command_add_entity(tarasque_engine *handle, entity *subject, command_add_entity cmd);
+
+static void tarasque_engine_process_command_graft(tarasque_engine *handle, entity *subject, command_graft cmd);
 /* Processes a specific command to remove an entity from the engine, changing the state of the game tree. */
 static void tarasque_engine_process_command_remove_entity(tarasque_engine *handle, entity *subject, command_remove_entity cmd);
 /* Processes a specific command to subscribe an entity to an event, changing the state of the publisher / susbcriber collection. */
@@ -308,6 +310,8 @@ void tarasque_engine_remove_entity(tarasque_engine *handle, const char *str_path
  */
 void tarasque_engine_graft(tarasque_engine *handle, const char *str_path, const char *str_id, graft_user_data graft_data)
 {
+    command cmd = { 0u };
+
     if (!handle) {
         return;
     }
@@ -317,7 +321,14 @@ void tarasque_engine_graft(tarasque_engine *handle, const char *str_path, const 
         return;
     }
 
+    cmd = command_create_graft(handle->current_entity, str_path, str_id, graft_data, handle->alloc);
 
+    if (cmd.flavor == COMMAND_INVALID) {
+        logger_log(handle->logger, LOGGER_SEVERITY_WARN, "Failed to create command to add a graft (name : %s ; path : %s).\n", str_id, str_path);
+        return;
+    }
+
+    command_queue_append(handle->commands, cmd, handle->alloc);
 }
 
 /**
@@ -466,6 +477,9 @@ static void tarasque_engine_process_command(tarasque_engine *handle, command cmd
     case COMMAND_ADD_ENTITY:
         tarasque_engine_process_command_add_entity(handle, subject, cmd.specific.add_entity);
         break;
+    case COMMAND_GRAFT:
+        tarasque_engine_process_command_graft(handle, subject, cmd.specific.graft);
+        break;
     case COMMAND_REMOVE_ENTITY:
         tarasque_engine_process_command_remove_entity(handle, subject, cmd.specific.remove_entity);
         break;
@@ -510,6 +524,16 @@ static void tarasque_engine_process_command_add_entity(tarasque_engine *handle, 
     entity_add_child(found_parent, new_entity, handle->alloc);
     entity_init(new_entity, handle);
     logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Added entity \"%s\" under parent \"%s\".\n", entity_get_name(new_entity)->data, entity_get_name(found_parent)->data);
+}
+
+
+static void tarasque_engine_process_command_graft(tarasque_engine *handle, entity *subject, command_graft cmd)
+{
+    if (!handle) {
+        return;
+    }
+
+
 }
 
 /**

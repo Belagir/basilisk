@@ -59,6 +59,37 @@ command command_create_add_entity(entity *source, const char *id_path, const cha
 }
 
 /**
+ * @brief
+ *
+ * @param source
+ * @param id_path
+ * @param id
+ * @param graft_data
+ * @param alloc
+ * @return
+ */
+command command_create_graft(entity *source, const char *id_path, const char *id, graft_user_data graft_data, allocator alloc)
+{
+    command new_cmd = { 0u };
+
+    if (!id_path || !id) {
+        return (command) { .flavor = COMMAND_INVALID };
+    }
+
+    new_cmd = (command) {
+            .flavor = COMMAND_GRAFT,
+            .source = source,
+            .specific.graft = {
+                    .id = identifier_from_cstring(id, alloc),
+                    .id_path = path_from_cstring(id_path, alloc),
+                    .graft_data = graft_user_data_copy_create(graft_data, alloc),
+            },
+    };
+
+    return new_cmd;
+}
+
+/**
  * @brief Creates a command to remove an entity from the game tree later.
  *
  * @param[in] source Entity that sent the command.
@@ -134,6 +165,12 @@ void command_destroy(command *cmd, allocator alloc)
         range_destroy_dynamic(alloc, &range_to_any(cmd->specific.add_entity.id));
         path_destroy(&(cmd->specific.add_entity.id_path), alloc);
         entity_user_data_copy_destroy(&(cmd->specific.add_entity.user_data), alloc);
+        break;
+
+    case COMMAND_GRAFT:
+        range_destroy_dynamic(alloc, &range_to_any(cmd->specific.graft.id));
+        path_destroy(&(cmd->specific.graft.id_path), alloc);
+        graft_user_data_copy_destroy(&(cmd->specific.graft.graft_data), alloc);
         break;
 
     case COMMAND_REMOVE_ENTITY:

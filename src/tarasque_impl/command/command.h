@@ -101,6 +101,8 @@ typedef struct command {
     union {
         /** COMMAND_ADD_ENTITY */
         command_add_entity add_entity;
+        /** COMMAND_GRAFT */
+        command_graft graft;
         /** COMMAND_REMOVE_ENTITY */
         command_remove_entity remove_entity;
         /** COMMAND_SUBSCRIBE_TO_EVENT */
@@ -114,6 +116,8 @@ typedef struct command {
 
 /* Creates a command to add an entity. */
 command command_create_add_entity(entity *source, const char *id_path, const char *id, entity_user_data user_data, allocator alloc);
+/* */
+command command_create_graft(entity *source, const char *id_path, const char *id, graft_user_data graft_data, allocator alloc);
 /* Creates a command to remove an entity. */
 command command_create_remove_entity(entity *source, const char *id_path, allocator alloc);
 /* Creates a command to subscribe an entity and a callback to an event. */
