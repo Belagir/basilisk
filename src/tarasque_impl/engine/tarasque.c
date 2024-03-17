@@ -18,10 +18,11 @@
 
 #include <ustd/logging.h>
 
+#include "tarasque_impl.h"
+
 #include "../common.h"
 
 #include "../command/command.h"
-#include "../entity/entity.h"
 #include "../event/event.h"
 
 // -------------------------------------------------------------------------------------------------
@@ -48,6 +49,8 @@ typedef struct tarasque_engine {
     /** Entity currently being processed by the engine. This value is set before a foreign entity-specified
       * callback is executed to save the context and link operations from the callback back to the entity. */
     entity *current_entity;
+
+    tarasque_entity_scene root_scene;
 
     /** Flag signaling wether the engine should exit or not the main loop. */
     bool should_quit;
@@ -130,6 +133,8 @@ tarasque_engine *tarasque_engine_create(void)
                 .root_entity = entity_create(identifier_root, (entity_user_data) { 0u }, used_alloc),
                 .current_entity = NULL,
 
+                .root_scene = (tarasque_entity_scene) { .handle = new_engine, .current_entity = new_engine->root_entity, },
+
                 .should_quit = false,
 
                 .alloc = used_alloc,
@@ -171,6 +176,16 @@ void tarasque_engine_destroy(tarasque_engine **handle)
 
     used_alloc.free(used_alloc, *handle);
     *handle = NULL;
+}
+
+
+tarasque_entity_scene *tarasque_engine_root_scene(tarasque_engine *handle)
+{
+    if (!handle) {
+        return NULL;
+    }
+
+    return &handle->root_scene;
 }
 
 // -------------------------------------------------------------------------------------------------

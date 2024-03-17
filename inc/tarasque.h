@@ -23,6 +23,9 @@
 /* Opaque type of an engine handle. Those are used to carry around references to the engine's data. */
 typedef struct tarasque_engine tarasque_engine;
 
+
+typedef struct tarasque_entity_scene tarasque_entity_scene;
+
 // -------------------------------------------------------------------------------------------------
 
 /**
@@ -64,6 +67,8 @@ typedef struct graft_user_data {
 tarasque_engine *tarasque_engine_create(void);
 /* Destroys a previously allocated engine instance and nullifies the given pointer. */
 void tarasque_engine_destroy(tarasque_engine **handle);
+
+tarasque_entity_scene *tarasque_engine_root_scene(tarasque_engine *handle);
 
 // -------------------------------------------------------------------------------------------------
 
