@@ -523,17 +523,33 @@ static void tarasque_engine_process_command_add_entity(tarasque_engine *handle, 
     new_entity = entity_create(cmd.id, cmd.user_data, handle->alloc);
     entity_add_child(found_parent, new_entity, handle->alloc);
     entity_init(new_entity, handle);
+
     logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Added entity \"%s\" under parent \"%s\".\n", entity_get_name(new_entity)->data, entity_get_name(found_parent)->data);
 }
 
 
 static void tarasque_engine_process_command_graft(tarasque_engine *handle, entity *subject, command_graft cmd)
 {
+    entity *graft_parent = NULL;
+    entity *graft_root = NULL;
+
     if (!handle) {
         return;
     }
 
+    graft_parent = entity_get_child(tarasque_engine_for(handle, subject)->current_entity, cmd.id_path);
 
+    if (!graft_parent) {
+        return;
+    }
+
+    graft_root = entity_create(cmd.id, (entity_user_data_copy) { 0u }, handle->alloc);
+    entity_add_child(graft_parent, graft_root, handle->alloc);
+    entity_init(graft_parent, handle);
+
+    cmd.graft_data.graft_procedure(tarasque_engine_for(handle, graft_root), cmd.graft_data.args);
+
+    logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Added graft \"%s\" under parent \"%s\".\n", cmd.id->data, entity_get_name(graft_parent)->data);
 }
 
 /**

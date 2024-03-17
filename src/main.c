@@ -8,7 +8,8 @@ int main(void)
 {
     tarasque_engine *handle = tarasque_engine_create();
 
-    tarasque_engine_graft(handle, "", "SDL Graft", (graft_user_data) {
+    tarasque_engine_add_entity(handle, "", "Game", (entity_user_data) { 0u });
+    tarasque_engine_graft(handle, "Game", "SDL Graft", (graft_user_data) {
             .args_size = GRAFT_SDL_WINDOW_ARGS_SIZE,
             .args = &(graft_sdl_window_args) {
                     .title = "hello world !",
