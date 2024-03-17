@@ -298,6 +298,29 @@ void tarasque_engine_remove_entity(tarasque_engine *handle, const char *str_path
 }
 
 /**
+ * @brief
+ *
+ * @param handle
+ * @param str_path
+ * @param str_id
+ * @param graft_procedure
+ * @param graft_args
+ */
+void tarasque_engine_graft(tarasque_engine *handle, const char *str_path, const char *str_id, graft_user_data graft_data)
+{
+    if (!handle) {
+        return;
+    }
+
+    if (!str_path || !str_id) {
+        logger_log(handle->logger, LOGGER_SEVERITY_WARN, "Invalid name (%s) or path (%s) to query a graft.\n", str_id, str_path);
+        return;
+    }
+
+
+}
+
+/**
  * @brief Queue a command to subscribe an entity's callback to an event.
  * This function can only be called from an entity's registered callback. If this entity is removed
  * before the operation is done, the command is also removed.

@@ -14,6 +14,8 @@ typedef struct graft_sdl_window_args {
     SDL_RendererFlags renderer_flags;
 } graft_sdl_window_args;
 
+typedef enum graft_sdl_window_args_size { GRAFT_SDL_WINDOW_ARGS_SIZE = sizeof(graft_sdl_window_args) } graft_sdl_window_args_size;
+
 void graft_sdl_window(tarasque_engine *handle, void *graft_args);
 
 #endif

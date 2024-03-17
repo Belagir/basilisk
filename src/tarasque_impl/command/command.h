@@ -13,6 +13,7 @@
 
 #include "../common.h"
 #include "../entity/entity.h"
+#include "../grafting/grafting.h"
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -31,19 +32,10 @@ typedef struct command_queue command_queue;
 typedef enum command_flavor {
     COMMAND_INVALID = 0,            /// flags an error value
     COMMAND_ADD_ENTITY,             /// flags a command to add an entity
+    COMMAND_GRAFT,                  /// flags a command to add a graft
     COMMAND_REMOVE_ENTITY,          /// flags a command to remove an entity
     COMMAND_SUBSCRIBE_TO_EVENT,     /// flags a command to subscribe an entity to an event
 } command_flavor;
-
-// -------------------------------------------------------------------------------------------------
-
-/**
- * @brief Specific data layout for a command to remove an entity at some location.
- */
-typedef struct command_remove_entity {
-    /** Range of identifiers leading to the removal location. */
-    path *id_path;
-} command_remove_entity;
 
 // -------------------------------------------------------------------------------------------------
 
@@ -58,6 +50,27 @@ typedef struct command_add_entity {
     /** Entity user data. */
     entity_user_data_copy user_data;
 } command_add_entity;
+
+// -------------------------------------------------------------------------------------------------
+
+typedef struct command_graft {
+    /** Range of identifiers leading to the removal location. */
+    path *id_path;
+    /** Name of the new identifier. */
+    identifier *id;
+
+    graft_user_data_copy graft_data;
+} command_graft;
+
+// -------------------------------------------------------------------------------------------------
+
+/**
+ * @brief Specific data layout for a command to remove an entity at some location.
+ */
+typedef struct command_remove_entity {
+    /** Range of identifiers leading to the removal location. */
+    path *id_path;
+} command_remove_entity;
 
 // -------------------------------------------------------------------------------------------------
 
