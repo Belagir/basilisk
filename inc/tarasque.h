@@ -85,7 +85,7 @@ void tarasque_entity_scene_add_entity(tarasque_entity_scene *scene, const char *
 /* From or out of an entity callback, adds a pending command to remove an entity from the game tree. */
 void tarasque_entity_scene_remove_entity(tarasque_entity_scene *scene, const char *str_path);
 /* From or out of an entity callback, adds a pending command to graft a set of entities in the game tree. */
-void tarasque_engine_graft(tarasque_engine *handle, const char *str_path, const char *str_id, graft_user_data graft_data);
+void tarasque_entity_scene_graft(tarasque_entity_scene *scene, const char *str_path, const char *str_id, graft_user_data graft_data);
 
 /* From an entity callback and only, adds a pending command to subscribe a callback to an event by the event's name. */
 void tarasque_engine_subscribe_to_event(tarasque_engine *handle, const char *str_event_name, void (*callback)(void *entity_data, void *event_data));

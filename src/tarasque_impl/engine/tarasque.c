@@ -319,33 +319,33 @@ void tarasque_entity_scene_remove_entity(tarasque_entity_scene *scene, const cha
 /**
  * @brief
  *
- * @param handle
+ * @param scene
  * @param str_path
  * @param str_id
  * @param graft_procedure
  * @param graft_args
  */
-void tarasque_engine_graft(tarasque_engine *handle, const char *str_path, const char *str_id, graft_user_data graft_data)
+void tarasque_entity_scene_graft(tarasque_entity_scene *scene, const char *str_path, const char *str_id, graft_user_data graft_data)
 {
     command cmd = { 0u };
 
-    if (!handle) {
+    if (!scene || !scene->handle || !scene->current_entity) {
         return;
     }
 
     if (!str_path || !str_id) {
-        logger_log(handle->logger, LOGGER_SEVERITY_WARN, "Invalid name (%s) or path (%s) to query a graft.\n", str_id, str_path);
+        logger_log(scene->handle->logger, LOGGER_SEVERITY_WARN, "Invalid name (%s) or path (%s) to query a graft.\n", str_id, str_path);
         return;
     }
 
-    cmd = command_create_graft(handle->current_entity, str_path, str_id, graft_data, handle->alloc);
+    cmd = command_create_graft(scene->current_entity, str_path, str_id, graft_data, scene->handle->alloc);
 
     if (cmd.flavor == COMMAND_INVALID) {
-        logger_log(handle->logger, LOGGER_SEVERITY_WARN, "Failed to create command to add a graft (name : %s ; path : %s).\n", str_id, str_path);
+        logger_log(scene->handle->logger, LOGGER_SEVERITY_WARN, "Failed to create command to add a graft (name : %s ; path : %s).\n", str_id, str_path);
         return;
     }
 
-    command_queue_append(handle->commands, cmd, handle->alloc);
+    command_queue_append(scene->handle->commands, cmd, scene->handle->alloc);
 }
 
 /**
