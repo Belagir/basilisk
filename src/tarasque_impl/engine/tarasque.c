@@ -133,12 +133,14 @@ tarasque_engine *tarasque_engine_create(void)
                 .root_entity = entity_create(identifier_root, (entity_user_data) { 0u }, used_alloc),
                 .current_entity = NULL,
 
-                .root_scene = (tarasque_entity_scene) { .handle = new_engine, .current_entity = new_engine->root_entity, },
+                .root_scene = (tarasque_entity_scene) { 0u },
 
                 .should_quit = false,
 
                 .alloc = used_alloc,
         };
+
+        new_engine->root_scene = (tarasque_entity_scene) { .handle = new_engine, .current_entity = new_engine->root_entity };
 
         logger_log(new_engine->logger, LOGGER_SEVERITY_INFO, "Engine is ready.\n");
     }
@@ -254,32 +256,32 @@ void tarasque_engine_quit(tarasque_engine *handle)
  * under which the callback was registered. If this entity is removed before the operation is done, the
  * command is also removed.
  *
- * @param[inout] handle Engine instance.
+ * @param[inout] scene
  * @param[in] str_path String (copied) describing a '/'-delimited path to an entity that will be the parent of the new entity.
  * @param[in] str_id New entity's name (copied), must be unique in respect to its siblings and not contain the character '/'.
  * @param[in] user_data Basic entity information (copied).
  */
-void tarasque_engine_add_entity(tarasque_engine *handle, const char *str_path, const char *str_id, entity_user_data user_data)
+void tarasque_entity_scene_add_entity(tarasque_entity_scene *scene, const char *str_path, const char *str_id, entity_user_data user_data)
 {
     command cmd = { 0u };
 
-    if (!handle) {
+    if (!scene || !scene->handle || !scene->current_entity) {
         return;
     }
 
     if (!str_path || !str_id) {
-        logger_log(handle->logger, LOGGER_SEVERITY_WARN, "Invalid name (%s) or path (%s) to query an entity addition.\n", str_id, str_path);
+        logger_log(scene->handle->logger, LOGGER_SEVERITY_WARN, "Invalid name (%s) or path (%s) to query an entity addition.\n", str_id, str_path);
         return;
     }
 
-    cmd = command_create_add_entity(handle->current_entity, str_path, str_id, user_data, handle->alloc);
+    cmd = command_create_add_entity(scene->current_entity, str_path, str_id, user_data, scene->handle->alloc);
 
     if (cmd.flavor == COMMAND_INVALID) {
-        logger_log(handle->logger, LOGGER_SEVERITY_WARN, "Failed to create command to add an entity (name : %s ; path : %s).\n", str_id, str_path);
+        logger_log(scene->handle->logger, LOGGER_SEVERITY_WARN, "Failed to create command to add an entity (name : %s ; path : %s).\n", str_id, str_path);
         return;
     }
 
-    command_queue_append(handle->commands, cmd, handle->alloc);
+    command_queue_append(scene->handle->commands, cmd, scene->handle->alloc);
 }
 
 /**
