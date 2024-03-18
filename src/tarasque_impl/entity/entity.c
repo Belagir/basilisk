@@ -251,14 +251,12 @@ const identifier *entity_get_name(const entity *target)
  */
 void entity_step_frame(entity *target, f32 elapsed_ms, tarasque_engine *handle)
 {
-    tarasque_entity_scene scene = (tarasque_entity_scene) { .handle = handle, .current_entity = target };
-
     if (!target) {
         return;
     }
 
     if (target->user_data.on_frame) {
-        target->user_data.on_frame(target->user_data.data, elapsed_ms, &scene);
+        target->user_data.on_frame(target->user_data.data, elapsed_ms, &(tarasque_entity_scene) { handle, target });
     }
 }
 
@@ -286,14 +284,12 @@ void entity_send_event(entity *target, void (*callback)(void *entity_data, void 
  */
 void entity_init(entity *target, tarasque_engine *handle)
 {
-    tarasque_entity_scene scene = (tarasque_entity_scene) { .handle = handle, .current_entity = target };
-
     if (!target) {
         return;
     }
 
     if (target->user_data.on_init) {
-        target->user_data.on_init(target->user_data.data, &scene);
+        target->user_data.on_init(target->user_data.data, &(tarasque_entity_scene) { handle, target });
     }
 }
 
@@ -305,14 +301,12 @@ void entity_init(entity *target, tarasque_engine *handle)
  */
 void entity_deinit(entity *target, tarasque_engine *handle)
 {
-    tarasque_entity_scene scene = (tarasque_entity_scene) { .handle = handle, .current_entity = target };
-
     if (!target) {
         return;
     }
 
     if (target->user_data.on_deinit) {
-        target->user_data.on_deinit(target->user_data.data, &scene);
+        target->user_data.on_deinit(target->user_data.data, &(tarasque_entity_scene) { handle, target });
     }
 }
 
