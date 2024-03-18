@@ -353,60 +353,60 @@ void tarasque_entity_scene_graft(tarasque_entity_scene *scene, const char *str_p
  * This function can only be called from an entity's registered callback. If this entity is removed
  * before the operation is done, the command is also removed.
  *
- * @param[inout] handle Engine instance.
+ * @param[inout] scene
  * @param[in] str_event_name Name (copied) of the event the entity wants to subscribe a callback to.
  * @param[in] callback Pointer to the callback that will receive the entity's data and event data.
  */
-void tarasque_engine_subscribe_to_event(tarasque_engine *handle,  const char *str_event_name, void (*callback)(void *entity_data, void *event_data))
+void tarasque_entity_scene_subscribe_to_event(tarasque_entity_scene *scene,  const char *str_event_name, void (*callback)(void *entity_data, void *event_data))
 {
     command cmd = { 0u };
 
-    if (!handle) {
+    if (!scene || !scene->handle || !scene->current_entity) {
         return;
     }
 
     if (!str_event_name || !callback) {
-        logger_log(handle->logger, LOGGER_SEVERITY_WARN, "Invalid event name (%s) or callback pointer (%#010x) to query a subscription.\n", str_event_name, callback);
+        logger_log(scene->handle->logger, LOGGER_SEVERITY_WARN, "Invalid event name (%s) or callback pointer (%#010x) to query a subscription.\n", str_event_name, callback);
         return;
     }
 
-    cmd = command_create_subscribe_to_event(handle->current_entity, str_event_name, callback, handle->alloc);
+    cmd = command_create_subscribe_to_event(scene->current_entity, str_event_name, callback, scene->handle->alloc);
 
     if (cmd.flavor == COMMAND_INVALID) {
-        logger_log(handle->logger, LOGGER_SEVERITY_WARN, "Failed to create command to add an event subscription (event name : %s, callback pointer %#010x).\n", str_event_name, callback);
+        logger_log(scene->handle->logger, LOGGER_SEVERITY_WARN, "Failed to create command to add an event subscription (event name : %s, callback pointer %#010x).\n", str_event_name, callback);
         return;
     }
 
-    command_queue_append(handle->commands, cmd, handle->alloc);
+    command_queue_append(scene->handle->commands, cmd, scene->handle->alloc);
 }
 
 /**
  * @brief Immediately stacks a named event to be sent to all entities registered to the event's name.
  *
- * @param[inout] handle Engine instance.
+ * @param[inout] scene
  * @param[in] str_event_name Name (copied) of the event stacked.
  * @param[in] event_data_size Event's specific data size in bytes.
  * @param[in] event_data Event's specific data (copied).
  * @param[in] is_detached if set, the event will not be removed if the entity that sent it is removed itself.
  */
-void tarasque_engine_stack_event(tarasque_engine *handle, const char *str_event_name, size_t event_data_size, void *event_data, bool is_detached)
+void tarasque_entity_scene_stack_event(tarasque_entity_scene *scene, const char *str_event_name, size_t event_data_size, void *event_data, bool is_detached)
 {
     entity *source_entity = NULL;
 
-    if (!handle) {
+    if (!scene || !scene->handle || !scene->current_entity) {
         return;
     }
 
     if (!str_event_name) {
-        logger_log(handle->logger, LOGGER_SEVERITY_ERRO, "Invalid event name (%s).\n", str_event_name);
+        logger_log(scene->handle->logger, LOGGER_SEVERITY_ERRO, "Invalid event name (%s).\n", str_event_name);
         return;
     }
 
     if (!is_detached) {
-        source_entity = handle->current_entity;
+        source_entity = scene->current_entity;
     }
 
-    event_stack_push(handle->events, source_entity, str_event_name, event_data_size, event_data, handle->alloc);
+    event_stack_push(scene->handle->events, source_entity, str_event_name, event_data_size, event_data, scene->handle->alloc);
 }
 
 // -------------------------------------------------------------------------------------------------

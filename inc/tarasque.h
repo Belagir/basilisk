@@ -88,8 +88,8 @@ void tarasque_entity_scene_remove_entity(tarasque_entity_scene *scene, const cha
 void tarasque_entity_scene_graft(tarasque_entity_scene *scene, const char *str_path, const char *str_id, graft_user_data graft_data);
 
 /* From an entity callback and only, adds a pending command to subscribe a callback to an event by the event's name. */
-void tarasque_engine_subscribe_to_event(tarasque_engine *handle, const char *str_event_name, void (*callback)(void *entity_data, void *event_data));
+void tarasque_entity_scene_subscribe_to_event(tarasque_entity_scene *scene, const char *str_event_name, void (*callback)(void *entity_data, void *event_data));
 /* From an entity or not, detached from it or not, sends an event to subscribed entities. */
-void tarasque_engine_stack_event(tarasque_engine *handle, const char *str_event_name, size_t event_data_size, void *event_data, bool is_detached);
+void tarasque_entity_scene_stack_event(tarasque_entity_scene *scene, const char *str_event_name, size_t event_data_size, void *event_data, bool is_detached);
 
 #endif
