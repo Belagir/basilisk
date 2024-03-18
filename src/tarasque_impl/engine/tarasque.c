@@ -564,7 +564,7 @@ static void tarasque_engine_process_command_graft(tarasque_engine *handle, entit
     entity_add_child(graft_parent, graft_root, handle->alloc);
     entity_init(graft_parent, handle);
 
-    cmd.graft_data.graft_procedure(tarasque_engine_for(handle, graft_root), cmd.graft_data.args);
+    cmd.graft_data.graft_procedure(&(tarasque_entity_scene) { handle, graft_root }, cmd.graft_data.args);
 
     logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Added graft \"%s\" under parent \"%s\".\n", cmd.id->data, entity_get_name(graft_parent)->data);
 }

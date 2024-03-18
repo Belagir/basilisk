@@ -56,7 +56,7 @@ typedef struct graft_user_data {
     functions that take the containing struct type. */
     void *args;
 
-    void (*graft_procedure)(tarasque_engine *handle, void *graft_args);
+    void (*graft_procedure)(tarasque_entity_scene *scene, void *graft_args);
 } graft_user_data;
 
 // -------------------------------------------------------------------------------------------------
