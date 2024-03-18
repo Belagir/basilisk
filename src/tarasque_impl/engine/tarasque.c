@@ -265,18 +265,7 @@ void tarasque_entity_scene_add_entity(tarasque_entity_scene *scene, const char *
         return;
     }
 
-    if (!str_path || !str_id) {
-        logger_log(scene->handle->logger, LOGGER_SEVERITY_WARN, "Invalid name (%s) or path (%s) to query an entity addition.\n", str_id, str_path);
-        return;
-    }
-
     cmd = command_create_add_entity(scene->current_entity, str_path, str_id, user_data, scene->handle->alloc);
-
-    if (cmd.flavor == COMMAND_INVALID) {
-        logger_log(scene->handle->logger, LOGGER_SEVERITY_WARN, "Failed to create command to add an entity (name : %s ; path : %s).\n", str_id, str_path);
-        return;
-    }
-
     command_queue_append(scene->handle->commands, cmd, scene->handle->alloc);
 }
 
@@ -297,18 +286,7 @@ void tarasque_entity_scene_remove_entity(tarasque_entity_scene *scene, const cha
         return;
     }
 
-    if (!str_path) {
-        logger_log(scene->handle->logger, LOGGER_SEVERITY_WARN, "Invalid path (%s) to query an entity removal.\n", str_path);
-        return;
-    }
-
     cmd = command_create_remove_entity(scene->current_entity, str_path, scene->handle->alloc);
-
-    if (cmd.flavor == COMMAND_INVALID) {
-        logger_log(scene->handle->logger, LOGGER_SEVERITY_WARN, "Failed to create command to remove an entity (path : %s).\n", str_path);
-        return;
-    }
-
     command_queue_append(scene->handle->commands, cmd, scene->handle->alloc);
 }
 
@@ -329,18 +307,7 @@ void tarasque_entity_scene_graft(tarasque_entity_scene *scene, const char *str_p
         return;
     }
 
-    if (!str_path || !str_id) {
-        logger_log(scene->handle->logger, LOGGER_SEVERITY_WARN, "Invalid name (%s) or path (%s) to query a graft.\n", str_id, str_path);
-        return;
-    }
-
     cmd = command_create_graft(scene->current_entity, str_path, str_id, graft_data, scene->handle->alloc);
-
-    if (cmd.flavor == COMMAND_INVALID) {
-        logger_log(scene->handle->logger, LOGGER_SEVERITY_WARN, "Failed to create command to add a graft (name : %s ; path : %s).\n", str_id, str_path);
-        return;
-    }
-
     command_queue_append(scene->handle->commands, cmd, scene->handle->alloc);
 }
 
@@ -361,18 +328,7 @@ void tarasque_entity_scene_subscribe_to_event(tarasque_entity_scene *scene,  con
         return;
     }
 
-    if (!str_event_name || !callback) {
-        logger_log(scene->handle->logger, LOGGER_SEVERITY_WARN, "Invalid event name (%s) or callback pointer (%#010x) to query a subscription.\n", str_event_name, callback);
-        return;
-    }
-
     cmd = command_create_subscribe_to_event(scene->current_entity, str_event_name, callback, scene->handle->alloc);
-
-    if (cmd.flavor == COMMAND_INVALID) {
-        logger_log(scene->handle->logger, LOGGER_SEVERITY_WARN, "Failed to create command to add an event subscription (event name : %s, callback pointer %#010x).\n", str_event_name, callback);
-        return;
-    }
-
     command_queue_append(scene->handle->commands, cmd, scene->handle->alloc);
 }
 
@@ -390,11 +346,6 @@ void tarasque_entity_scene_stack_event(tarasque_entity_scene *scene, const char 
     entity *source_entity = NULL;
 
     if (!scene || !scene->handle || !scene->current_entity) {
-        return;
-    }
-
-    if (!str_event_name) {
-        logger_log(scene->handle->logger, LOGGER_SEVERITY_ERRO, "Invalid event name (%s).\n", str_event_name);
         return;
     }
 

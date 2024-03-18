@@ -12,6 +12,7 @@
  *
  */
 typedef struct graft_entity_sdl_window_data {
+
     SDL_Window *window;
 } graft_entity_sdl_window_data;
 
@@ -20,9 +21,21 @@ typedef struct graft_entity_sdl_window_data {
 // -------------------------------------------------------------------------------------------------
 
 /*  */
-static void graft_entity_sdl_window_init(void *self_data, tarasque_entity_scene *handle);
+static void graft_entity_sdl_window_init(void *self_data, tarasque_entity_scene *scene);
 /*  */
-static void graft_entity_sdl_window_deinit(void *self_data, tarasque_engine *handle);
+static void graft_entity_sdl_window_deinit(void *self_data, tarasque_entity_scene *scene);
+
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+
+static const entity_user_data global_graft_entity_sdl_window = {
+        .data_size = sizeof(graft_entity_sdl_window_data),
+        .data = &(graft_entity_sdl_window_data) { 0u },
+
+        .on_init = graft_entity_sdl_window_init,
+        .on_deinit = graft_entity_sdl_window_deinit,
+};
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -32,11 +45,11 @@ static void graft_entity_sdl_window_deinit(void *self_data, tarasque_engine *han
  * @brief
  *
  * @param self_data
- * @param handle
+ * @param scene
  */
-static void graft_entity_sdl_window_init(void *self_data, tarasque_entity_scene *handle)
+static void graft_entity_sdl_window_init(void *self_data, tarasque_entity_scene *scene)
 {
-    (void) handle;
+    (void) scene;
 
     graft_entity_sdl_window_data *window_data = (graft_entity_sdl_window_data *) self_data;
     if (!window_data) {
@@ -51,11 +64,11 @@ static void graft_entity_sdl_window_init(void *self_data, tarasque_entity_scene 
  * @brief
  *
  * @param self_data
- * @param handle
+ * @param scene
  */
-static void graft_entity_sdl_window_deinit(void *self_data, tarasque_engine *handle)
+static void graft_entity_sdl_window_deinit(void *self_data, tarasque_entity_scene *scene)
 {
-    (void) handle;
+    (void) scene;
 
     graft_entity_sdl_window_data *window_data = (graft_entity_sdl_window_data *) self_data;
     if (!window_data) {
@@ -69,10 +82,10 @@ static void graft_entity_sdl_window_deinit(void *self_data, tarasque_engine *han
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-const entity_user_data graft_entity_sdl_window = {
-        .data_size = sizeof(graft_entity_sdl_window_data),
-        .data = &(graft_entity_sdl_window_data) { 0u },
+entity_user_data *graft_entity_sdl_window_as(const char *title, size_t x, size_t y,  size_t w, size_t h, SDL_WindowFlags flags)
+{
+    if (!title) {
+        title = "window";
+    }
 
-        .on_init = graft_entity_sdl_window_init,
-        .on_deinit = graft_entity_sdl_window_deinit,
-};
+}
