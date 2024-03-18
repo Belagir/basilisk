@@ -329,10 +329,13 @@ entity_user_data_copy entity_user_data_copy_create(entity_user_data user_data, a
             .on_frame = user_data.on_frame,
     };
 
-    if (user_data.data && (user_data.data_size > 0u)) {
+    if (user_data.data_size > 0u) {
         copy.data = alloc.malloc(alloc, user_data.data_size);
-        bytewise_copy(copy.data, user_data.data, user_data.data_size);
         copy.data_size = user_data.data_size;
+    }
+
+    if (user_data.data) {
+        bytewise_copy(copy.data, user_data.data, user_data.data_size);
     }
 
     return copy;

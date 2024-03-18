@@ -12,9 +12,12 @@
  *
  */
 typedef struct graft_entity_sdl_window_data {
+    graft_entity_sdl_window_args init_args;
 
     SDL_Window *window;
 } graft_entity_sdl_window_data;
+
+static graft_entity_sdl_window_data sdl_window_data_buffer = { 0u };
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -24,18 +27,6 @@ typedef struct graft_entity_sdl_window_data {
 static void graft_entity_sdl_window_init(void *self_data, tarasque_entity_scene *scene);
 /*  */
 static void graft_entity_sdl_window_deinit(void *self_data, tarasque_entity_scene *scene);
-
-// -------------------------------------------------------------------------------------------------
-// -------------------------------------------------------------------------------------------------
-// -------------------------------------------------------------------------------------------------
-
-static const entity_user_data global_graft_entity_sdl_window = {
-        .data_size = sizeof(graft_entity_sdl_window_data),
-        .data = &(graft_entity_sdl_window_data) { 0u },
-
-        .on_init = graft_entity_sdl_window_init,
-        .on_deinit = graft_entity_sdl_window_deinit,
-};
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -51,13 +42,17 @@ static void graft_entity_sdl_window_init(void *self_data, tarasque_entity_scene 
 {
     (void) scene;
 
-    graft_entity_sdl_window_data *window_data = (graft_entity_sdl_window_data *) self_data;
-    if (!window_data) {
+    if (!self_data) {
         return;
     }
 
-    // TODO : inject configuration to this call
-    window_data->window = SDL_CreateWindow("window", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1200, 800, 0);
+    graft_entity_sdl_window_data *window_data = (graft_entity_sdl_window_data *) self_data;
+
+    window_data->window = SDL_CreateWindow(
+            window_data->init_args.title,
+            (int) window_data->init_args.x, (int) window_data->init_args.y,
+            (int) window_data->init_args.w, (int) window_data->init_args.h,
+            window_data->init_args.flags);
 }
 
 /**
@@ -82,10 +77,19 @@ static void graft_entity_sdl_window_deinit(void *self_data, tarasque_entity_scen
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-entity_user_data *graft_entity_sdl_window_as(const char *title, size_t x, size_t y,  size_t w, size_t h, SDL_WindowFlags flags)
+entity_user_data graft_entity_sdl_window(graft_entity_sdl_window_args args)
 {
-    if (!title) {
-        title = "window";
-    }
+    // avoiding stack allocation but still won't force the user to deal with the heap...
+    sdl_window_data_buffer = (graft_entity_sdl_window_data) {
+            .init_args = args,
 
+            .window = NULL,
+    };
+
+    return (entity_user_data) {
+            .data_size = sizeof(sdl_window_data_buffer),
+            .data = &sdl_window_data_buffer,
+            .on_init = &graft_entity_sdl_window_init,
+            .on_deinit = &graft_entity_sdl_window_deinit,
+    };
 }
