@@ -290,30 +290,30 @@ void tarasque_entity_scene_add_entity(tarasque_entity_scene *scene, const char *
  * under which the callback was registered. If this entity is removed before the operation is done, the
  * command is also removed.
  *
- * @param[inout] handle Engine instance.
+ * @param[inout] scene
  * @param[in] str_path tring (copied) describing a '/'-delimited path to the removeed entity.
  */
-void tarasque_engine_remove_entity(tarasque_engine *handle, const char *str_path)
+void tarasque_entity_scene_remove_entity(tarasque_entity_scene *scene, const char *str_path)
 {
     command cmd = { 0u };
 
-    if (!handle) {
+    if (!scene || !scene->handle || !scene->current_entity) {
         return;
     }
 
     if (!str_path) {
-        logger_log(handle->logger, LOGGER_SEVERITY_WARN, "Invalid path (%s) to query an entity removal.\n", str_path);
+        logger_log(scene->handle->logger, LOGGER_SEVERITY_WARN, "Invalid path (%s) to query an entity removal.\n", str_path);
         return;
     }
 
-    cmd = command_create_remove_entity(handle->current_entity, str_path, handle->alloc);
+    cmd = command_create_remove_entity(scene->current_entity, str_path, scene->handle->alloc);
 
     if (cmd.flavor == COMMAND_INVALID) {
-        logger_log(handle->logger, LOGGER_SEVERITY_WARN, "Failed to create command to remove an entity (path : %s).\n", str_path);
+        logger_log(scene->handle->logger, LOGGER_SEVERITY_WARN, "Failed to create command to remove an entity (path : %s).\n", str_path);
         return;
     }
 
-    command_queue_append(handle->commands, cmd, handle->alloc);
+    command_queue_append(scene->handle->commands, cmd, scene->handle->alloc);
 }
 
 /**
