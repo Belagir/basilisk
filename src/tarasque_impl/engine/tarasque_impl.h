@@ -21,7 +21,4 @@ typedef struct tarasque_entity_scene {
     entity *current_entity;
 } tarasque_entity_scene;
 
-/* Sets the engine's current entity to link future operations back to it. */
-tarasque_engine *tarasque_engine_for(tarasque_engine *handle, entity *current_entity);
-
 #endif

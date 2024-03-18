@@ -46,9 +46,6 @@ typedef struct tarasque_engine {
 
     /** Root of the game tree as an empty entity. */
     entity *root_entity;
-    /** Entity currently being processed by the engine. This value is set before a foreign entity-specified
-      * callback is executed to save the context and link operations from the callback back to the entity. */
-    entity *current_entity;
 
     tarasque_entity_scene root_scene;
 
@@ -131,7 +128,6 @@ tarasque_engine *tarasque_engine_create(void)
                 .pub_sub = event_broker_create(used_alloc),
 
                 .root_entity = entity_create(identifier_root, (entity_user_data) { 0u }, used_alloc),
-                .current_entity = NULL,
 
                 .root_scene = (tarasque_entity_scene) { 0u },
 
@@ -237,7 +233,7 @@ void tarasque_engine_run(tarasque_engine *handle, int fps) {
  *
  * @param[inout] scene
  */
-void tarasque_engine_quit(tarasque_entity_scene *scene)
+void tarasque_entity_scene_quit(tarasque_entity_scene *scene)
 {
     if (!scene || !scene->handle) {
         return;
@@ -414,27 +410,6 @@ void tarasque_entity_scene_stack_event(tarasque_entity_scene *scene, const char 
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief Sets the current entity of the engine to some value and returns the updated engine instance.
- *
- * @param[inout] handle Engine instance.
- * @param[in] current_entity New current entity.
- * @return tarasque_engine*
- */
-tarasque_engine *tarasque_engine_for(tarasque_engine *handle, entity *current_entity)
-{
-    if (!handle) {
-        return NULL;
-    }
-
-    handle->current_entity = current_entity;
-    return handle;
-}
-
-// -------------------------------------------------------------------------------------------------
-// -------------------------------------------------------------------------------------------------
-// -------------------------------------------------------------------------------------------------
-
-/**
  * @brief Completely removes an entity and its children from everything in the engine.
  * Additionally of removing the entities from the tree, it will remove all relevant events, subscriptions
  * and commands linked to the entities. All of the entities memory is released.
@@ -554,7 +529,7 @@ static void tarasque_engine_process_command_graft(tarasque_engine *handle, entit
         return;
     }
 
-    graft_parent = entity_get_child(tarasque_engine_for(handle, subject)->current_entity, cmd.id_path);
+    graft_parent = entity_get_child(subject, cmd.id_path);
 
     if (!graft_parent) {
         return;

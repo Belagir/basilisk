@@ -79,7 +79,7 @@ void tarasque_engine_run(tarasque_engine *handle, int fps);
 // -------------------------------------------------------------------------------------------------
 
 /* Flags the engine to exit next frame. */
-void tarasque_engine_quit(tarasque_entity_scene *scene);
+void tarasque_entity_scene_quit(tarasque_entity_scene *scene);
 
 /* From or out of an entity callback, adds a pending command to add another entity to the game tree. */
 void tarasque_entity_scene_add_entity(tarasque_entity_scene *scene, const char *str_path, const char *str_id, entity_user_data user_data);
