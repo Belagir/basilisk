@@ -235,15 +235,15 @@ void tarasque_engine_run(tarasque_engine *handle, int fps) {
  * @brief Flags the engine to quit on the next frame.
  * The current frame will still finish before quitting.
  *
- * @param[inout] handle Engine instance.
+ * @param[inout] scene
  */
-void tarasque_engine_quit(tarasque_engine *handle)
+void tarasque_engine_quit(tarasque_entity_scene *scene)
 {
-    if (!handle) {
+    if (!scene || !scene->handle) {
         return;
     }
 
-    handle->should_quit = true;
+    scene->handle->should_quit = true;
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -20,7 +20,7 @@ typedef struct graft_entity_sdl_window_data {
 // -------------------------------------------------------------------------------------------------
 
 /*  */
-static void graft_entity_sdl_window_init(void *self_data, tarasque_engine *handle);
+static void graft_entity_sdl_window_init(void *self_data, tarasque_entity_scene *handle);
 /*  */
 static void graft_entity_sdl_window_deinit(void *self_data, tarasque_engine *handle);
 
@@ -34,7 +34,7 @@ static void graft_entity_sdl_window_deinit(void *self_data, tarasque_engine *han
  * @param self_data
  * @param handle
  */
-static void graft_entity_sdl_window_init(void *self_data, tarasque_engine *handle)
+static void graft_entity_sdl_window_init(void *self_data, tarasque_entity_scene *handle)
 {
     (void) handle;
 

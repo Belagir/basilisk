@@ -8,9 +8,9 @@
 // -------------------------------------------------------------------------------------------------
 
 /*  */
-static void graft_entity_sdl_context_init(void *self_data, tarasque_engine *handle);
+static void graft_entity_sdl_context_init(void *self_data, tarasque_entity_scene *scene);
 /*  */
-static void graft_entity_sdl_context_deinit(void *self_data, tarasque_engine *handle);
+static void graft_entity_sdl_context_deinit(void *self_data, tarasque_entity_scene *scene);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -20,9 +20,9 @@ static void graft_entity_sdl_context_deinit(void *self_data, tarasque_engine *ha
  * @brief
  *
  * @param self_data
- * @param handle
+ * @param scene
  */
-static void graft_entity_sdl_context_init(void *self_data, tarasque_engine *handle)
+static void graft_entity_sdl_context_init(void *self_data, tarasque_entity_scene *scene)
 {
     (void) self_data;
 
@@ -33,9 +33,9 @@ static void graft_entity_sdl_context_init(void *self_data, tarasque_engine *hand
  * @brief
  *
  * @param self_data
- * @param handle
+ * @param scene
  */
-static void graft_entity_sdl_context_deinit(void *self_data, tarasque_engine *handle)
+static void graft_entity_sdl_context_deinit(void *self_data, tarasque_entity_scene *scene)
 {
     (void) self_data;
 

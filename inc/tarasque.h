@@ -39,11 +39,11 @@ typedef struct entity_user_data {
     void *data;
 
     /** Function ran on the entity-specific data when it is first created. */
-    void (*on_init)(void *entity_data, tarasque_engine *handle);
+    void (*on_init)(void *entity_data, tarasque_entity_scene *scene);
     /** Function ran on the entity-specific data when it is destroyed. */
-    void (*on_deinit)(void *entity_data, tarasque_engine *handle);
+    void (*on_deinit)(void *entity_data, tarasque_entity_scene *scene);
     /** Function ran on the entity-specific data each frame. */
-    void (*on_frame)(void *entity_data, float elapsed_ms, tarasque_engine *handle);
+    void (*on_frame)(void *entity_data, float elapsed_ms, tarasque_entity_scene *scene);
 } entity_user_data;
 
 /**
@@ -68,17 +68,18 @@ tarasque_engine *tarasque_engine_create(void);
 /* Destroys a previously allocated engine instance and nullifies the given pointer. */
 void tarasque_engine_destroy(tarasque_engine **handle);
 
-tarasque_entity_scene *tarasque_engine_root_scene(tarasque_engine *handle);
-
 // -------------------------------------------------------------------------------------------------
+
+tarasque_entity_scene *tarasque_engine_root_scene(tarasque_engine *handle);
 
 /* Starts the main loop of the engine, resolving pending commands, sending events and stepping
 entities. */
 void tarasque_engine_run(tarasque_engine *handle, int fps);
-/* Flags the engine to exit next frame. */
-void tarasque_engine_quit(tarasque_engine *handle);
 
 // -------------------------------------------------------------------------------------------------
+
+/* Flags the engine to exit next frame. */
+void tarasque_engine_quit(tarasque_entity_scene *scene);
 
 /* From or out of an entity callback, adds a pending command to add another entity to the game tree. */
 void tarasque_entity_scene_add_entity(tarasque_entity_scene *scene, const char *str_path, const char *str_id, entity_user_data user_data);
