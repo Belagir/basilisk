@@ -48,8 +48,11 @@ static void graft_entity_sdl_context_deinit(void *self_data, tarasque_entity_sce
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-const entity_user_data graft_entity_sdl_context = {
+entity_user_data graft_entity_sdl_context(void)
+{
+    return (entity_user_data) {
         .on_init = &graft_entity_sdl_context_init,
         .on_deinit = &graft_entity_sdl_context_deinit,
-};
+    };
+}
 
