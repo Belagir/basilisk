@@ -70,7 +70,7 @@ void tarasque_engine_destroy(tarasque_engine **handle);
 
 // -------------------------------------------------------------------------------------------------
 
-tarasque_entity_scene *tarasque_engine_root_scene(tarasque_engine *handle);
+tarasque_entity_scene *tarasque_engine_root_entity_scene(tarasque_engine *handle);
 
 /* Starts the main loop of the engine, resolving pending commands, sending events and stepping
 entities. */

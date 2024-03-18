@@ -177,7 +177,7 @@ void tarasque_engine_destroy(tarasque_engine **handle)
 }
 
 
-tarasque_entity_scene *tarasque_engine_root_scene(tarasque_engine *handle)
+tarasque_entity_scene *tarasque_engine_root_entity_scene(tarasque_engine *handle)
 {
     if (!handle) {
         return NULL;
