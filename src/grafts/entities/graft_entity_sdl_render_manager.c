@@ -3,8 +3,6 @@
 
 #include "graft_entities.h"
 
-#include <stdio.h>
-
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -72,7 +70,6 @@ static void graft_entity_sdl_render_manager_on_frame(void *self_data, float elap
 
     graft_entity_sdl_render_manager_data *data = (graft_entity_sdl_render_manager_data *) self_data;
 
-    printf("events\n");
     tarasque_entity_scene_stack_event(scene, "sdl renderer post draw", 0u, NULL, false);
     tarasque_entity_scene_stack_event(scene, "sdl renderer draw", sizeof(graft_sdl_window_event_draw), &(graft_sdl_window_event_draw) { data->renderer }, false);
     tarasque_entity_scene_stack_event(scene, "sdl renderer pre draw", 0u, NULL, false);
@@ -86,8 +83,6 @@ static void graft_entity_sdl_render_manager_pre_draw(void *self_data, void *even
     if (!self_data) {
         return;
     }
-
-    printf("pre draw\n");
 
     graft_entity_sdl_render_manager_data *data = (graft_entity_sdl_render_manager_data *) self_data;
 
@@ -104,8 +99,6 @@ static void graft_entity_sdl_render_manager_post_draw(void *self_data, void *eve
     if (!self_data) {
         return;
     }
-
-    printf("post draw\n");
 
     graft_entity_sdl_render_manager_data *data = (graft_entity_sdl_render_manager_data *) self_data;
 

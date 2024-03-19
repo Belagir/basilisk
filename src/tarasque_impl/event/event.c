@@ -173,6 +173,7 @@ void event_broker_subscribe(event_broker *broker, entity *subscribed, identifier
 
     if (!sorted_range_find_in(range_to_any(broker->subs), &identifier_compare, &target_event_name, &list_pos)) {
         created_list = event_subscription_list_create(target_event_name, alloc);
+        broker->subs = range_ensure_capacity(alloc, range_to_any(broker->subs), 1);
         list_pos = sorted_range_insert_in(range_to_any(broker->subs), &identifier_compare, &created_list);
     }
 
