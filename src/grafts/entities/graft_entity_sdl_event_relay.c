@@ -1,8 +1,39 @@
 
 #include "graft_entities.h"
 
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+
+static void graft_entity_sdl_event_relay_on_frame(void *entity_data, float elapsed_ms, tarasque_entity_scene *scene);
+
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+
+static void graft_entity_sdl_event_relay_on_frame(void *entity_data, float elapsed_ms, tarasque_entity_scene *scene)
+{
+    (void) entity_data;
+    (void) elapsed_ms;
+
+    SDL_Event event = { 0u };
+
+    while (SDL_PollEvent(&event)) {
+        if (event.type == SDL_QUIT) {
+            tarasque_entity_scene_stack_event(scene, "sdl event quit", 0u, NULL, true);
+        } else {
+            tarasque_entity_scene_stack_event(scene, "sdl event", sizeof(event), &event, false);
+        }
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 entity_user_data graft_entity_sdl_event_relay(void)
 {
-    return (entity_user_data) { 0u };
+    return (entity_user_data) {
+            .on_frame = &graft_entity_sdl_event_relay_on_frame,
+    };
 }
