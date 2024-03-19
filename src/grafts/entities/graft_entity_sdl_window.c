@@ -59,7 +59,7 @@ static void graft_entity_sdl_window_init(void *self_data, tarasque_entity_scene 
     tarasque_entity_scene_add_entity(scene, "", "Render Manager",
             graft_entity_sdl_render_manager((graft_entity_sdl_render_manager_args) { .source_window = window_data->window, .flags = 0 }));
 
-    tarasque_entity_scene_subscribe_to_event(scene, "sdl event quit", &graft_entity_sdl_window_quit);
+    tarasque_entity_scene_subscribe_to_event(scene, "sdl event quit", (event_subscription_user_data) { &graft_entity_sdl_window_quit });
 }
 
 /**
@@ -103,7 +103,10 @@ entity_user_data graft_entity_sdl_window(graft_entity_sdl_window_args args)
     return (entity_user_data) {
             .data_size = sizeof(sdl_window_data_buffer),
             .data = &sdl_window_data_buffer,
-            .on_init = &graft_entity_sdl_window_init,
-            .on_deinit = &graft_entity_sdl_window_deinit,
+
+            .callbacks = {
+                    .on_init = &graft_entity_sdl_window_init,
+                    .on_deinit = &graft_entity_sdl_window_deinit,
+            }
     };
 }

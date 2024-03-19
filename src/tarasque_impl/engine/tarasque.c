@@ -127,7 +127,7 @@ tarasque_engine *tarasque_engine_create(void)
                 .events = event_stack_create(used_alloc),
                 .pub_sub = event_broker_create(used_alloc),
 
-                .root_entity = entity_create(identifier_root, (entity_user_data) { 0u }, used_alloc),
+                .root_entity = entity_create(identifier_root, (entity_user_data) { 0u }, NULL, used_alloc),
 
                 .root_scene = (tarasque_entity_scene) { 0u },
 
@@ -320,7 +320,7 @@ void tarasque_entity_scene_graft(tarasque_entity_scene *scene, const char *str_p
  * @param[in] str_event_name Name (copied) of the event the entity wants to subscribe a callback to.
  * @param[in] callback Pointer to the callback that will receive the entity's data and event data.
  */
-void tarasque_entity_scene_subscribe_to_event(tarasque_entity_scene *scene,  const char *str_event_name, void (*callback)(void *entity_data, void *event_data, tarasque_entity_scene *scene))
+void tarasque_entity_scene_subscribe_to_event(tarasque_entity_scene *scene,  const char *str_event_name, event_subscription_user_data subscription_data)
 {
     command cmd = { 0u };
 
@@ -328,7 +328,7 @@ void tarasque_entity_scene_subscribe_to_event(tarasque_entity_scene *scene,  con
         return;
     }
 
-    cmd = command_create_subscribe_to_event(scene->current_entity, str_event_name, callback, scene->handle->alloc);
+    cmd = command_create_subscribe_to_event(scene->current_entity, str_event_name, subscription_data, scene->handle->alloc);
     command_queue_append(scene->handle->commands, cmd, scene->handle->alloc);
 }
 
@@ -465,7 +465,7 @@ static void tarasque_engine_process_command_add_entity(tarasque_engine *handle, 
         return;
     }
 
-    new_entity = entity_create(cmd.id, cmd.user_data, handle->alloc);
+    new_entity = entity_create(cmd.id, cmd.user_data, handle, handle->alloc);
     entity_add_child(found_parent, new_entity, handle->alloc);
     entity_init(new_entity, handle);
 
@@ -494,7 +494,7 @@ static void tarasque_engine_process_command_graft(tarasque_engine *handle, entit
         return;
     }
 
-    graft_root = entity_create(cmd.id, (entity_user_data_copy) { 0u }, handle->alloc);
+    graft_root = entity_create(cmd.id, (entity_user_data_copy) { 0u }, handle, handle->alloc);
     entity_add_child(graft_parent, graft_root, handle->alloc);
     entity_init(graft_parent, handle);
 
@@ -547,8 +547,8 @@ static void tarasque_engine_process_command_subscribe_to_event(tarasque_engine *
         return;
     }
 
-    event_broker_subscribe(handle->pub_sub, cmd.subscribed, cmd.target_event_name, cmd.callback, handle->alloc);
-    logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Entity \"%s\" subscribed callback %#010x to event \"%s\".\n", entity_get_name(cmd.subscribed)->data, cmd.callback, cmd.target_event_name->data);
+    event_broker_subscribe(handle->pub_sub, cmd.subscribed, cmd.target_event_name, cmd.subscription_data, handle->alloc);
+    logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Entity \"%s\" subscribed callback %#010x to event \"%s\".\n", entity_get_name(cmd.subscribed)->data, cmd.subscription_data, cmd.target_event_name->data);
 }
 
 // -------------------------------------------------------------------------------------------------

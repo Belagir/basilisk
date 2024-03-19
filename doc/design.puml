@@ -67,7 +67,7 @@ package entity {
         + range(entity *) *entity_get_children(entity *target, allocator alloc)
         ..
         void entity_step_frame(entity *target, f32 elapsed_ms, tarasque_engine *handle)
-        void entity_send_event(entity *target, void (*callback)(void *entity_data, void *event_data), void *event_data)
+        void entity_send_event(entity *target, void (*callback)(void *self_data, void *event_data), void *event_data)
     }
     engine_entity::user_data --* "1" engine_entity_user_data_copy
     engine_entity::id --* "1" identifier
@@ -99,7 +99,7 @@ package command {
     struct engine_command_subscribe_to_event as "command_subscribe_to_event" {
         + identifier *target_event_name
         + entity *subscribed
-        + {field} void (*callback)(void *entity_data, void *event_data)
+        + {field} void (*callback)(void *self_data, void *event_data)
     }
     engine_command_subscribe_to_event::target_event_name --* "1" identifier
     engine_command_subscribe_to_event::subscribed --o "1" engine_entity
@@ -125,7 +125,7 @@ package command {
         __
         + command command_create_add_entity(entity *source, const char *id_path, const char *id, engine_entity_user_data user_data, allocator alloc)
         + command command_create_remove_entity(entity *source, const char *id_path, allocator alloc)
-        + command command_create_subscribe_to_event(entity *source, const char *event_name, void (*callback)(void *entity_data, void *event_data), allocator alloc)
+        + command command_create_subscribe_to_event(entity *source, const char *event_name, void (*callback)(void *self_data, void *event_data), allocator alloc)
         ..
         + void command_destroy(command *cmd, allocator alloc)
     }
@@ -160,7 +160,7 @@ package event {
 
         struct engine_event_subscription as "event_subscription" {
             + entity *subscribed
-            + {field} void (*callback)(void *entity_data, void *event_data)
+            + {field} void (*callback)(void *self_data, void *event_data)
         }
         engine_event_subscription::subscribed --o "1" engine_entity
 
@@ -173,8 +173,8 @@ package event {
             + event_subscription_list event_subscription_list_create(identifier *event_name, allocator alloc)
             + void event_subscription_list_destroy(event_subscription_list *list, allocator alloc)
             ..
-            + void event_subscription_list_append(event_subscription_list *list, entity *subscribed, void (*callback)(void *entity_data, void *event_data))
-            + void event_subscription_list_remove(event_subscription_list *list, entity *subscribed, void (*callback)(void *entity_data, void *event_data))
+            + void event_subscription_list_append(event_subscription_list *list, entity *subscribed, void (*callback)(void *self_data, void *event_data))
+            + void event_subscription_list_remove(event_subscription_list *list, entity *subscribed, void (*callback)(void *self_data, void *event_data))
             ..
             + void event_subscription_list_publish(event_subscription_list *list, event ev)
             + size_t event_subscription_list_length(const event_subscription_list *list)
@@ -191,8 +191,8 @@ package event {
         + event_broker *event_broker_create(allocator alloc)
         + void event_broker_destroy(event_broker **broker, allocator alloc)
         ..
-        + void event_broker_subscribe(event_broker *broker, entity *subscribed, identifier *target_event_name, void (*callback)(void *entity_data, void *event_data), allocator alloc)
-        + void event_broker_unsubscribe(event_broker *broker, entity *target, identifier *target_event_name, void (*callback)(void *entity_data, void *event_data), allocator alloc)
+        + void event_broker_subscribe(event_broker *broker, entity *subscribed, identifier *target_event_name, void (*callback)(void *self_data, void *event_data), allocator alloc)
+        + void event_broker_unsubscribe(event_broker *broker, entity *target, identifier *target_event_name, void (*callback)(void *self_data, void *event_data), allocator alloc)
         + void event_broker_publish(event_broker *broker, event ev)
     }
     engine_event_broker::sub --* "0..*" engine_event_subscription_list
@@ -257,7 +257,7 @@ package main_header {
         + void tarasque_engine_add_entity(tarasque_engine *handle, const char *str_path, const char *str_id, entity_user_data user_data)
         + void tarasque_engine_remove_entity(tarasque_engine *handle, const char *str_path)
         ..
-        + void tarasque_engine_subscribe_to_event(tarasque_engine *handle, const char *str_event_name, void (*callback)(void *entity_data, void *event_data))
+        + void tarasque_engine_subscribe_to_event(tarasque_engine *handle, const char *str_event_name, void (*callback)(void *self_data, void *event_data))
         + void tarasque_engine_stack_event(tarasque_engine *handle, const char *str_event_name, size_t data_size, void *data, bool is_detached)
         ..
         ~ tarasque_engine *tarasque_engine_for(tarasque_engine *handle, entity *current_entity)

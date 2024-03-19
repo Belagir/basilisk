@@ -43,8 +43,8 @@ static void graft_entity_sdl_render_manager_init(void *self_data, tarasque_entit
     init_data->renderer = SDL_CreateRenderer(init_data->init.source_window, -1, init_data->init.flags);
 
     if (init_data->renderer) {
-        tarasque_entity_scene_subscribe_to_event(scene, "sdl renderer pre draw", &graft_entity_sdl_render_manager_pre_draw);
-        tarasque_entity_scene_subscribe_to_event(scene, "sdl renderer post draw", &graft_entity_sdl_render_manager_post_draw);
+        tarasque_entity_scene_subscribe_to_event(scene, "sdl renderer pre draw",  (event_subscription_user_data) { &graft_entity_sdl_render_manager_pre_draw });
+        tarasque_entity_scene_subscribe_to_event(scene, "sdl renderer post draw", (event_subscription_user_data) { &graft_entity_sdl_render_manager_post_draw });
     }
 }
 
@@ -120,8 +120,10 @@ entity_user_data graft_entity_sdl_render_manager(graft_entity_sdl_render_manager
             .data_size = sizeof(graft_entity_sdl_render_manager_data_buffer),
             .data = &graft_entity_sdl_render_manager_data_buffer,
 
-            .on_init = &graft_entity_sdl_render_manager_init,
-            .on_frame = &graft_entity_sdl_render_manager_on_frame,
-            .on_deinit = &graft_entity_sdl_render_manager_deinit,
+            .callbacks = {
+                    .on_init = &graft_entity_sdl_render_manager_init,
+                    .on_frame = &graft_entity_sdl_render_manager_on_frame,
+                    .on_deinit = &graft_entity_sdl_render_manager_deinit,
+            }
     };
 }

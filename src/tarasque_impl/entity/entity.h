@@ -34,7 +34,7 @@ typedef entity_user_data entity_user_data_copy;
 // -------------------------------------------------------------------------------------------------
 
 /* Creates an entity and returns a pointer to it. */
-entity *entity_create(const identifier *id, entity_user_data_copy user_data, allocator alloc);
+entity *entity_create(const identifier *id, entity_user_data_copy user_data, tarasque_engine *handle, allocator alloc);
 /* Destroys an entity and nullifies the pointer passed. */
 void entity_destroy(entity **target, allocator alloc);
 
@@ -67,7 +67,7 @@ const identifier *entity_get_name(const entity *target);
 void entity_step_frame(entity *target, f32 elapsed_ms, tarasque_engine *handle);
 
 /* Execute an event callback trusted to be linked to an entity. */
-void entity_send_event(entity *target, void (*callback)(void *entity_data, void *event_data, tarasque_entity_scene *scene), void *event_data, tarasque_engine *handle);
+void entity_send_event(entity *target, event_subscription_user_data subscription_data, void *event_data, tarasque_engine *handle);
 
 /* Execute the on_init() callback tied to an entity */
 void entity_init(entity *target, tarasque_engine *handle);

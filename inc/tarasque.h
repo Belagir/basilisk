@@ -26,7 +26,19 @@ typedef struct tarasque_engine tarasque_engine;
 
 typedef struct tarasque_entity_scene tarasque_entity_scene;
 
+
+typedef void entity_data;
+
 // -------------------------------------------------------------------------------------------------
+
+typedef struct entity_callbacks {
+    /** Function ran on the entity-specific data when it is first created. */
+    void (*on_init)(void *self_data, tarasque_entity_scene *scene);
+    /** Function ran on the entity-specific data when it is destroyed. */
+    void (*on_deinit)(void *self_data, tarasque_entity_scene *scene);
+    /** Function ran on the entity-specific data each frame. */
+    void (*on_frame)(void *self_data, float elapsed_ms, tarasque_entity_scene *scene);
+} entity_callbacks;
 
 /**
  * @brief Data representing the key components of an entity.
@@ -38,13 +50,16 @@ typedef struct entity_user_data {
     functions that take the containing struct type. */
     void *data;
 
-    /** Function ran on the entity-specific data when it is first created. */
-    void (*on_init)(void *entity_data, tarasque_entity_scene *scene);
-    /** Function ran on the entity-specific data when it is destroyed. */
-    void (*on_deinit)(void *entity_data, tarasque_entity_scene *scene);
-    /** Function ran on the entity-specific data each frame. */
-    void (*on_frame)(void *entity_data, float elapsed_ms, tarasque_entity_scene *scene);
+    entity_callbacks callbacks;
 } entity_user_data;
+
+/**
+ * @brief
+ *
+ */
+typedef struct event_subscription_user_data {
+    void (*callback)(void *self_data, void *event_data, tarasque_entity_scene *scene);
+} event_subscription_user_data;
 
 /**
  * @brief
@@ -89,7 +104,7 @@ void tarasque_entity_scene_remove_entity(tarasque_entity_scene *scene, const cha
 void tarasque_entity_scene_graft(tarasque_entity_scene *scene, const char *str_path, const char *str_id, graft_user_data graft_data);
 
 /* From an entity callback and only, adds a pending command to subscribe a callback to an event by the event's name. */
-void tarasque_entity_scene_subscribe_to_event(tarasque_entity_scene *scene, const char *str_event_name, void (*callback)(void *entity_data, void *event_data, tarasque_entity_scene *scene));
+void tarasque_entity_scene_subscribe_to_event(tarasque_entity_scene *scene, const char *str_event_name, event_subscription_user_data subscription_data);
 /* From an entity or not, detached from it or not, sends an event to subscribed entities. */
 void tarasque_entity_scene_stack_event(tarasque_entity_scene *scene, const char *str_event_name, size_t event_data_size, void *event_data, bool is_detached);
 

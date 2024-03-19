@@ -83,7 +83,7 @@ typedef struct command_subscribe_to_event {
     /** Non-owned reference to the subscriber entity. */
     entity *subscribed;
     /** Registered callback. */
-    void (*callback)(void *entity_data, void *event_data, tarasque_entity_scene *scene);
+    event_subscription_user_data subscription_data;
 } command_subscribe_to_event;
 
 // -------------------------------------------------------------------------------------------------
@@ -121,7 +121,7 @@ command command_create_graft(entity *source, const char *id_path, const char *id
 /* Creates a command to remove an entity. */
 command command_create_remove_entity(entity *source, const char *id_path, allocator alloc);
 /* Creates a command to subscribe an entity and a callback to an event. */
-command command_create_subscribe_to_event(entity *source, const char *event_name, void (*callback)(void *entity_data, void *event_data, tarasque_entity_scene *scene), allocator alloc);
+command command_create_subscribe_to_event(entity *source, const char *event_name, event_subscription_user_data subscription_data, allocator alloc);
 
 // -------------------------------------------------------------------------------------------------
 

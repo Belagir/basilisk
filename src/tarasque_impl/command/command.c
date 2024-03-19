@@ -125,11 +125,11 @@ command command_create_remove_entity(entity *source, const char *id_path, alloca
  * @param[inout] alloc Allocator used for the allocation of the command.
  * @return A fresh command to be queued.
  */
-command command_create_subscribe_to_event(entity *source, const char *event_name, void (*callback)(void *entity_data, void *event_data, tarasque_entity_scene *scene), allocator alloc)
+command command_create_subscribe_to_event(entity *source, const char *event_name, event_subscription_user_data subscription_data, allocator alloc)
 {
     command new_cmd = { 0u };
 
-    if (!source || !event_name || !callback) {
+    if (!source || !event_name || !subscription_data.callback) {
         return (command) { .flavor = COMMAND_INVALID };
     }
 
@@ -139,7 +139,7 @@ command command_create_subscribe_to_event(entity *source, const char *event_name
             .specific.subscribe_to_event = {
                     .target_event_name = identifier_from_cstring(event_name, alloc),
                     .subscribed = source,
-                    .callback = callback,
+                    .subscription_data = subscription_data,
             },
     };
 

@@ -5,15 +5,15 @@
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-static void graft_entity_sdl_event_relay_on_frame(void *entity_data, float elapsed_ms, tarasque_entity_scene *scene);
+static void graft_entity_sdl_event_relay_on_frame(void *self_data, float elapsed_ms, tarasque_entity_scene *scene);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-static void graft_entity_sdl_event_relay_on_frame(void *entity_data, float elapsed_ms, tarasque_entity_scene *scene)
+static void graft_entity_sdl_event_relay_on_frame(void *self_data, float elapsed_ms, tarasque_entity_scene *scene)
 {
-    (void) entity_data;
+    (void) self_data;
     (void) elapsed_ms;
 
     SDL_Event event = { 0u };
@@ -34,6 +34,8 @@ static void graft_entity_sdl_event_relay_on_frame(void *entity_data, float elaps
 entity_user_data graft_entity_sdl_event_relay(void)
 {
     return (entity_user_data) {
-            .on_frame = &graft_entity_sdl_event_relay_on_frame,
+            .callbacks = {
+                    .on_frame = &graft_entity_sdl_event_relay_on_frame,
+            }
     };
 }

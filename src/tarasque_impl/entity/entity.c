@@ -29,8 +29,12 @@ typedef struct entity {
     /** Array of all of the entity's children. */
     entity_range *children;
 
-    /** Copy of the user-specified data. */
-    entity_user_data_copy user_data;
+    entity_callbacks callbacks;
+
+    // tarasque_engine *host_handle;
+
+    size_t data_size;
+    byte data[];
 } entity;
 
 // -------------------------------------------------------------------------------------------------
@@ -42,23 +46,30 @@ typedef struct entity {
  *
  * @param[in] id Name (copied) of the new entity.
  * @param[in] user_data Copy (copied again) of some user data.
- * @param[inout] handle Handle to the engine instance to allow the created entity to.
+ * @param[inout] handle Handle to the engine instance to allow the created entity to change its state.
  * @param[inout] alloc Allocator used for the creation of the entity.
  * @return entity *
  */
-entity *entity_create(const identifier *id, entity_user_data_copy user_data, allocator alloc)
+entity *entity_create(const identifier *id, entity_user_data_copy user_data, tarasque_engine *handle, allocator alloc)
 {
     entity *new_entity = NULL;
 
-    new_entity = alloc.malloc(alloc, sizeof(*new_entity));
+    new_entity = alloc.malloc(alloc, sizeof(*new_entity) + user_data.data_size);
 
     if (new_entity) {
         *new_entity = (entity) {
                 .id = range_create_dynamic_from_copy_of(alloc, range_to_any(id)),
                 .parent = NULL,
                 .children = range_create_dynamic(alloc, sizeof(*new_entity->children->data), TARASQUE_COLLECTIONS_START_LENGTH),
-                .user_data = entity_user_data_copy_create(user_data, alloc),
+
+                .callbacks = user_data.callbacks,
+
+                // .host_handle = handle,
+
+                .data_size = user_data.data_size,
         };
+
+        bytewise_copy(new_entity->data, user_data.data, user_data.data_size);
     }
 
     return new_entity;
@@ -79,7 +90,6 @@ void entity_destroy(entity **target, allocator alloc)
 
     range_destroy_dynamic(alloc, &range_to_any((*target)->children));
     range_destroy_dynamic(alloc, &range_to_any((*target)->id));
-    entity_user_data_copy_destroy(&(*target)->user_data, alloc);
 
     alloc.free(alloc, *target);
     *target = NULL;
@@ -254,9 +264,8 @@ void entity_step_frame(entity *target, f32 elapsed_ms, tarasque_engine *handle)
     if (!target) {
         return;
     }
-
-    if (target->user_data.on_frame) {
-        target->user_data.on_frame(target->user_data.data, elapsed_ms, &(tarasque_entity_scene) { handle, target });
+    if (target->callbacks.on_frame) {
+        target->callbacks.on_frame(target->data, elapsed_ms, &(tarasque_entity_scene) { handle, target });
     }
 }
 
@@ -267,13 +276,13 @@ void entity_step_frame(entity *target, f32 elapsed_ms, tarasque_engine *handle)
  * @param[in] callback Event callback.
  * @param[inout] event_data Event data passed to the callback.
  */
-void entity_send_event(entity *target, void (*callback)(void *entity_data, void *event_data, tarasque_entity_scene *scene), void *event_data, tarasque_engine *handle)
+void entity_send_event(entity *target, event_subscription_user_data subscription_data, void *event_data, tarasque_engine *handle)
 {
-    if (!target || !callback) {
+    if (!target || !subscription_data.callback) {
         return;
     }
 
-    callback(target->user_data.data, event_data, &(tarasque_entity_scene) { handle, target });
+    subscription_data.callback(target->data, event_data, &(tarasque_entity_scene) { handle, target });
 }
 
 /**
@@ -288,8 +297,8 @@ void entity_init(entity *target, tarasque_engine *handle)
         return;
     }
 
-    if (target->user_data.on_init) {
-        target->user_data.on_init(target->user_data.data, &(tarasque_entity_scene) { handle, target });
+    if (target->callbacks.on_init) {
+        target->callbacks.on_init(target->data, &(tarasque_entity_scene) { handle, target });
     }
 }
 
@@ -305,8 +314,8 @@ void entity_deinit(entity *target, tarasque_engine *handle)
         return;
     }
 
-    if (target->user_data.on_deinit) {
-        target->user_data.on_deinit(target->user_data.data, &(tarasque_entity_scene) { handle, target });
+    if (target->callbacks.on_deinit) {
+        target->callbacks.on_deinit(target->data, &(tarasque_entity_scene) { handle, target });
     }
 }
 
@@ -324,9 +333,11 @@ void entity_deinit(entity *target, tarasque_engine *handle)
 entity_user_data_copy entity_user_data_copy_create(entity_user_data user_data, allocator alloc)
 {
     entity_user_data_copy copy = {
-            .on_init = user_data.on_init,
-            .on_deinit = user_data.on_deinit,
-            .on_frame = user_data.on_frame,
+            .callbacks = {
+                    .on_init   = user_data.callbacks.on_init,
+                    .on_deinit = user_data.callbacks.on_deinit,
+                    .on_frame  = user_data.callbacks.on_frame,
+            }
     };
 
     if (user_data.data_size > 0u) {

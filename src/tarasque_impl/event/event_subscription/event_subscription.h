@@ -26,7 +26,7 @@ typedef struct event_subscription {
     /** Reference to an entity thye callback is linked to */
     entity *subscribed;
     /** Pointer to some callback function to execute code on an event reception. */
-    void (*callback)(void *entity_data, void *event_data, tarasque_entity_scene *scene);
+    event_subscription_user_data subscription_data;
 } event_subscription;
 
 /**
@@ -53,10 +53,10 @@ void event_subscription_list_destroy(event_subscription_list *list, allocator al
 // -------------------------------------------------------------------------------------------------
 
 /* Inserts a new entry in the callback list. */
-void event_subscription_list_append(event_subscription_list *list, entity *subscribed, void (*callback)(void *entity_data, void *event_data, tarasque_entity_scene *scene), allocator alloc);
+void event_subscription_list_append(event_subscription_list *list, entity *subscribed, event_subscription_user_data subscription_data, allocator alloc);
 
 /* Removes an entry from the callback list. */
-void event_subscription_list_remove(event_subscription_list *list, entity *subscribed, void (*callback)(void *entity_data, void *event_data, tarasque_entity_scene *scene));
+void event_subscription_list_remove(event_subscription_list *list, entity *subscribed, event_subscription_user_data subscription_data);
 
 /* Removes all entries tied to some entity. */
 void event_subscription_list_remove_all_from(event_subscription_list *list, entity *subscribed);

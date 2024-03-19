@@ -74,14 +74,14 @@ void event_subscription_list_destroy(event_subscription_list *list, allocator al
  * @param[in] callback Function called to receive the event.
  * @param[inout] alloc Allocator used to eventually extend the list.
  */
-void event_subscription_list_append(event_subscription_list *list, entity *subscribed, void (*callback)(void *entity_data, void *event_data, tarasque_entity_scene *scene), allocator alloc)
+void event_subscription_list_append(event_subscription_list *list, entity *subscribed, event_subscription_user_data subscription_data, allocator alloc)
 {
-    if (!list || !subscribed || !callback) {
+    if (!list || !subscribed || !subscription_data.callback) {
         return;
     }
 
     list->subscription_list = range_ensure_capacity(alloc, range_to_any(list->subscription_list), 1);
-    sorted_range_insert_in(range_to_any(list->subscription_list), &event_subscription_compare, &(event_subscription) { .subscribed = subscribed, .callback = callback, });
+    sorted_range_insert_in(range_to_any(list->subscription_list), &event_subscription_compare, &(event_subscription) { .subscribed = subscribed, .subscription_data = subscription_data, });
 }
 
 /**
@@ -91,13 +91,13 @@ void event_subscription_list_append(event_subscription_list *list, entity *subsc
  * @param[in] subscribed Entity that subscribed a callback.
  * @param[in] callback Callback previously registered.
  */
-void event_subscription_list_remove(event_subscription_list *list, entity *subscribed, void (*callback)(void *entity_data, void *event_data, tarasque_entity_scene *scene))
+void event_subscription_list_remove(event_subscription_list *list, entity *subscribed, event_subscription_user_data subscription_data)
 {
     if (!list || !subscribed) {
         return;
     }
 
-    sorted_range_remove_from(range_to_any(list->subscription_list), &event_subscription_compare, &(event_subscription) { .subscribed = subscribed, .callback = callback, });
+    sorted_range_remove_from(range_to_any(list->subscription_list), &event_subscription_compare, &(event_subscription) { .subscribed = subscribed, .subscription_data = subscription_data, });
 }
 
 /**
@@ -114,7 +114,7 @@ void event_subscription_list_remove_all_from(event_subscription_list *list, enti
         return;
     }
 
-    if (!sorted_range_find_in(range_to_any(list->subscription_list), &event_subscription_compare, &(event_subscription) { .subscribed = subscribed, .callback = NULL, }, &subs_index)) {
+    if (!sorted_range_find_in(range_to_any(list->subscription_list), &event_subscription_compare, &(event_subscription) { .subscribed = subscribed, .subscription_data = { NULL }, }, &subs_index)) {
         return;
     }
 
@@ -142,8 +142,8 @@ void event_subscription_list_publish(event_subscription_list *list, event ev, ta
 
     for (size_t i = 0u ; i < list->subscription_list->length ; i++) {
         tmp_sub = list->subscription_list->data[i];
-        if (tmp_sub.callback) {
-            entity_send_event(tmp_sub.subscribed, tmp_sub.callback, ev.data, handle);
+        if (tmp_sub.subscription_data.callback) {
+            entity_send_event(tmp_sub.subscribed, tmp_sub.subscription_data, ev.data, handle);
         }
     }
 }
@@ -176,8 +176,8 @@ static i32 event_subscription_compare(const void *lhs, const void *rhs)
 
     event_name_cmp = identifier_compare_doubleref(sub_lhs, sub_rhs);
 
-    if ((event_name_cmp == 0) && sub_lhs->callback && sub_rhs->callback) {
-        return (((uintptr_t) sub_lhs->callback) > ((uintptr_t) sub_rhs->callback)) - (((uintptr_t) sub_lhs->callback) < ((uintptr_t) sub_rhs->callback));
+    if ((event_name_cmp == 0) && sub_lhs->subscription_data.callback && sub_rhs->subscription_data.callback) {
+        return (((uintptr_t) sub_lhs->subscription_data.callback) > ((uintptr_t) sub_rhs->subscription_data.callback)) - (((uintptr_t) sub_lhs->subscription_data.callback) < ((uintptr_t) sub_rhs->subscription_data.callback));
     }
     return event_name_cmp;
 }

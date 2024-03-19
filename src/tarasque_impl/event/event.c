@@ -162,7 +162,7 @@ void event_stack_destroy(event_stack **stack, allocator alloc)
  * @param[in] callback Callback subscribed under the event.
  * @param[inout] alloc Allocator to use for eventual list creation or extension.
  */
-void event_broker_subscribe(event_broker *broker, entity *subscribed, identifier *target_event_name, void (*callback)(void *entity_data, void *event_data, tarasque_entity_scene *scene), allocator alloc)
+void event_broker_subscribe(event_broker *broker, entity *subscribed, identifier *target_event_name, event_subscription_user_data subscription_data, allocator alloc)
 {
     size_t list_pos = 0u;
     event_subscription_list created_list = { 0u };
@@ -177,7 +177,7 @@ void event_broker_subscribe(event_broker *broker, entity *subscribed, identifier
         list_pos = sorted_range_insert_in(range_to_any(broker->subs), &identifier_compare, &created_list);
     }
 
-    event_subscription_list_append(broker->subs->data + list_pos, subscribed, callback, alloc);
+    event_subscription_list_append(broker->subs->data + list_pos, subscribed, subscription_data, alloc);
 }
 
 /**
@@ -189,16 +189,16 @@ void event_broker_subscribe(event_broker *broker, entity *subscribed, identifier
  * @param[in] callback Callback previously subscribed to the event.
  * @param[inout] alloc Allocator used for the eventual list deletion.
  */
-void event_broker_unsubscribe(event_broker *broker, entity *target, identifier *target_event_name, void (*callback)(void *entity_data, void *event_data, tarasque_entity_scene *scene), allocator alloc)
+void event_broker_unsubscribe(event_broker *broker, entity *target, identifier *target_event_name, event_subscription_user_data subscription_data, allocator alloc)
 {
     size_t list_pos = 0u;
 
-    if (!broker || !target || !target_event_name || !callback) {
+    if (!broker || !target || !target_event_name || !subscription_data.callback) {
         return;
     }
 
     if (sorted_range_find_in(range_to_any(broker->subs), &identifier_compare, &target_event_name, &list_pos)) {
-        event_subscription_list_remove(broker->subs->data + list_pos, target, callback);
+        event_subscription_list_remove(broker->subs->data + list_pos, target, subscription_data);
     }
 
     event_broker_cleanup_empty_subscriptions(broker, alloc);
