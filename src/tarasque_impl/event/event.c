@@ -197,7 +197,9 @@ void event_broker_unsubscribe(event_broker *broker, entity *target, identifier *
         return;
     }
 
-    // TODO
+    if (sorted_range_find_in(range_to_any(broker->subs), &identifier_compare, &target_event_name, &list_pos)) {
+        event_subscription_list_remove(broker->subs->data + list_pos, target, callback);
+    }
 
     event_broker_cleanup_empty_subscriptions(broker, alloc);
 }
