@@ -25,9 +25,6 @@ void graft_sdl_window(tarasque_entity_scene *scene, void *graft_args)
 
     tarasque_entity_scene_add_entity(scene, "SDL Context/SDL Window", "SDL Event Relay",
             graft_entity_sdl_event_relay());
-
-    tarasque_entity_scene_add_entity(scene, "SDL Context/SDL Window", "Render Manager",
-            graft_entity_sdl_render_manager((graft_entity_sdl_render_manager_args) { 0 }));
 }
 
 // -------------------------------------------------------------------------------------------------

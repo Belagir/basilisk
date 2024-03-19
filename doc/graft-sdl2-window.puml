@@ -19,7 +19,7 @@ package SDL2_Window_Graft as "SDL2 Window Graft" {
     root -down- SDL
         SDL -down- SDL_Window
             SDL_Window -down- SDL_Event
-            SDL_Window -down- Render_Manager
+            SDL_Window .down. Render_Manager
 }
 
 

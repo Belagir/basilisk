@@ -6,6 +6,11 @@
 
 #include <tarasque.h>
 
+typedef struct graft_sdl_window_event_draw {
+    SDL_Renderer *renderer;
+} graft_sdl_window_event_draw;
+
+
 typedef struct graft_sdl_window_args {
     const char *title;
     size_t x, y;

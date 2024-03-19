@@ -56,6 +56,9 @@ static void graft_entity_sdl_window_init(void *self_data, tarasque_entity_scene 
             (int) window_data->init_args.w, (int) window_data->init_args.h,
             window_data->init_args.flags);
 
+    tarasque_entity_scene_add_entity(scene, "", "Render Manager",
+            graft_entity_sdl_render_manager((graft_entity_sdl_render_manager_args) { .source_window = window_data->window, .flags = 0 }));
+
     tarasque_entity_scene_subscribe_to_event(scene, "sdl event quit", &graft_entity_sdl_window_quit);
 }
 
@@ -76,6 +79,7 @@ static void graft_entity_sdl_window_deinit(void *self_data, tarasque_entity_scen
     graft_entity_sdl_window_data *window_data = (graft_entity_sdl_window_data *) self_data;
 
     SDL_DestroyWindow(window_data->window);
+    window_data->window = NULL;
 }
 
 static void graft_entity_sdl_window_quit(void *self_data, void *event_data, tarasque_entity_scene *scene)
