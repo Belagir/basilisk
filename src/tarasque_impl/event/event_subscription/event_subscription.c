@@ -74,7 +74,7 @@ void event_subscription_list_destroy(event_subscription_list *list, allocator al
  * @param[in] callback Function called to receive the event.
  * @param[inout] alloc Allocator used to eventually extend the list.
  */
-void event_subscription_list_append(event_subscription_list *list, entity *subscribed, void (*callback)(void *entity_data, void *event_data), allocator alloc)
+void event_subscription_list_append(event_subscription_list *list, entity *subscribed, void (*callback)(void *entity_data, void *event_data, tarasque_entity_scene *scene), allocator alloc)
 {
     if (!list || !subscribed || !callback) {
         return;
@@ -91,7 +91,7 @@ void event_subscription_list_append(event_subscription_list *list, entity *subsc
  * @param[in] subscribed Entity that subscribed a callback.
  * @param[in] callback Callback previously registered.
  */
-void event_subscription_list_remove(event_subscription_list *list, entity *subscribed, void (*callback)(void *entity_data, void *event_data))
+void event_subscription_list_remove(event_subscription_list *list, entity *subscribed, void (*callback)(void *entity_data, void *event_data, tarasque_entity_scene *scene))
 {
     if (!list || !subscribed) {
         return;
@@ -132,7 +132,7 @@ void event_subscription_list_remove_all_from(event_subscription_list *list, enti
  * @param[in] list List containing the callbacks.
  * @param[inout] ev Event sent to the list.
  */
-void event_subscription_list_publish(event_subscription_list *list, event ev)
+void event_subscription_list_publish(event_subscription_list *list, event ev, tarasque_engine *handle)
 {
     event_subscription tmp_sub = { 0u };
 
@@ -143,7 +143,7 @@ void event_subscription_list_publish(event_subscription_list *list, event ev)
     for (size_t i = 0u ; i < list->subscription_list->length ; i++) {
         tmp_sub = list->subscription_list->data[i];
         if (tmp_sub.callback) {
-            entity_send_event(tmp_sub.subscribed, tmp_sub.callback, ev.data);
+            entity_send_event(tmp_sub.subscribed, tmp_sub.callback, ev.data, handle);
         }
     }
 }

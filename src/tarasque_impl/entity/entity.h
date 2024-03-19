@@ -67,7 +67,7 @@ const identifier *entity_get_name(const entity *target);
 void entity_step_frame(entity *target, f32 elapsed_ms, tarasque_engine *handle);
 
 /* Execute an event callback trusted to be linked to an entity. */
-void entity_send_event(entity *target, void (*callback)(void *entity_data, void *event_data), void *event_data);
+void entity_send_event(entity *target, void (*callback)(void *entity_data, void *event_data, tarasque_entity_scene *scene), void *event_data, tarasque_engine *handle);
 
 /* Execute the on_init() callback tied to an entity */
 void entity_init(entity *target, tarasque_engine *handle);

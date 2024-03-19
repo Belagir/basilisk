@@ -320,7 +320,7 @@ void tarasque_entity_scene_graft(tarasque_entity_scene *scene, const char *str_p
  * @param[in] str_event_name Name (copied) of the event the entity wants to subscribe a callback to.
  * @param[in] callback Pointer to the callback that will receive the entity's data and event data.
  */
-void tarasque_entity_scene_subscribe_to_event(tarasque_entity_scene *scene,  const char *str_event_name, void (*callback)(void *entity_data, void *event_data))
+void tarasque_entity_scene_subscribe_to_event(tarasque_entity_scene *scene,  const char *str_event_name, void (*callback)(void *entity_data, void *event_data, tarasque_entity_scene *scene))
 {
     command cmd = { 0u };
 
@@ -349,7 +349,9 @@ void tarasque_entity_scene_stack_event(tarasque_entity_scene *scene, const char 
         return;
     }
 
-    if (!is_detached) {
+    if (is_detached) {
+        source_entity = scene->handle->root_entity;
+    } else {
         source_entity = scene->current_entity;
     }
 
@@ -470,7 +472,13 @@ static void tarasque_engine_process_command_add_entity(tarasque_engine *handle, 
     logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Added entity \"%s\" under parent \"%s\".\n", entity_get_name(new_entity)->data, entity_get_name(found_parent)->data);
 }
 
-
+/**
+ * @brief
+ *
+ * @param handle
+ * @param subject
+ * @param cmd
+ */
 static void tarasque_engine_process_command_graft(tarasque_engine *handle, entity *subject, command_graft cmd)
 {
     entity *graft_parent = NULL;
@@ -522,8 +530,8 @@ static void tarasque_engine_process_command_remove_entity(tarasque_engine *handl
         return;
     }
 
-    tarasque_engine_full_destroy_entity(handle, found_entity);
     logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Removed entity \"%s\".\n", entity_get_name(subject)->data);
+    tarasque_engine_full_destroy_entity(handle, found_entity);
 }
 
 /**
@@ -557,7 +565,7 @@ static void tarasque_engine_process_event(tarasque_engine *handle, event process
         return;
     }
 
-    event_broker_publish(handle->pub_sub, processed_event);
+    event_broker_publish(handle->pub_sub, processed_event, handle);
 
     event_destroy(&processed_event, handle->alloc);
 }

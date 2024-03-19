@@ -162,7 +162,7 @@ void event_stack_destroy(event_stack **stack, allocator alloc)
  * @param[in] callback Callback subscribed under the event.
  * @param[inout] alloc Allocator to use for eventual list creation or extension.
  */
-void event_broker_subscribe(event_broker *broker, entity *subscribed, identifier *target_event_name, void (*callback)(void *entity_data, void *event_data), allocator alloc)
+void event_broker_subscribe(event_broker *broker, entity *subscribed, identifier *target_event_name, void (*callback)(void *entity_data, void *event_data, tarasque_entity_scene *scene), allocator alloc)
 {
     size_t list_pos = 0u;
     event_subscription_list created_list = { 0u };
@@ -188,13 +188,15 @@ void event_broker_subscribe(event_broker *broker, entity *subscribed, identifier
  * @param[in] callback Callback previously subscribed to the event.
  * @param[inout] alloc Allocator used for the eventual list deletion.
  */
-void event_broker_unsubscribe(event_broker *broker, entity *target, identifier *target_event_name, void (*callback)(void *entity_data, void *event_data), allocator alloc)
+void event_broker_unsubscribe(event_broker *broker, entity *target, identifier *target_event_name, void (*callback)(void *entity_data, void *event_data, tarasque_entity_scene *scene), allocator alloc)
 {
     size_t list_pos = 0u;
 
     if (!broker || !target || !target_event_name || !callback) {
         return;
     }
+
+    // TODO
 
     event_broker_cleanup_empty_subscriptions(broker, alloc);
 }
@@ -227,7 +229,7 @@ void event_broker_unsubscribe_from_all(event_broker *broker, entity *target, all
  * @param[inout] broker Target broker.
  * @param[in] ev event sent to the callbacks.
  */
-void event_broker_publish(event_broker *broker, event ev)
+void event_broker_publish(event_broker *broker, event ev, tarasque_engine *handle)
 {
     size_t list_pos = 0u;
 
@@ -236,7 +238,7 @@ void event_broker_publish(event_broker *broker, event ev)
     }
 
     if (sorted_range_find_in(range_to_any(broker->subs), &identifier_compare, &(ev.name), &list_pos)) {
-        event_subscription_list_publish(broker->subs->data + list_pos, ev);
+        event_subscription_list_publish(broker->subs->data + list_pos, ev, handle);
     }
 }
 

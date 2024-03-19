@@ -267,13 +267,13 @@ void entity_step_frame(entity *target, f32 elapsed_ms, tarasque_engine *handle)
  * @param[in] callback Event callback.
  * @param[inout] event_data Event data passed to the callback.
  */
-void entity_send_event(entity *target, void (*callback)(void *entity_data, void *event_data), void *event_data)
+void entity_send_event(entity *target, void (*callback)(void *entity_data, void *event_data, tarasque_entity_scene *scene), void *event_data, tarasque_engine *handle)
 {
     if (!target || !callback) {
         return;
     }
 
-    callback(target->user_data.data, event_data);
+    callback(target->user_data.data, event_data, &(tarasque_entity_scene) { handle, target });
 }
 
 /**

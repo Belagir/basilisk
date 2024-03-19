@@ -125,7 +125,7 @@ command command_create_remove_entity(entity *source, const char *id_path, alloca
  * @param[inout] alloc Allocator used for the allocation of the command.
  * @return A fresh command to be queued.
  */
-command command_create_subscribe_to_event(entity *source, const char *event_name, void (*callback)(void *entity_data, void *event_data), allocator alloc)
+command command_create_subscribe_to_event(entity *source, const char *event_name, void (*callback)(void *entity_data, void *event_data, tarasque_entity_scene *scene), allocator alloc)
 {
     command new_cmd = { 0u };
 
