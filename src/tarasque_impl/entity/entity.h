@@ -45,6 +45,10 @@ tarasque_engine_entity *tarasque_engine_entity_get_containing_full_entity(tarasq
 tarasque_entity *tarasque_engine_entity_get_specific_data(tarasque_engine_entity *target);
 /* Returns the engine instance hosting this entity. */
 tarasque_engine *tarasque_engine_entity_get_host_engine_handle(tarasque_engine_entity *target);
+/* Returns the name of an entity. */
+const identifier *tarasque_engine_entity_get_name(const tarasque_engine_entity *target);
+
+tarasque_engine_entity *tarasque_engine_entity_get_parent(tarasque_engine_entity *target);
 
 // -------------------------------------------------------------------------------------------------
 
@@ -61,13 +65,8 @@ void tarasque_engine_entity_destroy_children(tarasque_engine_entity *target, all
 tarasque_engine_entity *tarasque_engine_entity_get_child(tarasque_engine_entity *target, const path *id);
 /* Find a child that is directly under an entity. */
 tarasque_engine_entity *tarasque_engine_entity_get_direct_child(tarasque_engine_entity *target, const identifier *id_path);
-
-
 /* Returns an allocated range of all children of an entity, recursively. */
 tarasque_entity_range *tarasque_engine_entity_get_children(tarasque_engine_entity *target, allocator alloc);
-
-/* Returns the name of an entity. */
-const identifier *tarasque_engine_entity_get_name(const tarasque_engine_entity *target);
 
 // -------------------------------------------------------------------------------------------------
 

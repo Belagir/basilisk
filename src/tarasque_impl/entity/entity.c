@@ -49,35 +49,6 @@ typedef struct tarasque_engine_entity {
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief
- *
- * @param entity
- * @param str_parent_name
- */
-tarasque_entity *tarasque_entity_get_parent(tarasque_entity *entity, const char *str_parent_name)
-{
-    if (!entity) {
-        return NULL;
-    }
-
-    tarasque_engine_entity *full_entity = tarasque_engine_entity_get_containing_full_entity(entity);
-
-    if (!str_parent_name) {
-        return full_entity->parent;
-    }
-
-    while ((full_entity->parent != NULL) && (identifier_compare_to_cstring(full_entity->id, str_parent_name) != 0)) {
-        full_entity = full_entity->parent;
-    }
-
-    return full_entity->data;
-}
-
-// -------------------------------------------------------------------------------------------------
-// -------------------------------------------------------------------------------------------------
-// -------------------------------------------------------------------------------------------------
-
-/**
  * @brief Creates a newly allocated entity and returns a pointer to it.
  *
  * @param[in] id Name (copied) of the new entity.
@@ -176,6 +147,36 @@ tarasque_engine *tarasque_engine_entity_get_host_engine_handle(tarasque_engine_e
     }
 
     return target->host_handle;
+}
+
+/**
+ * @brief Returns a reference to the name of an entity.
+ *
+ * @param[in] target Target entity.
+ * @return const identifier *
+ */
+const identifier *tarasque_engine_entity_get_name(const tarasque_engine_entity *target)
+{
+    if (!target) {
+        return NULL;
+    }
+
+    return target->id;
+}
+
+/**
+ * @brief
+ *
+ * @param target
+ * @return
+ */
+tarasque_engine_entity *tarasque_engine_entity_get_parent(tarasque_engine_entity *target)
+{
+    if (!target) {
+        return NULL;
+    }
+
+    return target->parent;
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -318,21 +319,6 @@ tarasque_entity_range *tarasque_engine_entity_get_children(tarasque_engine_entit
     }
 
     return entities;
-}
-
-/**
- * @brief Returns a reference to the name of an entity.
- *
- * @param[in] target Target entity.
- * @return const identifier *
- */
-const identifier *tarasque_engine_entity_get_name(const tarasque_engine_entity *target)
-{
-    if (!target) {
-        return NULL;
-    }
-
-    return target->id;
 }
 
 /**

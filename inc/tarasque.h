@@ -124,5 +124,7 @@ void tarasque_entity_stack_event(tarasque_entity *entity, const char *str_event_
 
 /* Search for a parent of a certain name the entity might be related to. If the name is NULL, the first parent is returned. */
 tarasque_entity *tarasque_entity_get_parent(tarasque_entity *entity, const char *str_parent_name);
+/*  */
+tarasque_entity *tarasque_entity_get_child(tarasque_entity *entity, const char *str_path);
 
 #endif

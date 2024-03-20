@@ -382,6 +382,63 @@ void tarasque_entity_stack_event(tarasque_entity *entity, const char *str_event_
 // -------------------------------------------------------------------------------------------------
 
 /**
+ * @brief
+ *
+ * @param entity
+ * @param str_parent_name
+ */
+tarasque_entity *tarasque_entity_get_parent(tarasque_entity *entity, const char *str_parent_name)
+{
+    if (!entity) {
+        return NULL;
+    }
+
+    tarasque_engine_entity *full_entity = tarasque_engine_entity_get_containing_full_entity(entity);
+
+    if (!str_parent_name) {
+        return tarasque_engine_entity_get_parent(full_entity);
+    }
+
+    while ((tarasque_engine_entity_get_parent(full_entity) != NULL)
+            && (identifier_compare_to_cstring(tarasque_engine_entity_get_name(full_entity), str_parent_name) != 0)) {
+        full_entity = tarasque_engine_entity_get_parent(full_entity);
+    }
+
+    return tarasque_engine_entity_get_specific_data(full_entity);
+}
+
+/**
+ * @brief
+ *
+ * @param entity
+ * @param path
+ * @return
+ */
+tarasque_entity *tarasque_entity_get_child(tarasque_entity *entity, const char *str_path)
+{
+    if (!entity || !str_path) {
+        return NULL;
+    }
+
+    tarasque_engine_entity *full_entity = tarasque_engine_entity_get_containing_full_entity(entity);
+    tarasque_engine *handle = tarasque_engine_entity_get_host_engine_handle(full_entity);
+    tarasque_engine_entity *found_entity = NULL;
+    path *child_path = NULL;
+
+    if (handle) {
+        child_path = path_from_cstring(str_path, handle->alloc);
+        found_entity = tarasque_engine_entity_get_child(full_entity, child_path);
+        path_destroy(&child_path, handle->alloc);
+    }
+
+    return found_entity;
+}
+
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+
+/**
  * @brief Completely removes an entity and its children from everything in the engine.
  * Additionally of removing the entities from the tree, it will remove all relevant events, subscriptions
  * and commands linked to the entities. All of the entities memory is released.
