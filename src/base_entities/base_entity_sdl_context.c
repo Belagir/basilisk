@@ -26,7 +26,7 @@ static void base_entity_sdl_context_init(tarasque_entity *self_data)
 {
     (void) self_data;
 
-    SDL_Init(SDL_INIT_EVERYTHING);
+    SDL_Init(SDL_INIT_TIMER);
 }
 
 /**

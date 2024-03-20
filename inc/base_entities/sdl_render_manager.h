@@ -21,7 +21,7 @@ typedef struct base_entity_sdl_render_manager_event_draw {
 typedef struct base_entity_sdl_render_manager_data {
     SDL_Color clear_color;
     SDL_RendererFlags flags;
-    SDL_Window *source_window;
+    const char *window_entity_name;
 
     SDL_Renderer *renderer;
 } base_entity_sdl_render_manager_data;

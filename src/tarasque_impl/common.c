@@ -162,6 +162,19 @@ void print_path(const path *p)
 
 // -------------------------------------------------------------------------------------------------
 
+i32 identifier_compare_to_cstring(const identifier *id, const char *str)
+{
+    size_t pos = 0u;
+    i32 cmp_result = 0;
+
+    while((pos < id->length) && (str[pos] != '\0') && (cmp_result == 0)) {
+        cmp_result = identifier_compare_character(str + pos, id->data + pos);
+        pos += 1u;
+    }
+
+    return cmp_result;
+}
+
 /**
  * @brief Compares two identifiers hidden between two indirections (such as a double pointer to an entity, that stores an identifier -- that is always accessed through a pointer since it is an incomplete type)
  *

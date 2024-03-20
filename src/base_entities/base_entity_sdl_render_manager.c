@@ -1,5 +1,6 @@
 
 #include <base_entities/sdl_render_manager.h>
+#include <base_entities/sdl_window.h>
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -34,7 +35,10 @@ static void base_entity_sdl_render_manager_init(tarasque_entity *self_data)
     }
 
     base_entity_sdl_render_manager_data *init_data = (base_entity_sdl_render_manager_data *) self_data;
-    init_data->renderer = SDL_CreateRenderer(init_data->source_window, -1, init_data->flags);
+
+    base_entity_sdl_window_data *parent_window = (base_entity_sdl_window_data *) tarasque_entity_get_parent(self_data, init_data->window_entity_name);
+
+    init_data->renderer = SDL_CreateRenderer(parent_window->window, -1, init_data->flags);
 
     if (init_data->renderer) {
         tarasque_entity_subscribe_to_event(self_data, "sdl renderer pre draw",  (tarasque_specific_event_subscription) { &base_entity_sdl_render_manager_pre_draw });

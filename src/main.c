@@ -4,20 +4,32 @@
 #include <tarasque.h>
 #include <grafts/sdl2_window.h>
 
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+
 static void dummy_draw_rect(tarasque_entity *self_data, void *event_data)
 {
     (void) self_data;
 
-//     graft_sdl_window_event_draw *draw_data = (graft_sdl_window_event_draw *) event_data;
+    base_entity_sdl_render_manager_event_draw *draw_data = (base_entity_sdl_render_manager_event_draw *) event_data;
 
-//     SDL_SetRenderDrawColor(draw_data->renderer, 0, 50u, 255u, 255u);
-//     SDL_RenderDrawRect(draw_data->renderer, &(const SDL_Rect) { 30, 30, 300, 400 });
+    SDL_SetRenderDrawColor(draw_data->renderer, 0, 50u, 255u, 255u);
+    SDL_RenderDrawRect(draw_data->renderer, &(const SDL_Rect) { 30, 30, 300, 400 });
 }
+
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 static void dummy_draw_init(tarasque_entity *self_data)
 {
     tarasque_entity_subscribe_to_event(self_data, "sdl renderer draw", (tarasque_specific_event_subscription) { .callback = &dummy_draw_rect, });
 }
+
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 int main(void)
 {

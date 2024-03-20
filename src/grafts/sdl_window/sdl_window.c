@@ -3,11 +3,6 @@
 
 #include <grafts/sdl2_window.h>
 
-#include <base_entities/sdl_context.h>
-#include <base_entities/sdl_event_relay.h>
-#include <base_entities/sdl_render_manager.h>
-#include <base_entities/sdl_window.h>
-
 void graft_sdl_window(tarasque_entity *entity, void *graft_args)
 {
     if (!graft_args) {
@@ -25,6 +20,12 @@ void graft_sdl_window(tarasque_entity *entity, void *graft_args)
                     .x = sdl_win_args.for_window.x, .y = sdl_win_args.for_window.y,
                     .w = sdl_win_args.for_window.w, .h = sdl_win_args.for_window.h,
                     .flags = sdl_win_args.for_window.flags }));
+
+    tarasque_entity_add_child(entity, "SDL Context/SDL Window", "SDL Render Manager",
+            base_entity_sdl_render_manager(&(base_entity_sdl_render_manager_data) {
+                    .clear_color = sdl_win_args.for_renderer.clear_color,
+                    .flags = sdl_win_args.for_renderer.flags,
+                    .window_entity_name = "SDL Window" }));
 
     tarasque_entity_add_child(entity, "SDL Context/SDL Window", "SDL Event Relay",
             base_entity_sdl_event_relay());

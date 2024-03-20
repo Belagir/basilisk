@@ -30,6 +30,8 @@ static void base_entity_sdl_window_init(tarasque_entity *self_data)
 
     base_entity_sdl_window_data *window_data = (base_entity_sdl_window_data *) self_data;
 
+    SDL_InitSubSystem(SDL_INIT_VIDEO);
+
     window_data->window = SDL_CreateWindow(
             window_data->title,
             (int) window_data->x, (int) window_data->y,
@@ -59,6 +61,7 @@ static void base_entity_sdl_window_deinit(tarasque_entity *self_data)
 
 static void base_entity_sdl_window_quit(tarasque_entity *self_data, void *event_data)
 {
+    SDL_QuitSubSystem(SDL_INIT_VIDEO);
     tarasque_entity_remove_child(self_data, "");
 }
 

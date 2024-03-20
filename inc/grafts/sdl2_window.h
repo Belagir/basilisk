@@ -6,6 +6,11 @@
 
 #include <tarasque.h>
 
+#include <base_entities/sdl_context.h>
+#include <base_entities/sdl_event_relay.h>
+#include <base_entities/sdl_render_manager.h>
+#include <base_entities/sdl_window.h>
+
 /**
  * @brief
  *
