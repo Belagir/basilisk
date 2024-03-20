@@ -19,6 +19,8 @@
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
+typedef byte tarasque_entity_storage[];
+
 /**
  * @brief Entity data structure aggregating user data with engine-related data.
  */
@@ -31,7 +33,7 @@ typedef struct tarasque_engine_entity {
     tarasque_entity_range *children;
 
     /** Entity callbacks to be used by the engine. */
-    tarasque_entity_callbacks callbacks;
+    tarasque_specific_entity_callbacks callbacks;
 
     /** Engine owning the entity, used to redirect user's actions back to the whole engine. */
     tarasque_engine *host_handle;
@@ -39,7 +41,7 @@ typedef struct tarasque_engine_entity {
     /** Size in bytes of the user's data. */
     size_t data_size;
     /** The user's data. */
-    byte data[];
+    tarasque_entity_storage data;
 } tarasque_engine_entity;
 
 // -------------------------------------------------------------------------------------------------
@@ -327,7 +329,7 @@ void tarasque_engine_entity_step_frame(tarasque_engine_entity *target, f32 elaps
  * @param[in] callback Event callback.
  * @param[inout] event_data Event data passed to the callback.
  */
-void tarasque_engine_entity_send_event(tarasque_engine_entity *target, tarasque_event_subscription_specific_data subscription_data, void *event_data)
+void tarasque_engine_entity_send_event(tarasque_engine_entity *target, tarasque_specific_event_subscription subscription_data, void *event_data)
 {
     if (!target || !subscription_data.callback) {
         return;
@@ -379,7 +381,7 @@ void tarasque_engine_entity_deinit(tarasque_engine_entity *target)
  * @param[inout] alloc Allocator used for the copy.
  * @return
  */
-tarasque_entity_specific_data_copy tarasque_entity_specific_data_copy_create(tarasque_entity_specific_data user_data, allocator alloc)
+tarasque_entity_specific_data_copy tarasque_entity_specific_data_copy_create(tarasque_specific_entity user_data, allocator alloc)
 {
     tarasque_entity_specific_data_copy copy = {
             .callbacks = {

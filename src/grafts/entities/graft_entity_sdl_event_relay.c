@@ -20,9 +20,9 @@ static void graft_entity_sdl_event_relay_on_frame(tarasque_entity *self_data, fl
 
     while (SDL_PollEvent(&event)) {
         if (event.type == SDL_QUIT) {
-            tarasque_entity_stack_event(self_data, "sdl event quit", 0u, NULL, true);
+            tarasque_entity_stack_event(self_data, "sdl event quit", (tarasque_specific_event) { .is_detached = true });
         } else {
-            tarasque_entity_stack_event(self_data, "sdl event", sizeof(event), &event, false);
+            tarasque_entity_stack_event(self_data, "sdl event", (tarasque_specific_event) { .is_detached = false, .data_size = sizeof(event), .data = &event, });
         }
     }
 }
@@ -31,9 +31,9 @@ static void graft_entity_sdl_event_relay_on_frame(tarasque_entity *self_data, fl
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-tarasque_entity_specific_data graft_entity_sdl_event_relay(void)
+tarasque_specific_entity graft_entity_sdl_event_relay(void)
 {
-    return (tarasque_entity_specific_data) {
+    return (tarasque_specific_entity) {
             .callbacks = {
                     .on_frame = &graft_entity_sdl_event_relay_on_frame,
             }

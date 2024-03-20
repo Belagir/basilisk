@@ -59,8 +59,8 @@ static void graft_entity_sdl_render_manager_init(tarasque_entity *self_data)
     init_data->renderer = SDL_CreateRenderer(init_data->init.source_window, -1, init_data->init.args.flags);
 
     if (init_data->renderer) {
-        tarasque_entity_subscribe_to_event(self_data, "sdl renderer pre draw",  (tarasque_event_subscription_specific_data) { &graft_entity_sdl_render_manager_pre_draw });
-        tarasque_entity_subscribe_to_event(self_data, "sdl renderer post draw", (tarasque_event_subscription_specific_data) { &graft_entity_sdl_render_manager_post_draw });
+        tarasque_entity_subscribe_to_event(self_data, "sdl renderer pre draw",  (tarasque_specific_event_subscription) { &graft_entity_sdl_render_manager_pre_draw });
+        tarasque_entity_subscribe_to_event(self_data, "sdl renderer post draw", (tarasque_specific_event_subscription) { &graft_entity_sdl_render_manager_post_draw });
     }
 }
 
@@ -95,9 +95,9 @@ static void graft_entity_sdl_render_manager_on_frame(tarasque_entity *self_data,
 
     graft_entity_sdl_render_manager_data *data = (graft_entity_sdl_render_manager_data *) self_data;
 
-    tarasque_entity_stack_event(self_data, "sdl renderer post draw", 0u, NULL, false);
-    tarasque_entity_stack_event(self_data, "sdl renderer draw", sizeof(graft_sdl_window_event_draw), &(graft_sdl_window_event_draw) { data->renderer }, false);
-    tarasque_entity_stack_event(self_data, "sdl renderer pre draw", 0u, NULL, false);
+    tarasque_entity_stack_event(self_data, "sdl renderer post draw", (tarasque_specific_event) { 0u });
+    tarasque_entity_stack_event(self_data, "sdl renderer draw", (tarasque_specific_event) { .data_size = sizeof(graft_sdl_window_event_draw), .data = &(graft_sdl_window_event_draw) { data->renderer } });
+    tarasque_entity_stack_event(self_data, "sdl renderer pre draw", (tarasque_specific_event) { 0u });
 }
 
 /**
@@ -153,7 +153,7 @@ static void graft_entity_sdl_render_manager_post_draw(tarasque_entity *self_data
  * @param args
  * @return
  */
-tarasque_entity_specific_data graft_entity_sdl_render_manager(graft_entity_sdl_render_manager_args args)
+tarasque_specific_entity graft_entity_sdl_render_manager(graft_entity_sdl_render_manager_args args)
 {
     // avoiding stack allocation but still won't force the user to deal with the heap...
     graft_entity_sdl_render_manager_data_buffer = (graft_entity_sdl_render_manager_data) {
@@ -161,7 +161,7 @@ tarasque_entity_specific_data graft_entity_sdl_render_manager(graft_entity_sdl_r
             .renderer = NULL,
     };
 
-    return (tarasque_entity_specific_data) {
+    return (tarasque_specific_entity) {
             .data_size = sizeof(graft_entity_sdl_render_manager_data_buffer),
             .data = &graft_entity_sdl_render_manager_data_buffer,
 

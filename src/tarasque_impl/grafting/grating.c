@@ -1,7 +1,7 @@
 
 #include "grafting.h"
 
-graft_user_data_copy graft_user_data_copy_create(tarasque_graft_specific_data data, allocator alloc)
+graft_user_data_copy graft_user_data_copy_create(tarasque_specific_graft data, allocator alloc)
 {
     graft_user_data_copy copy = { 0u };
 
@@ -16,7 +16,7 @@ graft_user_data_copy graft_user_data_copy_create(tarasque_graft_specific_data da
     return copy;
 }
 
-void graft_user_data_copy_destroy(tarasque_graft_specific_data *data, allocator alloc)
+void graft_user_data_copy_destroy(tarasque_specific_graft *data, allocator alloc)
 {
     if (!data) {
         return;
@@ -26,5 +26,5 @@ void graft_user_data_copy_destroy(tarasque_graft_specific_data *data, allocator 
         alloc.free(alloc, data->args);
     }
 
-    *data = (tarasque_graft_specific_data) { 0u };
+    *data = (tarasque_specific_graft) { 0u };
 }

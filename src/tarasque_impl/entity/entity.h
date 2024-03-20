@@ -26,7 +26,7 @@ typedef struct tarasque_engine_entity tarasque_engine_entity;
 typedef range(tarasque_engine_entity *) tarasque_entity_range;
 
 /* Redefinition of the tarasque_entity_specific_data type to signal memory allocation in opposition of the user-managed tarasque_entity_specific_data variables. */
-typedef tarasque_entity_specific_data tarasque_entity_specific_data_copy;
+typedef tarasque_specific_entity tarasque_entity_specific_data_copy;
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -75,7 +75,7 @@ const identifier *tarasque_engine_entity_get_name(const tarasque_engine_entity *
 void tarasque_engine_entity_step_frame(tarasque_engine_entity *target, f32 elapsed_ms);
 
 /* Execute an event callback trusted to be linked to an entity. */
-void tarasque_engine_entity_send_event(tarasque_engine_entity *target, tarasque_event_subscription_specific_data subscription_data, void *event_data);
+void tarasque_engine_entity_send_event(tarasque_engine_entity *target, tarasque_specific_event_subscription subscription_data, void *event_data);
 
 /* Execute the on_init() callback tied to an entity */
 void tarasque_engine_entity_init(tarasque_engine_entity *target);
@@ -88,7 +88,7 @@ void tarasque_engine_entity_deinit(tarasque_engine_entity *target);
 // -------------------------------------------------------------------------------------------------
 
 /* Copy entity user data on the heap, and returns a pointer to it. */
-tarasque_entity_specific_data_copy tarasque_entity_specific_data_copy_create(tarasque_entity_specific_data user_data, allocator alloc);
+tarasque_entity_specific_data_copy tarasque_entity_specific_data_copy_create(tarasque_specific_entity user_data, allocator alloc);
 /* Destroys some entity user data copy and nullifies the passed pointer. */
 void tarasque_entity_specific_data_copy_destroy(tarasque_entity_specific_data_copy *user_data, allocator alloc);
 

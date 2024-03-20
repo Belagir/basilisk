@@ -48,9 +48,9 @@ static void graft_entity_sdl_context_deinit(tarasque_entity *self_data)
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-tarasque_entity_specific_data graft_entity_sdl_context(void)
+tarasque_specific_entity graft_entity_sdl_context(void)
 {
-    return (tarasque_entity_specific_data) {
+    return (tarasque_specific_entity) {
         .callbacks = {
                 .on_init = &graft_entity_sdl_context_init,
                 .on_deinit = &graft_entity_sdl_context_deinit,

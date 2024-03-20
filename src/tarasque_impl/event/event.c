@@ -162,7 +162,7 @@ void event_stack_destroy(event_stack **stack, allocator alloc)
  * @param[in] callback Callback subscribed under the event.
  * @param[inout] alloc Allocator to use for eventual list creation or extension.
  */
-void event_broker_subscribe(event_broker *broker, tarasque_engine_entity *subscribed, identifier *target_event_name, tarasque_event_subscription_specific_data subscription_data, allocator alloc)
+void event_broker_subscribe(event_broker *broker, tarasque_engine_entity *subscribed, identifier *target_event_name, tarasque_specific_event_subscription subscription_data, allocator alloc)
 {
     size_t list_pos = 0u;
     event_subscription_list created_list = { 0u };
@@ -189,7 +189,7 @@ void event_broker_subscribe(event_broker *broker, tarasque_engine_entity *subscr
  * @param[in] callback Callback previously subscribed to the event.
  * @param[inout] alloc Allocator used for the eventual list deletion.
  */
-void event_broker_unsubscribe(event_broker *broker, tarasque_engine_entity *target, identifier *target_event_name, tarasque_event_subscription_specific_data subscription_data, allocator alloc)
+void event_broker_unsubscribe(event_broker *broker, tarasque_engine_entity *target, identifier *target_event_name, tarasque_specific_event_subscription subscription_data, allocator alloc)
 {
     size_t list_pos = 0u;
 

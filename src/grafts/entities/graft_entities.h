@@ -10,7 +10,7 @@
 // -------------------------------------------------------------------------------------------------
 
 /*  */
-tarasque_entity_specific_data graft_entity_sdl_context(void);
+tarasque_specific_entity graft_entity_sdl_context(void);
 
 // -------------------------------------------------------------------------------------------------
 
@@ -23,12 +23,12 @@ typedef struct graft_entity_sdl_window_args {
     graft_sdl_window_render_args for_render;
 } graft_entity_sdl_window_args;
 /*  */
-tarasque_entity_specific_data graft_entity_sdl_window(graft_entity_sdl_window_args args);
+tarasque_specific_entity graft_entity_sdl_window(graft_entity_sdl_window_args args);
 
 // -------------------------------------------------------------------------------------------------
 
 /*  */
-tarasque_entity_specific_data graft_entity_sdl_event_relay(void);
+tarasque_specific_entity graft_entity_sdl_event_relay(void);
 
 // -------------------------------------------------------------------------------------------------
 
@@ -41,7 +41,7 @@ typedef struct graft_entity_sdl_render_manager_args {
     SDL_Window *source_window;
 } graft_entity_sdl_render_manager_args;
 /*  */
-tarasque_entity_specific_data graft_entity_sdl_render_manager(graft_entity_sdl_render_manager_args args);
+tarasque_specific_entity graft_entity_sdl_render_manager(graft_entity_sdl_render_manager_args args);
 
 // -------------------------------------------------------------------------------------------------
 

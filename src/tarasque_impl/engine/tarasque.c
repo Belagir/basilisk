@@ -128,7 +128,7 @@ tarasque_engine *tarasque_engine_create(void)
                 .events = event_stack_create(used_alloc),
                 .pub_sub = event_broker_create(used_alloc),
 
-                .root_entity = tarasque_engine_entity_create(identifier_root, (tarasque_entity_specific_data) { 0u }, new_engine, used_alloc),
+                .root_entity = tarasque_engine_entity_create(identifier_root, (tarasque_specific_entity) { 0u }, new_engine, used_alloc),
 
                 .should_quit = false,
 
@@ -263,7 +263,7 @@ void tarasque_entity_quit(tarasque_entity *entity)
  * @param[in] str_id New entity's name (copied), must be unique in respect to its siblings and not contain the character '/'.
  * @param[in] user_data Basic entity information (copied).
  */
-void tarasque_entity_add_child(tarasque_entity *entity, const char *str_path, const char *str_id, tarasque_entity_specific_data user_data)
+void tarasque_entity_add_child(tarasque_entity *entity, const char *str_path, const char *str_id, tarasque_specific_entity user_data)
 {
     if (!entity) {
         return;
@@ -313,7 +313,7 @@ void tarasque_entity_remove_child(tarasque_entity *entity, const char *str_path)
  * @param[in] str_id Name (copied) to give to the root of the graft.
  * @param[in] graft_data Data (copied) describing the graft and its arguments.
  */
-void tarasque_entity_graft(tarasque_entity *entity, const char *str_path, const char *str_id, tarasque_graft_specific_data graft_data)
+void tarasque_entity_graft(tarasque_entity *entity, const char *str_path, const char *str_id, tarasque_specific_graft graft_data)
 {
     if (!entity) {
         return;
@@ -337,7 +337,7 @@ void tarasque_entity_graft(tarasque_entity *entity, const char *str_path, const 
  * @param[in] str_event_name Name (copied) of the event the entity wants to subscribe a callback to.
  * @param[in] callback Pointer to the callback that will receive the entity's data and event data.
  */
-void tarasque_entity_subscribe_to_event(tarasque_entity *entity,  const char *str_event_name, tarasque_event_subscription_specific_data subscription_data)
+void tarasque_entity_subscribe_to_event(tarasque_entity *entity,  const char *str_event_name, tarasque_specific_event_subscription subscription_data)
 {
     if (!entity) {
         return;
@@ -358,11 +358,9 @@ void tarasque_entity_subscribe_to_event(tarasque_entity *entity,  const char *st
  *
  * @param[in] entity Entity sending the event.
  * @param[in] str_event_name Name (copied) of the event stacked.
- * @param[in] event_data_size Event's specific data size in bytes.
  * @param[in] event_data Event's specific data (copied).
- * @param[in] is_detached if set, the event will not be removed if the entity that sent it is removed itself.
  */
-void tarasque_entity_stack_event(tarasque_entity *entity, const char *str_event_name, size_t event_data_size, void *event_data, bool is_detached)
+void tarasque_entity_stack_event(tarasque_entity *entity, const char *str_event_name, tarasque_specific_event event_data)
 {
     if (!entity) {
         return;
@@ -371,10 +369,10 @@ void tarasque_entity_stack_event(tarasque_entity *entity, const char *str_event_
     tarasque_engine_entity *full_entity = tarasque_engine_entity_get_containing_full_entity(entity);
     tarasque_engine *handle = tarasque_engine_entity_get_host_engine_handle(full_entity);
 
-    if (is_detached) {
-        event_stack_push(handle->events, handle->root_entity, str_event_name, event_data_size, event_data, handle->alloc);
+    if (event_data.is_detached) {
+        event_stack_push(handle->events, handle->root_entity, str_event_name, event_data.data_size, event_data.data, handle->alloc);
     } else {
-        event_stack_push(handle->events, full_entity, str_event_name, event_data_size, event_data, handle->alloc);
+        event_stack_push(handle->events, full_entity, str_event_name, event_data.data_size, event_data.data, handle->alloc);
     }
 
 }

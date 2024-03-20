@@ -37,7 +37,7 @@ typedef struct command_queue {
  * @param[inout] alloc Allocator used for the allocation of the command.
  * @return a fresh command to be queued.
  */
-command command_create_add_entity(tarasque_engine_entity *source, const char *id_path, const char *id, tarasque_entity_specific_data user_data, allocator alloc)
+command command_create_add_entity(tarasque_engine_entity *source, const char *id_path, const char *id, tarasque_specific_entity user_data, allocator alloc)
 {
     command new_cmd = { 0u };
 
@@ -68,7 +68,7 @@ command command_create_add_entity(tarasque_engine_entity *source, const char *id
  * @param alloc
  * @return
  */
-command command_create_graft(tarasque_engine_entity *source, const char *id_path, const char *id, tarasque_graft_specific_data graft_data, allocator alloc)
+command command_create_graft(tarasque_engine_entity *source, const char *id_path, const char *id, tarasque_specific_graft graft_data, allocator alloc)
 {
     command new_cmd = { 0u };
 
@@ -125,7 +125,7 @@ command command_create_remove_entity(tarasque_engine_entity *source, const char 
  * @param[inout] alloc Allocator used for the allocation of the command.
  * @return A fresh command to be queued.
  */
-command command_create_subscribe_to_event(tarasque_engine_entity *source, const char *event_name, tarasque_event_subscription_specific_data subscription_data, allocator alloc)
+command command_create_subscribe_to_event(tarasque_engine_entity *source, const char *event_name, tarasque_specific_event_subscription subscription_data, allocator alloc)
 {
     command new_cmd = { 0u };
 

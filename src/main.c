@@ -16,16 +16,16 @@ static void dummy_draw_rect(tarasque_entity *self_data, void *event_data)
 
 static void dummy_draw_init(tarasque_entity *self_data)
 {
-    tarasque_entity_subscribe_to_event(self_data, "sdl renderer draw", (tarasque_event_subscription_specific_data) { .callback = &dummy_draw_rect, });
+    tarasque_entity_subscribe_to_event(self_data, "sdl renderer draw", (tarasque_specific_event_subscription) { .callback = &dummy_draw_rect, });
 }
 
 int main(void)
 {
     tarasque_engine *handle = tarasque_engine_create();
 
-    tarasque_entity_add_child(tarasque_engine_root_entity(handle), "", "Game", (tarasque_entity_specific_data) { 0u });
+    tarasque_entity_add_child(tarasque_engine_root_entity(handle), "", "Game", (tarasque_specific_entity) { 0u });
 
-    tarasque_entity_graft(tarasque_engine_root_entity(handle), "Game", "SDL Graft", (tarasque_graft_specific_data) {
+    tarasque_entity_graft(tarasque_engine_root_entity(handle), "Game", "SDL Graft", (tarasque_specific_graft) {
             .args = &(graft_sdl_window_args) {
                     .for_window = {
                             .title = "hello",
@@ -40,7 +40,7 @@ int main(void)
             .graft_procedure = &graft_sdl_window,
     });
 
-    tarasque_entity_add_child(tarasque_engine_root_entity(handle), "Game", "square", (tarasque_entity_specific_data) {
+    tarasque_entity_add_child(tarasque_engine_root_entity(handle), "Game", "square", (tarasque_specific_entity) {
             .callbacks = {
                     .on_init = &dummy_draw_init
             },
