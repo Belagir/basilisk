@@ -1,17 +1,19 @@
 
-#include "graft_entities.h"
+#include <SDL2/SDL.h>
+
+#include <base_entities/sdl_event_relay.h>
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-static void graft_entity_sdl_event_relay_on_frame(tarasque_entity *self_data, float elapsed_ms);
+static void base_entity_sdl_event_relay_on_frame(tarasque_entity *self_data, float elapsed_ms);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-static void graft_entity_sdl_event_relay_on_frame(tarasque_entity *self_data, float elapsed_ms)
+static void base_entity_sdl_event_relay_on_frame(tarasque_entity *self_data, float elapsed_ms)
 {
     (void) self_data;
     (void) elapsed_ms;
@@ -31,11 +33,11 @@ static void graft_entity_sdl_event_relay_on_frame(tarasque_entity *self_data, fl
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-tarasque_specific_entity graft_entity_sdl_event_relay(void)
+tarasque_specific_entity base_entity_sdl_event_relay(void)
 {
     return (tarasque_specific_entity) {
             .callbacks = {
-                    .on_frame = &graft_entity_sdl_event_relay_on_frame,
+                    .on_frame = &base_entity_sdl_event_relay_on_frame,
             }
     };
 }

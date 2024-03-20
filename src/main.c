@@ -8,10 +8,10 @@ static void dummy_draw_rect(tarasque_entity *self_data, void *event_data)
 {
     (void) self_data;
 
-    graft_sdl_window_event_draw *draw_data = (graft_sdl_window_event_draw *) event_data;
+//     graft_sdl_window_event_draw *draw_data = (graft_sdl_window_event_draw *) event_data;
 
-    SDL_SetRenderDrawColor(draw_data->renderer, 0, 50u, 255u, 255u);
-    SDL_RenderDrawRect(draw_data->renderer, &(const SDL_Rect) { 30, 30, 300, 400 });
+//     SDL_SetRenderDrawColor(draw_data->renderer, 0, 50u, 255u, 255u);
+//     SDL_RenderDrawRect(draw_data->renderer, &(const SDL_Rect) { 30, 30, 300, 400 });
 }
 
 static void dummy_draw_init(tarasque_entity *self_data)

@@ -10,14 +10,6 @@
  * @brief
  *
  */
-typedef struct graft_sdl_window_event_draw {
-    SDL_Renderer *renderer;
-} graft_sdl_window_event_draw;
-
-/**
- * @brief
- *
- */
 typedef struct graft_sdl_window_win_args {
     const char *title;
     size_t x, y;
