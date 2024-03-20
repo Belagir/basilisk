@@ -20,33 +20,10 @@
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
+/* Opaque type to a full entity containing user data and information about how it lives in the engine. */
 typedef struct tarasque_engine_entity tarasque_engine_entity;
 /* Quickhand for a range of entities. */
 typedef range(tarasque_engine_entity *) tarasque_entity_range;
-
-/**
- * @brief Entity data structure aggregating user data with engine-related data.
- */
-typedef struct tarasque_engine_entity {
-    /** Name of the entity. */
-    identifier *id;
-    /** Non-owned reference to an eventual parent entity. */
-    tarasque_engine_entity *parent;
-    /** Array of all of the entity's children. */
-    tarasque_entity_range *children;
-
-    /** Entity callbacks to be used by the engine. */
-    tarasque_entity_callbacks callbacks;
-
-    /** Engine owning the entity, used to redirect user's actions back to the whole engine. */
-    tarasque_engine *host_handle;
-
-    /** Size in bytes of the user's data. */
-    size_t data_size;
-    /** The user's data. */
-    byte data[];
-} tarasque_engine_entity;
-
 
 /* Redefinition of the tarasque_entity_specific_data type to signal memory allocation in opposition of the user-managed tarasque_entity_specific_data variables. */
 typedef tarasque_entity_specific_data tarasque_entity_specific_data_copy;
@@ -59,6 +36,15 @@ typedef tarasque_entity_specific_data tarasque_entity_specific_data_copy;
 tarasque_engine_entity *tarasque_engine_entity_create(const identifier *id, tarasque_entity_specific_data_copy user_data, tarasque_engine *handle, allocator alloc);
 /* Destroys an entity and nullifies the pointer passed. */
 void tarasque_engine_entity_destroy(tarasque_engine_entity **target, allocator alloc);
+
+// -------------------------------------------------------------------------------------------------
+
+/* Trusting that the entity points to the data of an entity, returns the full entity containing it. */
+tarasque_engine_entity *tarasque_engine_entity_get_containing_full_entity(tarasque_entity *entity);
+/* Returns a pointer to the specific user data in an entity, even if it was unallocated. */
+tarasque_entity *tarasque_engine_entity_get_specific_data(tarasque_engine_entity *target);
+/* Returns the engine instance hosting this entity. */
+tarasque_engine *tarasque_engine_entity_get_host_engine_handle(tarasque_engine_entity *target);
 
 // -------------------------------------------------------------------------------------------------
 

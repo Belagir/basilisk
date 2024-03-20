@@ -20,6 +20,33 @@
 // -------------------------------------------------------------------------------------------------
 
 /**
+ * @brief Entity data structure aggregating user data with engine-related data.
+ */
+typedef struct tarasque_engine_entity {
+    /** Name of the entity. */
+    identifier *id;
+    /** Non-owned reference to an eventual parent entity. */
+    tarasque_engine_entity *parent;
+    /** Array of all of the entity's children. */
+    tarasque_entity_range *children;
+
+    /** Entity callbacks to be used by the engine. */
+    tarasque_entity_callbacks callbacks;
+
+    /** Engine owning the entity, used to redirect user's actions back to the whole engine. */
+    tarasque_engine *host_handle;
+
+    /** Size in bytes of the user's data. */
+    size_t data_size;
+    /** The user's data. */
+    byte data[];
+} tarasque_engine_entity;
+
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+
+/**
  * @brief Creates a newly allocated entity and returns a pointer to it.
  *
  * @param[in] id Name (copied) of the new entity.
@@ -71,6 +98,53 @@ void tarasque_engine_entity_destroy(tarasque_engine_entity **target, allocator a
 
     alloc.free(alloc, *target);
     *target = NULL;
+}
+
+// -------------------------------------------------------------------------------------------------
+
+/**
+ * @brief Returns the full entity embedding the user data passed in argument.
+ *
+ * @param[in] entity user data trusted to be the data field of a tarasque_engine_entity.
+ * @return tarasque_engine_entity *
+ */
+tarasque_engine_entity *tarasque_engine_entity_get_containing_full_entity(tarasque_entity *entity)
+{
+    if (!entity) {
+        return NULL;
+    }
+
+    return container_of(entity, tarasque_engine_entity, data);
+}
+
+/**
+ * @brief Returns a pointer to the user data field of an entity.
+ *
+ * @param[in] target Full entity.
+ * @return tarasque_entity *
+ */
+tarasque_entity *tarasque_engine_entity_get_specific_data(tarasque_engine_entity *target)
+{
+    if (!target) {
+        return NULL;
+    }
+
+    return target->data;
+}
+
+/**
+ * @brief Returns a pointer to the engine instance containing the entity.
+ *
+ * @param[in] target Full entity.
+ * @return tarasque_engine *
+ */
+tarasque_engine *tarasque_engine_entity_get_host_engine_handle(tarasque_engine_entity *target)
+{
+    if (!target) {
+        return NULL;
+    }
+
+    return target->host_handle;
 }
 
 // -------------------------------------------------------------------------------------------------
