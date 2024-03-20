@@ -60,7 +60,9 @@ typedef struct tarasque_engine {
 // -------------------------------------------------------------------------------------------------
 
 /* Removes an entity from the tree, cleaning all objects referencing to it, and does so for all its children. */
-static void tarasque_engine_full_destroy_entity(tarasque_engine *handle, tarasque_engine_entity *target);
+static void tarasque_engine_annihilate_entity_and_chilren(tarasque_engine *handle, tarasque_engine_entity *target);
+/* Removes an entity from the tree and cleaning all objects referencing to it */
+static void tarasque_engine_annihilate_entity(tarasque_engine *handle, tarasque_engine_entity *target);
 
 // -------------------------------------------------------------------------------------------------
 
@@ -161,7 +163,7 @@ void tarasque_engine_destroy(tarasque_engine **handle)
     event_stack_destroy(&(*handle)->events, used_alloc);
     command_queue_destroy(&(*handle)->commands, used_alloc);
 
-    tarasque_engine_full_destroy_entity((*handle), (*handle)->root_entity);
+    tarasque_engine_annihilate_entity_and_chilren((*handle), (*handle)->root_entity);
 
     logger_log((*handle)->logger, LOGGER_SEVERITY_INFO, "Engine shut down.\n");
 
@@ -389,27 +391,29 @@ void tarasque_entity_stack_event(tarasque_entity *entity, const char *str_event_
  * @param[inout] handle Engine handle.
  * @param[inout] target Entity to remove along its children.
  */
-static void tarasque_engine_full_destroy_entity(tarasque_engine *handle, tarasque_engine_entity *target)
+static void tarasque_engine_annihilate_entity_and_chilren(tarasque_engine *handle, tarasque_engine_entity *target)
 {
     tarasque_entity_range *all_children = NULL;
 
-    if (!handle || !target) {
+    if (!handle) {
         return;
     }
 
-    tarasque_engine_entity_deparent(target);
-
-    // TODOD : big oof please separate the two big code bricks in their own function
-
     all_children = tarasque_engine_entity_get_children(target, handle->alloc);
     for (size_t i = 0u ; i < all_children->length ; i++) {
-        tarasque_engine_entity_deinit(all_children->data[i]);
-        event_stack_remove_events_of(handle->events, all_children->data[i], handle->alloc);
-        command_queue_remove_commands_of(handle->commands, all_children->data[i], handle->alloc);
-        event_broker_unsubscribe_from_all(handle->pub_sub, all_children->data[i], handle->alloc);
-        tarasque_engine_entity_destroy(&(all_children->data[i]), handle->alloc);
+        tarasque_engine_annihilate_entity(handle, all_children->data[i]);
     }
     range_destroy_dynamic(handle->alloc, &range_to_any(all_children));
+
+    tarasque_engine_entity_deparent(target);
+    tarasque_engine_annihilate_entity(handle, target);
+}
+
+static void tarasque_engine_annihilate_entity(tarasque_engine *handle, tarasque_engine_entity *target)
+{
+    if (!handle) {
+        return;
+    }
 
     tarasque_engine_entity_deinit(target);
     event_stack_remove_events_of(handle->events, target, handle->alloc);
@@ -417,6 +421,7 @@ static void tarasque_engine_full_destroy_entity(tarasque_engine *handle, tarasqu
     event_broker_unsubscribe_from_all(handle->pub_sub, target, handle->alloc);
     tarasque_engine_entity_destroy(&target, handle->alloc);
 }
+
 
 // -------------------------------------------------------------------------------------------------
 
@@ -552,7 +557,7 @@ static void tarasque_engine_process_command_remove_entity(tarasque_engine *handl
     }
 
     logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Removed entity \"%s\".\n", tarasque_engine_entity_get_name(subject)->data);
-    tarasque_engine_full_destroy_entity(handle, found_entity);
+    tarasque_engine_annihilate_entity_and_chilren(handle, found_entity);
 }
 
 /**
