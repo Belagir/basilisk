@@ -577,7 +577,7 @@ static void tarasque_engine_process_command_graft(tarasque_engine *handle, taras
 
     graft_root = tarasque_engine_entity_create(cmd.id, (tarasque_entity_specific_data_copy) { 0u }, handle, handle->alloc);
     tarasque_engine_entity_add_child(graft_parent, graft_root, handle->alloc);
-    tarasque_engine_entity_init(graft_parent);
+    tarasque_engine_entity_init(graft_root);
 
     cmd.graft_data.graft_procedure(tarasque_engine_entity_get_specific_data(graft_root), cmd.graft_data.args);
 
