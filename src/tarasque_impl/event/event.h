@@ -60,13 +60,13 @@ void event_stack_destroy(event_stack **stack, allocator alloc);
 // -------------------------------------------------------------------------------------------------
 
 /* Subscribes an event callback to an event name. Events sharing the name will be sent to the callback. */
-void event_broker_subscribe(event_broker *broker, entity *subscribed, identifier *target_event_name, event_subscription_user_data subscription_data, allocator alloc);
+void event_broker_subscribe(event_broker *broker, tarasque_entity *subscribed, identifier *target_event_name, event_subscription_user_data subscription_data, allocator alloc);
 
 /* Unsubscribes an event callback from the event broker. */
-void event_broker_unsubscribe(event_broker *broker, entity *target, identifier *target_event_name, event_subscription_user_data subscription_data, allocator alloc);
+void event_broker_unsubscribe(event_broker *broker, tarasque_entity *target, identifier *target_event_name, event_subscription_user_data subscription_data, allocator alloc);
 
 /* Unsubscribes all callbacks associated to an entity from all events. */
-void event_broker_unsubscribe_from_all(event_broker *broker, entity *target, allocator alloc);
+void event_broker_unsubscribe_from_all(event_broker *broker, tarasque_entity *target, allocator alloc);
 
 /* Sends an event to callbacks registered to its name. */
 void event_broker_publish(event_broker *broker, event ev, tarasque_engine *handle);
@@ -74,13 +74,13 @@ void event_broker_publish(event_broker *broker, event ev, tarasque_engine *handl
 // -------------------------------------------------------------------------------------------------
 
 /* Builds and pushes an event on top of the stack. */
-void event_stack_push(event_stack *stack, entity *source, const char *str_event_name, size_t event_data_size, const void *event_data, allocator alloc);
+void event_stack_push(event_stack *stack, tarasque_entity *source, const char *str_event_name, size_t event_data_size, const void *event_data, allocator alloc);
 
 /* Pop the most recent event from the stack and returns it. */
 event event_stack_pop(event_stack *stack);
 
 /* Remove all events tied to some entity. */
-void event_stack_remove_events_of(event_stack *stack, entity *source, allocator alloc);
+void event_stack_remove_events_of(event_stack *stack, tarasque_entity *source, allocator alloc);
 
 /* Returns the number of events in the stack. */
 size_t event_stack_length(const event_stack *stack);

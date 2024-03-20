@@ -24,11 +24,11 @@ static graft_entity_sdl_window_data sdl_window_data_buffer = { 0u };
 // -------------------------------------------------------------------------------------------------
 
 /*  */
-static void graft_entity_sdl_window_init(void *self_data, tarasque_entity_scene *scene);
+static void graft_entity_sdl_window_init(entity_data *self_data, tarasque_entity_scene *scene);
 /*  */
-static void graft_entity_sdl_window_deinit(void *self_data, tarasque_entity_scene *scene);
+static void graft_entity_sdl_window_deinit(entity_data *self_data, tarasque_entity_scene *scene);
 /*  */
-static void graft_entity_sdl_window_quit(void *self_data, void *event_data, tarasque_entity_scene *scene);
+static void graft_entity_sdl_window_quit(entity_data *self_data, void *event_data, tarasque_entity_scene *scene);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -40,7 +40,7 @@ static void graft_entity_sdl_window_quit(void *self_data, void *event_data, tara
  * @param self_data
  * @param scene
  */
-static void graft_entity_sdl_window_init(void *self_data, tarasque_entity_scene *scene)
+static void graft_entity_sdl_window_init(entity_data *self_data, tarasque_entity_scene *scene)
 {
     (void) scene;
 
@@ -56,10 +56,10 @@ static void graft_entity_sdl_window_init(void *self_data, tarasque_entity_scene 
             (int) window_data->init_args.w, (int) window_data->init_args.h,
             window_data->init_args.flags);
 
-    tarasque_entity_scene_add_entity(scene, "", "Render Manager",
+    tarasque_entity_scene_add_entity(self_data, "", "Render Manager",
             graft_entity_sdl_render_manager((graft_entity_sdl_render_manager_args) { .source_window = window_data->window, .flags = 0 }));
 
-    tarasque_entity_scene_subscribe_to_event(scene, "sdl event quit", (event_subscription_user_data) { &graft_entity_sdl_window_quit });
+    tarasque_entity_scene_subscribe_to_event(self_data, "sdl event quit", (event_subscription_user_data) { &graft_entity_sdl_window_quit });
 }
 
 /**
@@ -68,7 +68,7 @@ static void graft_entity_sdl_window_init(void *self_data, tarasque_entity_scene 
  * @param self_data
  * @param scene
  */
-static void graft_entity_sdl_window_deinit(void *self_data, tarasque_entity_scene *scene)
+static void graft_entity_sdl_window_deinit(entity_data *self_data, tarasque_entity_scene *scene)
 {
     (void) scene;
 
@@ -82,9 +82,9 @@ static void graft_entity_sdl_window_deinit(void *self_data, tarasque_entity_scen
     window_data->window = NULL;
 }
 
-static void graft_entity_sdl_window_quit(void *self_data, void *event_data, tarasque_entity_scene *scene)
+static void graft_entity_sdl_window_quit(entity_data *self_data, void *event_data, tarasque_entity_scene *scene)
 {
-    tarasque_entity_scene_remove_entity(scene, "");
+    tarasque_entity_scene_remove_entity(self_data, "");
 }
 
 // -------------------------------------------------------------------------------------------------

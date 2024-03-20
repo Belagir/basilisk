@@ -74,7 +74,7 @@ void event_subscription_list_destroy(event_subscription_list *list, allocator al
  * @param[in] callback Function called to receive the event.
  * @param[inout] alloc Allocator used to eventually extend the list.
  */
-void event_subscription_list_append(event_subscription_list *list, entity *subscribed, event_subscription_user_data subscription_data, allocator alloc)
+void event_subscription_list_append(event_subscription_list *list, tarasque_entity *subscribed, event_subscription_user_data subscription_data, allocator alloc)
 {
     if (!list || !subscribed || !subscription_data.callback) {
         return;
@@ -91,7 +91,7 @@ void event_subscription_list_append(event_subscription_list *list, entity *subsc
  * @param[in] subscribed Entity that subscribed a callback.
  * @param[in] callback Callback previously registered.
  */
-void event_subscription_list_remove(event_subscription_list *list, entity *subscribed, event_subscription_user_data subscription_data)
+void event_subscription_list_remove(event_subscription_list *list, tarasque_entity *subscribed, event_subscription_user_data subscription_data)
 {
     if (!list || !subscribed) {
         return;
@@ -106,7 +106,7 @@ void event_subscription_list_remove(event_subscription_list *list, entity *subsc
  * @param[inout] list List containing the elements to remove.
  * @param[in] subscribed Entity that subscribed a (some) callback(s).
  */
-void event_subscription_list_remove_all_from(event_subscription_list *list, entity *subscribed)
+void event_subscription_list_remove_all_from(event_subscription_list *list, tarasque_entity *subscribed)
 {
     size_t subs_index = 0u;
 

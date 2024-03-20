@@ -37,7 +37,7 @@ typedef struct command_queue {
  * @param[inout] alloc Allocator used for the allocation of the command.
  * @return a fresh command to be queued.
  */
-command command_create_add_entity(entity *source, const char *id_path, const char *id, entity_user_data user_data, allocator alloc)
+command command_create_add_entity(tarasque_entity *source, const char *id_path, const char *id, entity_user_data user_data, allocator alloc)
 {
     command new_cmd = { 0u };
 
@@ -68,7 +68,7 @@ command command_create_add_entity(entity *source, const char *id_path, const cha
  * @param alloc
  * @return
  */
-command command_create_graft(entity *source, const char *id_path, const char *id, graft_user_data graft_data, allocator alloc)
+command command_create_graft(tarasque_entity *source, const char *id_path, const char *id, graft_user_data graft_data, allocator alloc)
 {
     command new_cmd = { 0u };
 
@@ -97,7 +97,7 @@ command command_create_graft(entity *source, const char *id_path, const char *id
  * @param[inout] alloc Allocator used for the allocation of the command.
  * @return A fresh command to be queued.
  */
-command command_create_remove_entity(entity *source, const char *id_path, allocator alloc)
+command command_create_remove_entity(tarasque_entity *source, const char *id_path, allocator alloc)
 {
     command new_cmd = { 0u };
 
@@ -125,7 +125,7 @@ command command_create_remove_entity(entity *source, const char *id_path, alloca
  * @param[inout] alloc Allocator used for the allocation of the command.
  * @return A fresh command to be queued.
  */
-command command_create_subscribe_to_event(entity *source, const char *event_name, event_subscription_user_data subscription_data, allocator alloc)
+command command_create_subscribe_to_event(tarasque_entity *source, const char *event_name, event_subscription_user_data subscription_data, allocator alloc)
 {
     command new_cmd = { 0u };
 
@@ -297,7 +297,7 @@ size_t command_queue_length(const command_queue *queue)
  * @param[in] target Entity the function must remove commands of.
  * @param[inout] alloc Allocator used for the commands destruction.
  */
-void command_queue_remove_commands_of(command_queue *queue, entity *target, allocator alloc)
+void command_queue_remove_commands_of(command_queue *queue, tarasque_entity *target, allocator alloc)
 {
     size_t pos = 0u;
 

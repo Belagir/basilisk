@@ -45,7 +45,7 @@ typedef struct tarasque_engine {
     event_broker *pub_sub;
 
     /** Root of the game tree as an empty entity. */
-    entity *root_entity;
+    tarasque_entity *root_entity;
 
     tarasque_entity_scene root_scene;
 
@@ -61,18 +61,18 @@ typedef struct tarasque_engine {
 // -------------------------------------------------------------------------------------------------
 
 /* Removes an entity from the tree, cleaning all objects referencing to it, and does so for all its children. */
-static void tarasque_engine_full_destroy_entity(tarasque_engine *handle, entity *target);
+static void tarasque_engine_full_destroy_entity(tarasque_engine *handle, tarasque_entity *target);
 
 // -------------------------------------------------------------------------------------------------
 
 /* Processes a general command, applying its effects and then destroying it. */
 static void tarasque_engine_process_command(tarasque_engine *handle, command cmd);
 /* Processes a specific command to add an entity in the engine, changing the state of the game tree. */
-static void tarasque_engine_process_command_add_entity(tarasque_engine *handle, entity *subject, command_add_entity cmd);
+static void tarasque_engine_process_command_add_entity(tarasque_engine *handle, tarasque_entity *subject, command_add_entity cmd);
 
-static void tarasque_engine_process_command_graft(tarasque_engine *handle, entity *subject, command_graft cmd);
+static void tarasque_engine_process_command_graft(tarasque_engine *handle, tarasque_entity *subject, command_graft cmd);
 /* Processes a specific command to remove an entity from the engine, changing the state of the game tree. */
-static void tarasque_engine_process_command_remove_entity(tarasque_engine *handle, entity *subject, command_remove_entity cmd);
+static void tarasque_engine_process_command_remove_entity(tarasque_engine *handle, tarasque_entity *subject, command_remove_entity cmd);
 /* Processes a specific command to subscribe an entity to an event, changing the state of the publisher / susbcriber collection. */
 static void tarasque_engine_process_command_subscribe_to_event(tarasque_engine *handle, command_subscribe_to_event cmd);
 
@@ -127,7 +127,7 @@ tarasque_engine *tarasque_engine_create(void)
                 .events = event_stack_create(used_alloc),
                 .pub_sub = event_broker_create(used_alloc),
 
-                .root_entity = entity_create(identifier_root, (entity_user_data) { 0u }, NULL, used_alloc),
+                .root_entity = entity_create(identifier_root, (entity_user_data) { 0u }, new_engine, used_alloc),
 
                 .root_scene = (tarasque_entity_scene) { 0u },
 
@@ -186,6 +186,15 @@ tarasque_entity_scene *tarasque_engine_root_entity_scene(tarasque_engine *handle
     return &handle->root_scene;
 }
 
+entity_data *tarasque_engine_root_entity(tarasque_engine *handle)
+{
+    if (!handle) {
+        return NULL;
+    }
+
+    return handle->root_entity->data;
+}
+
 // -------------------------------------------------------------------------------------------------
 
 /**
@@ -233,13 +242,15 @@ void tarasque_engine_run(tarasque_engine *handle, int fps) {
  *
  * @param[inout] scene
  */
-void tarasque_entity_scene_quit(tarasque_entity_scene *scene)
+void tarasque_entity_scene_quit(entity_data *entity)
 {
-    if (!scene || !scene->handle) {
+    if (!entity) {
         return;
     }
 
-    scene->handle->should_quit = true;
+    tarasque_entity *full_entity = container_of(entity, tarasque_entity, data);
+
+    full_entity->host_handle->should_quit = true;
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -252,21 +263,25 @@ void tarasque_entity_scene_quit(tarasque_entity_scene *scene)
  * under which the callback was registered. If this entity is removed before the operation is done, the
  * command is also removed.
  *
- * @param[inout] scene
+ * @param[inout] entity
  * @param[in] str_path String (copied) describing a '/'-delimited path to an entity that will be the parent of the new entity.
  * @param[in] str_id New entity's name (copied), must be unique in respect to its siblings and not contain the character '/'.
  * @param[in] user_data Basic entity information (copied).
  */
-void tarasque_entity_scene_add_entity(tarasque_entity_scene *scene, const char *str_path, const char *str_id, entity_user_data user_data)
+void tarasque_entity_scene_add_entity(entity_data *entity, const char *str_path, const char *str_id, entity_user_data user_data)
 {
-    command cmd = { 0u };
-
-    if (!scene || !scene->handle || !scene->current_entity) {
+    if (!entity) {
         return;
     }
 
-    cmd = command_create_add_entity(scene->current_entity, str_path, str_id, user_data, scene->handle->alloc);
-    command_queue_append(scene->handle->commands, cmd, scene->handle->alloc);
+    command cmd = { 0u };
+    tarasque_entity *full_entity = container_of(entity, tarasque_entity, data);
+    tarasque_engine *handle = full_entity->host_handle;
+
+    if (handle) {
+        cmd = command_create_add_entity(full_entity, str_path, str_id, user_data, handle->alloc);
+        command_queue_append(handle->commands, cmd, handle->alloc);
+    }
 }
 
 /**
@@ -278,16 +293,20 @@ void tarasque_entity_scene_add_entity(tarasque_entity_scene *scene, const char *
  * @param[inout] scene
  * @param[in] str_path tring (copied) describing a '/'-delimited path to the removeed entity.
  */
-void tarasque_entity_scene_remove_entity(tarasque_entity_scene *scene, const char *str_path)
+void tarasque_entity_scene_remove_entity(entity_data *entity, const char *str_path)
 {
-    command cmd = { 0u };
-
-    if (!scene || !scene->handle || !scene->current_entity) {
+    if (!entity) {
         return;
     }
 
-    cmd = command_create_remove_entity(scene->current_entity, str_path, scene->handle->alloc);
-    command_queue_append(scene->handle->commands, cmd, scene->handle->alloc);
+    command cmd = { 0u };
+    tarasque_entity *full_entity = container_of(entity, tarasque_entity, data);
+    tarasque_engine *handle = full_entity->host_handle;
+
+    if (handle) {
+        cmd = command_create_remove_entity(full_entity, str_path, handle->alloc);
+        command_queue_append(handle->commands, cmd, handle->alloc);
+    }
 }
 
 /**
@@ -299,16 +318,20 @@ void tarasque_entity_scene_remove_entity(tarasque_entity_scene *scene, const cha
  * @param graft_procedure
  * @param graft_args
  */
-void tarasque_entity_scene_graft(tarasque_entity_scene *scene, const char *str_path, const char *str_id, graft_user_data graft_data)
+void tarasque_entity_scene_graft(entity_data *entity, const char *str_path, const char *str_id, graft_user_data graft_data)
 {
-    command cmd = { 0u };
-
-    if (!scene || !scene->handle || !scene->current_entity) {
+    if (!entity) {
         return;
     }
 
-    cmd = command_create_graft(scene->current_entity, str_path, str_id, graft_data, scene->handle->alloc);
-    command_queue_append(scene->handle->commands, cmd, scene->handle->alloc);
+    command cmd = { 0u };
+    tarasque_entity *full_entity = container_of(entity, tarasque_entity, data);
+    tarasque_engine *handle = full_entity->host_handle;
+
+    if (handle) {
+        cmd = command_create_graft(full_entity, str_path, str_id, graft_data, handle->alloc);
+        command_queue_append(handle->commands, cmd, handle->alloc);
+    }
 }
 
 /**
@@ -320,16 +343,20 @@ void tarasque_entity_scene_graft(tarasque_entity_scene *scene, const char *str_p
  * @param[in] str_event_name Name (copied) of the event the entity wants to subscribe a callback to.
  * @param[in] callback Pointer to the callback that will receive the entity's data and event data.
  */
-void tarasque_entity_scene_subscribe_to_event(tarasque_entity_scene *scene,  const char *str_event_name, event_subscription_user_data subscription_data)
+void tarasque_entity_scene_subscribe_to_event(entity_data *entity,  const char *str_event_name, event_subscription_user_data subscription_data)
 {
-    command cmd = { 0u };
-
-    if (!scene || !scene->handle || !scene->current_entity) {
+    if (!entity) {
         return;
     }
 
-    cmd = command_create_subscribe_to_event(scene->current_entity, str_event_name, subscription_data, scene->handle->alloc);
-    command_queue_append(scene->handle->commands, cmd, scene->handle->alloc);
+    command cmd = { 0u };
+    tarasque_entity *full_entity = container_of(entity, tarasque_entity, data);
+    tarasque_engine *handle = full_entity->host_handle;
+
+    if (handle) {
+        cmd = command_create_subscribe_to_event(full_entity, str_event_name, subscription_data, handle->alloc);
+        command_queue_append(handle->commands, cmd, handle->alloc);
+    }
 }
 
 /**
@@ -341,21 +368,21 @@ void tarasque_entity_scene_subscribe_to_event(tarasque_entity_scene *scene,  con
  * @param[in] event_data Event's specific data (copied).
  * @param[in] is_detached if set, the event will not be removed if the entity that sent it is removed itself.
  */
-void tarasque_entity_scene_stack_event(tarasque_entity_scene *scene, const char *str_event_name, size_t event_data_size, void *event_data, bool is_detached)
+void tarasque_entity_scene_stack_event(entity_data *entity, const char *str_event_name, size_t event_data_size, void *event_data, bool is_detached)
 {
-    entity *source_entity = NULL;
-
-    if (!scene || !scene->handle || !scene->current_entity) {
+    if (!entity) {
         return;
     }
 
+    tarasque_entity *full_entity = container_of(entity, tarasque_entity, data);
+    tarasque_engine *handle = full_entity->host_handle;
+
     if (is_detached) {
-        source_entity = scene->handle->root_entity;
+        event_stack_push(handle->events, handle->root_entity, str_event_name, event_data_size, event_data, handle->alloc);
     } else {
-        source_entity = scene->current_entity;
+        event_stack_push(handle->events, full_entity, str_event_name, event_data_size, event_data, handle->alloc);
     }
 
-    event_stack_push(scene->handle->events, source_entity, str_event_name, event_data_size, event_data, scene->handle->alloc);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -370,7 +397,7 @@ void tarasque_entity_scene_stack_event(tarasque_entity_scene *scene, const char 
  * @param[inout] handle Engine handle.
  * @param[inout] target Entity to remove along its children.
  */
-static void tarasque_engine_full_destroy_entity(tarasque_engine *handle, entity *target)
+static void tarasque_engine_full_destroy_entity(tarasque_engine *handle, tarasque_entity *target)
 {
     entity_range *all_children = NULL;
 
@@ -407,7 +434,7 @@ static void tarasque_engine_full_destroy_entity(tarasque_engine *handle, entity 
  */
 static void tarasque_engine_process_command(tarasque_engine *handle, command cmd)
 {
-    entity *subject = NULL;
+    tarasque_entity *subject = NULL;
 
     if (!handle) {
         return;
@@ -445,10 +472,10 @@ static void tarasque_engine_process_command(tarasque_engine *handle, command cmd
  * @param[in] subject Entity that sent the command.
  * @param[in] cmd Command containing the addition data.
  */
-static void tarasque_engine_process_command_add_entity(tarasque_engine *handle, entity *subject, command_add_entity cmd)
+static void tarasque_engine_process_command_add_entity(tarasque_engine *handle, tarasque_entity *subject, command_add_entity cmd)
 {
-    entity *new_entity = NULL;
-    entity *found_parent = NULL;
+    tarasque_entity *new_entity = NULL;
+    tarasque_entity *found_parent = NULL;
 
     if (!handle) {
         return;
@@ -479,10 +506,10 @@ static void tarasque_engine_process_command_add_entity(tarasque_engine *handle, 
  * @param subject
  * @param cmd
  */
-static void tarasque_engine_process_command_graft(tarasque_engine *handle, entity *subject, command_graft cmd)
+static void tarasque_engine_process_command_graft(tarasque_engine *handle, tarasque_entity *subject, command_graft cmd)
 {
-    entity *graft_parent = NULL;
-    entity *graft_root = NULL;
+    tarasque_entity *graft_parent = NULL;
+    tarasque_entity *graft_root = NULL;
 
     if (!handle) {
         return;
@@ -498,7 +525,7 @@ static void tarasque_engine_process_command_graft(tarasque_engine *handle, entit
     entity_add_child(graft_parent, graft_root, handle->alloc);
     entity_init(graft_parent, handle);
 
-    cmd.graft_data.graft_procedure(&(tarasque_entity_scene) { handle, graft_root }, cmd.graft_data.args);
+    cmd.graft_data.graft_procedure(graft_root->data, cmd.graft_data.args);
 
     logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Added graft \"%s\" under parent \"%s\".\n", cmd.id->data, entity_get_name(graft_parent)->data);
 }
@@ -510,9 +537,9 @@ static void tarasque_engine_process_command_graft(tarasque_engine *handle, entit
  * @param[in] subject Entity that sent the command.
  * @param[in] cmd Command containing the removal data.
  */
-static void tarasque_engine_process_command_remove_entity(tarasque_engine *handle, entity *subject, command_remove_entity cmd)
+static void tarasque_engine_process_command_remove_entity(tarasque_engine *handle, tarasque_entity *subject, command_remove_entity cmd)
 {
-    entity *found_entity = NULL;
+    tarasque_entity *found_entity = NULL;
 
     if (!handle) {
         return;

@@ -19,29 +19,6 @@
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief Entity data structure aggregating user data with engine-related data.
- */
-typedef struct entity {
-    /** Name of the entity. */
-    identifier *id;
-    /** Non-owned reference to an eventual parent entity. */
-    entity *parent;
-    /** Array of all of the entity's children. */
-    entity_range *children;
-
-    entity_callbacks callbacks;
-
-    // tarasque_engine *host_handle;
-
-    size_t data_size;
-    byte data[];
-} entity;
-
-// -------------------------------------------------------------------------------------------------
-// -------------------------------------------------------------------------------------------------
-// -------------------------------------------------------------------------------------------------
-
-/**
  * @brief Creates a newly allocated entity and returns a pointer to it.
  *
  * @param[in] id Name (copied) of the new entity.
@@ -50,21 +27,21 @@ typedef struct entity {
  * @param[inout] alloc Allocator used for the creation of the entity.
  * @return entity *
  */
-entity *entity_create(const identifier *id, entity_user_data_copy user_data, tarasque_engine *handle, allocator alloc)
+tarasque_entity *entity_create(const identifier *id, entity_user_data_copy user_data, tarasque_engine *handle, allocator alloc)
 {
-    entity *new_entity = NULL;
+    tarasque_entity *new_entity = NULL;
 
     new_entity = alloc.malloc(alloc, sizeof(*new_entity) + user_data.data_size);
 
     if (new_entity) {
-        *new_entity = (entity) {
+        *new_entity = (tarasque_entity) {
                 .id = range_create_dynamic_from_copy_of(alloc, range_to_any(id)),
                 .parent = NULL,
                 .children = range_create_dynamic(alloc, sizeof(*new_entity->children->data), TARASQUE_COLLECTIONS_START_LENGTH),
 
                 .callbacks = user_data.callbacks,
 
-                // .host_handle = handle,
+                .host_handle = handle,
 
                 .data_size = user_data.data_size,
         };
@@ -82,7 +59,7 @@ entity *entity_create(const identifier *id, entity_user_data_copy user_data, tar
  * @param[inout] target Entity to destroy.
  * @param[inout] alloc Allocator used to release memory.
  */
-void entity_destroy(entity **target, allocator alloc)
+void entity_destroy(tarasque_entity **target, allocator alloc)
 {
     if (!target || !*target) {
         return;
@@ -104,7 +81,7 @@ void entity_destroy(entity **target, allocator alloc)
  * @param[inout] new_child Entity added as child.
  * @param[inout] alloc Allocator used for the children array insertion.
  */
-void entity_add_child(entity *target, entity *new_child, allocator alloc)
+void entity_add_child(tarasque_entity *target, tarasque_entity *new_child, allocator alloc)
 {
     if (!target || !new_child) {
         return;
@@ -121,7 +98,7 @@ void entity_add_child(entity *target, entity *new_child, allocator alloc)
  *
  * @param[inout] target Entity to de-parent.
  */
-void entity_deparent(entity *target)
+void entity_deparent(tarasque_entity *target)
 {
     if (!target || !target->parent) {
         return;
@@ -138,7 +115,7 @@ void entity_deparent(entity *target)
  * @param[inout] target Entity the children are destroyed from.
  * @param[inout] alloc Allocator used to release the memory of the children entities.
  */
-void entity_destroy_children(entity *target, allocator alloc)
+void entity_destroy_children(tarasque_entity *target, allocator alloc)
 {
     entity_range *all_children = NULL;
 
@@ -162,9 +139,9 @@ void entity_destroy_children(entity *target, allocator alloc)
  * @param[inout] id_path path of indetifiers leading to the searched entity.
  * @return entity*
  */
-entity *entity_get_child(entity *target, const path *id_path)
+tarasque_entity *entity_get_child(tarasque_entity *target, const path *id_path)
 {
-    entity *visited_entity = NULL;
+    tarasque_entity *visited_entity = NULL;
     size_t pos_path = 0u;
 
     if (!target) {
@@ -189,7 +166,7 @@ entity *entity_get_child(entity *target, const path *id_path)
  * @param[in] id_path Name of the searched child entity.
  * @return entity *
  */
-entity *entity_get_direct_child(entity *target, const identifier *id)
+tarasque_entity *entity_get_direct_child(tarasque_entity *target, const identifier *id)
 {
     bool found_child = false;
     size_t pos_child = 0u;
@@ -217,7 +194,7 @@ entity *entity_get_direct_child(entity *target, const identifier *id)
  * @param[inout] alloc Allocator used to create the returned range.
  * @return entity_range*
  */
-entity_range *entity_get_children(entity *target, allocator alloc)
+entity_range *entity_get_children(tarasque_entity *target, allocator alloc)
 {
     size_t child_pos = 0u;
     entity_range *entities = NULL;
@@ -243,7 +220,7 @@ entity_range *entity_get_children(entity *target, allocator alloc)
  * @param[in] target Target entity.
  * @return const identifier *
  */
-const identifier *entity_get_name(const entity *target)
+const identifier *entity_get_name(const tarasque_entity *target)
 {
     if (!target) {
         return NULL;
@@ -259,7 +236,7 @@ const identifier *entity_get_name(const entity *target)
  * @param[in] elapsed_ms Number of elapsed milliseconds, hopefully since the last time the callback was called.
  * @param[inout] handle Engine handle so the user code can modify the state of the engine.
  */
-void entity_step_frame(entity *target, f32 elapsed_ms, tarasque_engine *handle)
+void entity_step_frame(tarasque_entity *target, f32 elapsed_ms, tarasque_engine *handle)
 {
     if (!target) {
         return;
@@ -276,7 +253,7 @@ void entity_step_frame(entity *target, f32 elapsed_ms, tarasque_engine *handle)
  * @param[in] callback Event callback.
  * @param[inout] event_data Event data passed to the callback.
  */
-void entity_send_event(entity *target, event_subscription_user_data subscription_data, void *event_data, tarasque_engine *handle)
+void entity_send_event(tarasque_entity *target, event_subscription_user_data subscription_data, void *event_data, tarasque_engine *handle)
 {
     if (!target || !subscription_data.callback) {
         return;
@@ -291,7 +268,7 @@ void entity_send_event(entity *target, event_subscription_user_data subscription
  * @param[inout] target Target entity.
  * @param[in] handle Engine handle so the user code can modify the state of the engine.
  */
-void entity_init(entity *target, tarasque_engine *handle)
+void entity_init(tarasque_entity *target, tarasque_engine *handle)
 {
     if (!target) {
         return;
@@ -308,7 +285,7 @@ void entity_init(entity *target, tarasque_engine *handle)
  * @param[inout] target Target entity.
  * @param[in] handle Engine handle so the user code can modify the state of the engine.
  */
-void entity_deinit(entity *target, tarasque_engine *handle)
+void entity_deinit(tarasque_entity *target, tarasque_engine *handle)
 {
     if (!target) {
         return;

@@ -18,7 +18,7 @@
 
 typedef struct tarasque_entity_scene {
     tarasque_engine *handle;
-    entity *current_entity;
+    tarasque_entity *current_entity;
 } tarasque_entity_scene;
 
 #endif
