@@ -308,6 +308,7 @@ void event_stack_remove_events_of(event_stack *stack, tarasque_engine_entity *so
 
     while (pos < stack->stack_impl->length) {
         if (stack->stack_impl->data[pos].source == source) {
+            event_destroy(&(stack->stack_impl->data[pos].ev), alloc);
             range_remove(range_to_any(stack->stack_impl), pos);
         } else {
             pos += 1u;
