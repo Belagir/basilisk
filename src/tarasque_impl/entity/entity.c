@@ -11,8 +11,9 @@
 #include <ustd/sorting.h>
 #include <stdio.h>
 
+#include <tarasque.h>
+
 #include "entity.h"
-#include "../engine/tarasque_impl.h"
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -117,7 +118,7 @@ void entity_deparent(tarasque_entity *target)
  */
 void entity_destroy_children(tarasque_entity *target, allocator alloc)
 {
-    entity_range *all_children = NULL;
+    tarasque_entity_range *all_children = NULL;
 
     if (!target) {
         return;
@@ -192,12 +193,12 @@ tarasque_entity *entity_get_direct_child(tarasque_entity *target, const identifi
  *
  * @param[in] target Entity from which to extract children.
  * @param[inout] alloc Allocator used to create the returned range.
- * @return entity_range*
+ * @return tarasque_entity_range*
  */
-entity_range *entity_get_children(tarasque_entity *target, allocator alloc)
+tarasque_entity_range *entity_get_children(tarasque_entity *target, allocator alloc)
 {
     size_t child_pos = 0u;
-    entity_range *entities = NULL;
+    tarasque_entity_range *entities = NULL;
 
     if (!target) {
         return NULL;

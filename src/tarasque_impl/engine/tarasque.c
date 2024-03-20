@@ -18,11 +18,12 @@
 
 #include <ustd/logging.h>
 
-#include "tarasque_impl.h"
+#include <tarasque.h>
 
 #include "../common.h"
 
 #include "../command/command.h"
+#include "../entity/entity.h"
 #include "../event/event.h"
 
 // -------------------------------------------------------------------------------------------------
@@ -389,7 +390,7 @@ void tarasque_entity_stack_event(entity_data *entity, const char *str_event_name
  */
 static void tarasque_engine_full_destroy_entity(tarasque_engine *handle, tarasque_entity *target)
 {
-    entity_range *all_children = NULL;
+    tarasque_entity_range *all_children = NULL;
 
     if (!handle || !target) {
         return;
@@ -598,7 +599,7 @@ static void tarasque_engine_process_event(tarasque_engine *handle, event process
  */
 static void tarasque_engine_frame_step_entities(tarasque_engine *handle, f32 elapsed_ms)
 {
-    entity_range *all_entities = NULL;
+    tarasque_entity_range *all_entities = NULL;
 
     if (!handle) {
         return;

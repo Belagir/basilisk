@@ -22,7 +22,7 @@
 
 typedef struct tarasque_entity tarasque_entity;
 /* Quickhand for a range of entities. */
-typedef range(tarasque_entity *) entity_range;
+typedef range(tarasque_entity *) tarasque_entity_range;
 
 /**
  * @brief Entity data structure aggregating user data with engine-related data.
@@ -33,7 +33,7 @@ typedef struct tarasque_entity {
     /** Non-owned reference to an eventual parent entity. */
     tarasque_entity *parent;
     /** Array of all of the entity's children. */
-    entity_range *children;
+    tarasque_entity_range *children;
 
     entity_callbacks callbacks;
 
@@ -74,7 +74,7 @@ tarasque_entity *entity_get_direct_child(tarasque_entity *target, const identifi
 
 
 /* Returns an allocated range of all children of an entity, recursively. */
-entity_range *entity_get_children(tarasque_entity *target, allocator alloc);
+tarasque_entity_range *entity_get_children(tarasque_entity *target, allocator alloc);
 
 /* Returns the name of an entity. */
 const identifier *entity_get_name(const tarasque_entity *target);
