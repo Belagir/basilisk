@@ -19,6 +19,6 @@ typedef struct base_entity_sdl_window_data {
     SDL_Window *window;
 } base_entity_sdl_window_data;
 
-tarasque_specific_entity base_entity_sdl_render_manager(base_entity_sdl_window_data *args);
+tarasque_specific_entity base_entity_sdl_window(base_entity_sdl_window_data *args);
 
 #endif
