@@ -49,13 +49,13 @@ static void graft_entity_sdl_window_init(tarasque_entity *self_data)
     graft_entity_sdl_window_data *window_data = (graft_entity_sdl_window_data *) self_data;
 
     window_data->window = SDL_CreateWindow(
-            window_data->init_args.title,
-            (int) window_data->init_args.x, (int) window_data->init_args.y,
-            (int) window_data->init_args.w, (int) window_data->init_args.h,
-            window_data->init_args.flags);
+            window_data->init_args.for_window.title,
+            (int) window_data->init_args.for_window.x, (int) window_data->init_args.for_window.y,
+            (int) window_data->init_args.for_window.w, (int) window_data->init_args.for_window.h,
+            window_data->init_args.for_window.flags);
 
     tarasque_entity_add_child(self_data, "", "Render Manager",
-            graft_entity_sdl_render_manager((graft_entity_sdl_render_manager_args) { .source_window = window_data->window, .flags = 0 }));
+            graft_entity_sdl_render_manager((graft_entity_sdl_render_manager_args) { .args = window_data->init_args.for_render, .source_window = window_data->window, }));
 
     tarasque_entity_subscribe_to_event(self_data, "sdl event quit", (tarasque_event_subscription_specific_data) { &graft_entity_sdl_window_quit });
 }

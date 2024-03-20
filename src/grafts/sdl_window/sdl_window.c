@@ -18,10 +18,8 @@ void graft_sdl_window(tarasque_entity *entity, void *graft_args)
 
     tarasque_entity_add_child(entity, "SDL Context", "SDL Window",
             graft_entity_sdl_window((graft_entity_sdl_window_args) {
-                    sdl_win_args.title,
-                    sdl_win_args.x, sdl_win_args.y,
-                    sdl_win_args.w, sdl_win_args.h,
-                    sdl_win_args.win_flags }));
+                    .for_window = sdl_win_args.for_window,
+                    .for_render = sdl_win_args.for_renderer, }));
 
     tarasque_entity_add_child(entity, "SDL Context/SDL Window", "SDL Event Relay",
             graft_entity_sdl_event_relay());
