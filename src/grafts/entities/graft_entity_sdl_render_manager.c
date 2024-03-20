@@ -19,22 +19,20 @@ static graft_entity_sdl_render_manager_data graft_entity_sdl_render_manager_data
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-static void graft_entity_sdl_render_manager_init(entity_data *self_data, tarasque_entity_scene *scene);
+static void graft_entity_sdl_render_manager_init(entity_data *self_data);
 
-static void graft_entity_sdl_render_manager_deinit(entity_data *self_data, tarasque_entity_scene *scene);
+static void graft_entity_sdl_render_manager_deinit(entity_data *self_data);
 
-static void graft_entity_sdl_render_manager_on_frame(entity_data *self_data, float elapsed_ms, tarasque_entity_scene *scene);
+static void graft_entity_sdl_render_manager_on_frame(entity_data *self_data, float elapsed_ms);
 
-static void graft_entity_sdl_render_manager_pre_draw(entity_data *self_data, void *event_data, tarasque_entity_scene *scene);
-static void graft_entity_sdl_render_manager_post_draw(entity_data *self_data, void *event_data, tarasque_entity_scene *scene);
+static void graft_entity_sdl_render_manager_pre_draw(entity_data *self_data, void *event_data);
+static void graft_entity_sdl_render_manager_post_draw(entity_data *self_data, void *event_data);
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-static void graft_entity_sdl_render_manager_init(entity_data *self_data, tarasque_entity_scene *scene)
+static void graft_entity_sdl_render_manager_init(entity_data *self_data)
 {
-    (void) scene;
-
     if (!self_data) {
         return;
     }
@@ -48,10 +46,8 @@ static void graft_entity_sdl_render_manager_init(entity_data *self_data, tarasqu
     }
 }
 
-static void graft_entity_sdl_render_manager_deinit(entity_data *self_data, tarasque_entity_scene *scene)
+static void graft_entity_sdl_render_manager_deinit(entity_data *self_data)
 {
-    (void) scene;
-
     if (!self_data) {
         return;
     }
@@ -62,7 +58,7 @@ static void graft_entity_sdl_render_manager_deinit(entity_data *self_data, taras
     data->renderer = NULL;
 }
 
-static void graft_entity_sdl_render_manager_on_frame(entity_data *self_data, float elapsed_ms, tarasque_entity_scene *scene)
+static void graft_entity_sdl_render_manager_on_frame(entity_data *self_data, float elapsed_ms)
 {
     if (!self_data) {
         return;
@@ -75,10 +71,9 @@ static void graft_entity_sdl_render_manager_on_frame(entity_data *self_data, flo
     tarasque_entity_scene_stack_event(self_data, "sdl renderer pre draw", 0u, NULL, false);
 }
 
-static void graft_entity_sdl_render_manager_pre_draw(entity_data *self_data, void *event_data, tarasque_entity_scene *scene)
+static void graft_entity_sdl_render_manager_pre_draw(entity_data *self_data, void *event_data)
 {
     (void) event_data;
-    (void) scene;
 
     if (!self_data) {
         return;
@@ -91,10 +86,9 @@ static void graft_entity_sdl_render_manager_pre_draw(entity_data *self_data, voi
     SDL_RenderClear(data->renderer);
 }
 
-static void graft_entity_sdl_render_manager_post_draw(entity_data *self_data, void *event_data, tarasque_entity_scene *scene)
+static void graft_entity_sdl_render_manager_post_draw(entity_data *self_data, void *event_data)
 {
     (void) event_data;
-    (void) scene;
 
     if (!self_data) {
         return;

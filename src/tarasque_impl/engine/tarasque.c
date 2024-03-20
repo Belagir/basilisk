@@ -47,8 +47,6 @@ typedef struct tarasque_engine {
     /** Root of the game tree as an empty entity. */
     tarasque_entity *root_entity;
 
-    tarasque_entity_scene root_scene;
-
     /** Flag signaling wether the engine should exit or not the main loop. */
     bool should_quit;
 
@@ -129,14 +127,10 @@ tarasque_engine *tarasque_engine_create(void)
 
                 .root_entity = entity_create(identifier_root, (entity_user_data) { 0u }, new_engine, used_alloc),
 
-                .root_scene = (tarasque_entity_scene) { 0u },
-
                 .should_quit = false,
 
                 .alloc = used_alloc,
         };
-
-        new_engine->root_scene = (tarasque_entity_scene) { .handle = new_engine, .current_entity = new_engine->root_entity };
 
         logger_log(new_engine->logger, LOGGER_SEVERITY_INFO, "Engine is ready.\n");
     }
@@ -176,16 +170,12 @@ void tarasque_engine_destroy(tarasque_engine **handle)
     *handle = NULL;
 }
 
-
-tarasque_entity_scene *tarasque_engine_root_entity_scene(tarasque_engine *handle)
-{
-    if (!handle) {
-        return NULL;
-    }
-
-    return &handle->root_scene;
-}
-
+/**
+ * @brief
+ *
+ * @param handle
+ * @return
+ */
 entity_data *tarasque_engine_root_entity(tarasque_engine *handle)
 {
     if (!handle) {

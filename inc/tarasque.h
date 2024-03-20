@@ -24,20 +24,17 @@
 typedef struct tarasque_engine tarasque_engine;
 
 
-typedef struct tarasque_entity_scene tarasque_entity_scene;
-
-
 typedef void entity_data;
 
 // -------------------------------------------------------------------------------------------------
 
 typedef struct entity_callbacks {
     /** Function ran on the entity-specific data when it is first created. */
-    void (*on_init)(entity_data *self_data, tarasque_entity_scene *scene);
+    void (*on_init)(entity_data *self_data);
     /** Function ran on the entity-specific data when it is destroyed. */
-    void (*on_deinit)(entity_data *self_data, tarasque_entity_scene *scene);
+    void (*on_deinit)(entity_data *self_data);
     /** Function ran on the entity-specific data each frame. */
-    void (*on_frame)(entity_data *self_data, float elapsed_ms, tarasque_entity_scene *scene);
+    void (*on_frame)(entity_data *self_data, float elapsed_ms);
 } entity_callbacks;
 
 /**
@@ -58,7 +55,7 @@ typedef struct entity_user_data {
  *
  */
 typedef struct event_subscription_user_data {
-    void (*callback)(entity_data *self_data, void *event_data, tarasque_entity_scene *scene);
+    void (*callback)(entity_data *self_data, void *event_data);
 } event_subscription_user_data;
 
 /**
@@ -85,7 +82,6 @@ void tarasque_engine_destroy(tarasque_engine **handle);
 
 // -------------------------------------------------------------------------------------------------
 
-tarasque_entity_scene *tarasque_engine_root_entity_scene(tarasque_engine *handle);
 entity_data *tarasque_engine_root_entity(tarasque_engine *handle);
 
 /* Starts the main loop of the engine, resolving pending commands, sending events and stepping

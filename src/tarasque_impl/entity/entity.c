@@ -242,7 +242,7 @@ void entity_step_frame(tarasque_entity *target, f32 elapsed_ms, tarasque_engine 
         return;
     }
     if (target->callbacks.on_frame) {
-        target->callbacks.on_frame(target->data, elapsed_ms, &(tarasque_entity_scene) { handle, target });
+        target->callbacks.on_frame(target->data, elapsed_ms);
     }
 }
 
@@ -259,7 +259,7 @@ void entity_send_event(tarasque_entity *target, event_subscription_user_data sub
         return;
     }
 
-    subscription_data.callback(target->data, event_data, &(tarasque_entity_scene) { handle, target });
+    subscription_data.callback(target->data, event_data);
 }
 
 /**
@@ -275,7 +275,7 @@ void entity_init(tarasque_entity *target, tarasque_engine *handle)
     }
 
     if (target->callbacks.on_init) {
-        target->callbacks.on_init(target->data, &(tarasque_entity_scene) { handle, target });
+        target->callbacks.on_init(target->data);
     }
 }
 
@@ -292,7 +292,7 @@ void entity_deinit(tarasque_entity *target, tarasque_engine *handle)
     }
 
     if (target->callbacks.on_deinit) {
-        target->callbacks.on_deinit(target->data, &(tarasque_entity_scene) { handle, target });
+        target->callbacks.on_deinit(target->data);
     }
 }
 

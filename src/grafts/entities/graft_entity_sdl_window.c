@@ -24,11 +24,11 @@ static graft_entity_sdl_window_data sdl_window_data_buffer = { 0u };
 // -------------------------------------------------------------------------------------------------
 
 /*  */
-static void graft_entity_sdl_window_init(entity_data *self_data, tarasque_entity_scene *scene);
+static void graft_entity_sdl_window_init(entity_data *self_data);
 /*  */
-static void graft_entity_sdl_window_deinit(entity_data *self_data, tarasque_entity_scene *scene);
+static void graft_entity_sdl_window_deinit(entity_data *self_data);
 /*  */
-static void graft_entity_sdl_window_quit(entity_data *self_data, void *event_data, tarasque_entity_scene *scene);
+static void graft_entity_sdl_window_quit(entity_data *self_data, void *event_data);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -40,10 +40,8 @@ static void graft_entity_sdl_window_quit(entity_data *self_data, void *event_dat
  * @param self_data
  * @param scene
  */
-static void graft_entity_sdl_window_init(entity_data *self_data, tarasque_entity_scene *scene)
+static void graft_entity_sdl_window_init(entity_data *self_data)
 {
-    (void) scene;
-
     if (!self_data) {
         return;
     }
@@ -68,10 +66,8 @@ static void graft_entity_sdl_window_init(entity_data *self_data, tarasque_entity
  * @param self_data
  * @param scene
  */
-static void graft_entity_sdl_window_deinit(entity_data *self_data, tarasque_entity_scene *scene)
+static void graft_entity_sdl_window_deinit(entity_data *self_data)
 {
-    (void) scene;
-
     if (!self_data) {
         return;
     }
@@ -82,7 +78,7 @@ static void graft_entity_sdl_window_deinit(entity_data *self_data, tarasque_enti
     window_data->window = NULL;
 }
 
-static void graft_entity_sdl_window_quit(entity_data *self_data, void *event_data, tarasque_entity_scene *scene)
+static void graft_entity_sdl_window_quit(entity_data *self_data, void *event_data)
 {
     tarasque_entity_scene_remove_entity(self_data, "");
 }

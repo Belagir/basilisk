@@ -5,13 +5,13 @@
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-static void graft_entity_sdl_event_relay_on_frame(entity_data *self_data, float elapsed_ms, tarasque_entity_scene *scene);
+static void graft_entity_sdl_event_relay_on_frame(entity_data *self_data, float elapsed_ms);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-static void graft_entity_sdl_event_relay_on_frame(entity_data *self_data, float elapsed_ms, tarasque_entity_scene *scene)
+static void graft_entity_sdl_event_relay_on_frame(entity_data *self_data, float elapsed_ms)
 {
     (void) self_data;
     (void) elapsed_ms;
