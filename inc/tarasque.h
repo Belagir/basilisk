@@ -99,7 +99,6 @@ void tarasque_engine_destroy(tarasque_engine **handle);
 
 /* Returns the data bound to the root entity. This pointer has no memory behind it and cannot be dereferenced. */
 tarasque_entity *tarasque_engine_root_entity(tarasque_engine *handle);
-
 /* Starts the main loop of the engine, resolving pending commands, sending events and stepping
 entities. */
 void tarasque_engine_run(tarasque_engine *handle, int fps);
@@ -120,5 +119,10 @@ void tarasque_entity_graft(tarasque_entity *entity, const char *str_path, const 
 void tarasque_entity_subscribe_to_event(tarasque_entity *entity, const char *str_event_name, tarasque_specific_event_subscription subscription_data);
 /* Sends an event to subscribed entities. */
 void tarasque_entity_stack_event(tarasque_entity *entity, const char *str_event_name, tarasque_specific_event event_data);
+
+// -------------------------------------------------------------------------------------------------
+
+/* Search for a parent of a certain name the entity might be related to. If the name is NULL, the first parent is returned. */
+tarasque_entity *tarasque_entity_get_parent(tarasque_entity *entity, const char *str_parent_name);
 
 #endif

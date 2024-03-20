@@ -60,6 +60,8 @@ void print_path(const path *p);
 
 // -------------------------------------------------------------------------------------------------
 
+i32 identifier_compare_to_cstring(const identifier *id, const char *str);
+
 /* Compares two identifiers hidden between two indirections. */
 i32 identifier_compare_doubleref(const void *lhs, const void *rhs);
 
