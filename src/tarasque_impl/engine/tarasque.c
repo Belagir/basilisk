@@ -142,7 +142,8 @@ tarasque_engine *tarasque_engine_create(void)
 }
 
 /**
- * @brief Destroys memory held by an engine instance, releasing all memory held by it and nullifying the given pointer.
+ * @brief Destroys memory held by an engine instance, releasing all memory held by it and nullifying
+ * the given pointer.
  *
  * @param[inout] handle double pointer to an engine instance.
  */
@@ -172,10 +173,11 @@ void tarasque_engine_destroy(tarasque_engine **handle)
 }
 
 /**
- * @brief
+ * @brief Returns the data pointer of the root entity to be used with tarasque_entity_*() functions.
+ * The pointer itself points to unallocated memory and cannot be dereferenced.
  *
- * @param handle
- * @return
+ * @param[in] handle Handle to an engine instance. If NULL, the functions returns NULL.
+ * @return entity_data *
  */
 entity_data *tarasque_engine_root_entity(tarasque_engine *handle)
 {
@@ -231,7 +233,7 @@ void tarasque_engine_run(tarasque_engine *handle, int fps) {
  * @brief Flags the engine to quit on the next frame.
  * The current frame will still finish before quitting.
  *
- * @param[inout] scene
+ * @param[inout] entity entity querying the end of process.
  */
 void tarasque_entity_quit(entity_data *entity)
 {
@@ -250,12 +252,12 @@ void tarasque_entity_quit(entity_data *entity)
 
 /**
  * @brief Queues a command to add an entity into the game tree.
- * If the function is called from a callback registered in the engine, the path is relative to the entity
- * under which the callback was registered. If this entity is removed before the operation is done, the
+ * The path is relative to the entity passed as argument. If this entity is removed before the operation is done, the
  * command is also removed.
  *
- * @param[inout] entity
- * @param[in] str_path String (copied) describing a '/'-delimited path to an entity that will be the parent of the new entity.
+ * @param[in] entity Target to-be-parent entity.
+ * @param[in] str_path String (copied) describing a '/'-delimited path to an entity that will be the direct parent of the new entity.
+ *  The path "" represents the entity passed as argument.
  * @param[in] str_id New entity's name (copied), must be unique in respect to its siblings and not contain the character '/'.
  * @param[in] user_data Basic entity information (copied).
  */
@@ -277,12 +279,11 @@ void tarasque_entity_add_child(entity_data *entity, const char *str_path, const 
 
 /**
  * @brief Queue a command to remove an entity into the game tree.
- * If the function is called from a callback registered in the engine, the path is relative to the entity
- * under which the callback was registered. If this entity is removed before the operation is done, the
+ * The path is relative to the entity passed as argument. If this entity is removed before the operation is done, the
  * command is also removed.
  *
- * @param[inout] scene
- * @param[in] str_path tring (copied) describing a '/'-delimited path to the removeed entity.
+ * @param[in] entity Target entity to be removed. The path "" represents the entity passed as argument.
+ * @param[in] str_path string (copied) describing a '/'-delimited path to the removeed entity.
  */
 void tarasque_entity_remove_child(entity_data *entity, const char *str_path)
 {
@@ -301,13 +302,14 @@ void tarasque_entity_remove_child(entity_data *entity, const char *str_path)
 }
 
 /**
- * @brief
+ * @brief Execute a graft relative to some entity.
+ * The graft may queue any kind of operations to the engine, as described by its specific documentation.
+ * Grafts are usually used to add entities in bulk.
  *
- * @param scene
- * @param str_path
- * @param str_id
- * @param graft_procedure
- * @param graft_args
+ * @param[in] entity Target entity from which the graft will take place.
+ * @param[in] str_path Path (copied) from which the graft is executed.
+ * @param[in] str_id Name (copied) to give to the root of the graft.
+ * @param[in] graft_data Data (copied) describing the graft and its arguments.
  */
 void tarasque_entity_graft(entity_data *entity, const char *str_path, const char *str_id, graft_user_data graft_data)
 {
@@ -327,10 +329,9 @@ void tarasque_entity_graft(entity_data *entity, const char *str_path, const char
 
 /**
  * @brief Queue a command to subscribe an entity's callback to an event.
- * This function can only be called from an entity's registered callback. If this entity is removed
- * before the operation is done, the command is also removed.
+ * If this entity is removed before the operation is done, the command is also removed.
  *
- * @param[inout] scene
+ * @param[in] entity Entity subscribing the callback.
  * @param[in] str_event_name Name (copied) of the event the entity wants to subscribe a callback to.
  * @param[in] callback Pointer to the callback that will receive the entity's data and event data.
  */
@@ -353,7 +354,7 @@ void tarasque_entity_subscribe_to_event(entity_data *entity,  const char *str_ev
 /**
  * @brief Immediately stacks a named event to be sent to all entities registered to the event's name.
  *
- * @param[inout] scene
+ * @param[in] entity Entity sending the event.
  * @param[in] str_event_name Name (copied) of the event stacked.
  * @param[in] event_data_size Event's specific data size in bytes.
  * @param[in] event_data Event's specific data (copied).
@@ -397,6 +398,8 @@ static void tarasque_engine_full_destroy_entity(tarasque_engine *handle, tarasqu
     }
 
     entity_deparent(target);
+
+    // TODOD : big oof please separate the two big code bricks in their own function
 
     all_children = entity_get_children(target, handle->alloc);
     for (size_t i = 0u ; i < all_children->length ; i++) {

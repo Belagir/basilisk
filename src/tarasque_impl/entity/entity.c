@@ -235,9 +235,8 @@ const identifier *entity_get_name(const tarasque_entity *target)
  *
  * @param[inout] target Target entity.
  * @param[in] elapsed_ms Number of elapsed milliseconds, hopefully since the last time the callback was called.
- * @param[inout] handle Engine handle so the user code can modify the state of the engine.
  */
-void entity_step_frame(tarasque_entity *target, f32 elapsed_ms, tarasque_engine *handle)
+void entity_step_frame(tarasque_entity *target, f32 elapsed_ms)
 {
     if (!target) {
         return;
@@ -254,7 +253,7 @@ void entity_step_frame(tarasque_entity *target, f32 elapsed_ms, tarasque_engine 
  * @param[in] callback Event callback.
  * @param[inout] event_data Event data passed to the callback.
  */
-void entity_send_event(tarasque_entity *target, event_subscription_user_data subscription_data, void *event_data, tarasque_engine *handle)
+void entity_send_event(tarasque_entity *target, event_subscription_user_data subscription_data, void *event_data)
 {
     if (!target || !subscription_data.callback) {
         return;
@@ -267,9 +266,8 @@ void entity_send_event(tarasque_entity *target, event_subscription_user_data sub
  * @brief Calls the `.on_init()` callback of some entity, if it exists.
  *
  * @param[inout] target Target entity.
- * @param[in] handle Engine handle so the user code can modify the state of the engine.
  */
-void entity_init(tarasque_entity *target, tarasque_engine *handle)
+void entity_init(tarasque_entity *target)
 {
     if (!target) {
         return;
@@ -284,9 +282,8 @@ void entity_init(tarasque_entity *target, tarasque_engine *handle)
  * @brief Calls the `.on_deinit()` callback of some entity, if it exists.
  *
  * @param[inout] target Target entity.
- * @param[in] handle Engine handle so the user code can modify the state of the engine.
  */
-void entity_deinit(tarasque_entity *target, tarasque_engine *handle)
+void entity_deinit(tarasque_entity *target)
 {
     if (!target) {
         return;

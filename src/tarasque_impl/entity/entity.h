@@ -35,11 +35,15 @@ typedef struct tarasque_entity {
     /** Array of all of the entity's children. */
     tarasque_entity_range *children;
 
+    /** Entity callbacks to be used by the engine. */
     entity_callbacks callbacks;
 
+    /** Engine owning the entity, used to redirect user's actions back to the whole engine. */
     tarasque_engine *host_handle;
 
+    /** Size in bytes of the user's data. */
     size_t data_size;
+    /** The user's data. */
     byte data[];
 } tarasque_entity;
 
@@ -82,16 +86,16 @@ const identifier *entity_get_name(const tarasque_entity *target);
 // -------------------------------------------------------------------------------------------------
 
 /* Execute the on_frame() callback tied to an entity. */
-void entity_step_frame(tarasque_entity *target, f32 elapsed_ms, tarasque_engine *handle);
+void entity_step_frame(tarasque_entity *target, f32 elapsed_ms);
 
 /* Execute an event callback trusted to be linked to an entity. */
-void entity_send_event(tarasque_entity *target, event_subscription_user_data subscription_data, void *event_data, tarasque_engine *handle);
+void entity_send_event(tarasque_entity *target, event_subscription_user_data subscription_data, void *event_data);
 
 /* Execute the on_init() callback tied to an entity */
-void entity_init(tarasque_entity *target, tarasque_engine *handle);
+void entity_init(tarasque_entity *target);
 
 /* Execute the on_deinit() callback tied to an entity */
-void entity_deinit(tarasque_entity *target, tarasque_engine *handle);
+void entity_deinit(tarasque_entity *target);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------

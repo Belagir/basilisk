@@ -23,11 +23,14 @@
 /* Opaque type of an engine handle. Those are used to carry around references to the engine's data. */
 typedef struct tarasque_engine tarasque_engine;
 
-
+/* Anonymous type to whatever the user chose for an entity to store. Used as an access to change the state of an entity and its children. */
 typedef void entity_data;
 
 // -------------------------------------------------------------------------------------------------
 
+/**
+ * @brief Collection of callbacks that make an entity function in the engine.
+ */
 typedef struct entity_callbacks {
     /** Function ran on the entity-specific data when it is first created. */
     void (*on_init)(entity_data *self_data);
@@ -47,19 +50,19 @@ typedef struct entity_user_data {
     functions that take the containing struct type. */
     entity_data *data;
 
+    /** Specific callbacks. */
     entity_callbacks callbacks;
 } entity_user_data;
 
 /**
- * @brief
- *
+ * @brief Data representing the behavior to realize on an event.
  */
 typedef struct event_subscription_user_data {
     void (*callback)(entity_data *self_data, void *event_data);
 } event_subscription_user_data;
 
 /**
- * @brief
+ * @brief Data representing how to change the game tree to accomodate for a specific graft.
  */
 typedef struct graft_user_data {
     /** Size, in bytes, of the graft's arguments. */
@@ -68,6 +71,7 @@ typedef struct graft_user_data {
     functions that take the containing struct type. */
     void *args;
 
+    /** procedure called to add the graft. */
     void (*graft_procedure)(entity_data *entity, void *graft_args);
 } graft_user_data;
 
@@ -82,6 +86,7 @@ void tarasque_engine_destroy(tarasque_engine **handle);
 
 // -------------------------------------------------------------------------------------------------
 
+/* Returns the data bound to the root entity. This pointer has no memory behind it and cannot be dereferenced. */
 entity_data *tarasque_engine_root_entity(tarasque_engine *handle);
 
 /* Starts the main loop of the engine, resolving pending commands, sending events and stepping
