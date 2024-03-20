@@ -24,11 +24,11 @@ static graft_entity_sdl_window_data sdl_window_data_buffer = { 0u };
 // -------------------------------------------------------------------------------------------------
 
 /*  */
-static void graft_entity_sdl_window_init(entity_data *self_data);
+static void graft_entity_sdl_window_init(tarasque_entity *self_data);
 /*  */
-static void graft_entity_sdl_window_deinit(entity_data *self_data);
+static void graft_entity_sdl_window_deinit(tarasque_entity *self_data);
 /*  */
-static void graft_entity_sdl_window_quit(entity_data *self_data, void *event_data);
+static void graft_entity_sdl_window_quit(tarasque_entity *self_data, void *event_data);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -40,7 +40,7 @@ static void graft_entity_sdl_window_quit(entity_data *self_data, void *event_dat
  * @param self_data
  * @param scene
  */
-static void graft_entity_sdl_window_init(entity_data *self_data)
+static void graft_entity_sdl_window_init(tarasque_entity *self_data)
 {
     if (!self_data) {
         return;
@@ -57,7 +57,7 @@ static void graft_entity_sdl_window_init(entity_data *self_data)
     tarasque_entity_add_child(self_data, "", "Render Manager",
             graft_entity_sdl_render_manager((graft_entity_sdl_render_manager_args) { .source_window = window_data->window, .flags = 0 }));
 
-    tarasque_entity_subscribe_to_event(self_data, "sdl event quit", (event_subscription_user_data) { &graft_entity_sdl_window_quit });
+    tarasque_entity_subscribe_to_event(self_data, "sdl event quit", (tarasque_event_subscription_specific_data) { &graft_entity_sdl_window_quit });
 }
 
 /**
@@ -66,7 +66,7 @@ static void graft_entity_sdl_window_init(entity_data *self_data)
  * @param self_data
  * @param scene
  */
-static void graft_entity_sdl_window_deinit(entity_data *self_data)
+static void graft_entity_sdl_window_deinit(tarasque_entity *self_data)
 {
     if (!self_data) {
         return;
@@ -78,7 +78,7 @@ static void graft_entity_sdl_window_deinit(entity_data *self_data)
     window_data->window = NULL;
 }
 
-static void graft_entity_sdl_window_quit(entity_data *self_data, void *event_data)
+static void graft_entity_sdl_window_quit(tarasque_entity *self_data, void *event_data)
 {
     tarasque_entity_remove_child(self_data, "");
 }
@@ -87,7 +87,7 @@ static void graft_entity_sdl_window_quit(entity_data *self_data, void *event_dat
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-entity_user_data graft_entity_sdl_window(graft_entity_sdl_window_args args)
+tarasque_entity_specific_data graft_entity_sdl_window(graft_entity_sdl_window_args args)
 {
     // avoiding stack allocation but still won't force the user to deal with the heap...
     sdl_window_data_buffer = (graft_entity_sdl_window_data) {
@@ -96,7 +96,7 @@ entity_user_data graft_entity_sdl_window(graft_entity_sdl_window_args args)
             .window = NULL,
     };
 
-    return (entity_user_data) {
+    return (tarasque_entity_specific_data) {
             .data_size = sizeof(sdl_window_data_buffer),
             .data = &sdl_window_data_buffer,
 

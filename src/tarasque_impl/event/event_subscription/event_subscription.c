@@ -74,7 +74,7 @@ void event_subscription_list_destroy(event_subscription_list *list, allocator al
  * @param[in] callback Function called to receive the event.
  * @param[inout] alloc Allocator used to eventually extend the list.
  */
-void event_subscription_list_append(event_subscription_list *list, tarasque_entity *subscribed, event_subscription_user_data subscription_data, allocator alloc)
+void event_subscription_list_append(event_subscription_list *list, tarasque_engine_entity *subscribed, tarasque_event_subscription_specific_data subscription_data, allocator alloc)
 {
     if (!list || !subscribed || !subscription_data.callback) {
         return;
@@ -91,7 +91,7 @@ void event_subscription_list_append(event_subscription_list *list, tarasque_enti
  * @param[in] subscribed Entity that subscribed a callback.
  * @param[in] callback Callback previously registered.
  */
-void event_subscription_list_remove(event_subscription_list *list, tarasque_entity *subscribed, event_subscription_user_data subscription_data)
+void event_subscription_list_remove(event_subscription_list *list, tarasque_engine_entity *subscribed, tarasque_event_subscription_specific_data subscription_data)
 {
     if (!list || !subscribed) {
         return;
@@ -106,7 +106,7 @@ void event_subscription_list_remove(event_subscription_list *list, tarasque_enti
  * @param[inout] list List containing the elements to remove.
  * @param[in] subscribed Entity that subscribed a (some) callback(s).
  */
-void event_subscription_list_remove_all_from(event_subscription_list *list, tarasque_entity *subscribed)
+void event_subscription_list_remove_all_from(event_subscription_list *list, tarasque_engine_entity *subscribed)
 {
     size_t subs_index = 0u;
 
@@ -132,7 +132,7 @@ void event_subscription_list_remove_all_from(event_subscription_list *list, tara
  * @param[in] list List containing the callbacks.
  * @param[inout] ev Event sent to the list.
  */
-void event_subscription_list_publish(event_subscription_list *list, event ev, tarasque_engine *handle)
+void event_subscription_list_publish(event_subscription_list *list, event ev)
 {
     event_subscription tmp_sub = { 0u };
 
@@ -143,7 +143,7 @@ void event_subscription_list_publish(event_subscription_list *list, event ev, ta
     for (size_t i = 0u ; i < list->subscription_list->length ; i++) {
         tmp_sub = list->subscription_list->data[i];
         if (tmp_sub.subscription_data.callback) {
-            entity_send_event(tmp_sub.subscribed, tmp_sub.subscription_data, ev.data, handle);
+            tarasque_engine_entity_send_event(tmp_sub.subscribed, tmp_sub.subscription_data, ev.data);
         }
     }
 }

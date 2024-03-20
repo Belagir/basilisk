@@ -8,9 +8,9 @@
 // -------------------------------------------------------------------------------------------------
 
 /*  */
-static void graft_entity_sdl_context_init(entity_data *self_data);
+static void graft_entity_sdl_context_init(tarasque_entity *self_data);
 /*  */
-static void graft_entity_sdl_context_deinit(entity_data *self_data);
+static void graft_entity_sdl_context_deinit(tarasque_entity *self_data);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -22,7 +22,7 @@ static void graft_entity_sdl_context_deinit(entity_data *self_data);
  * @param self_data
  * @param scene
  */
-static void graft_entity_sdl_context_init(entity_data *self_data)
+static void graft_entity_sdl_context_init(tarasque_entity *self_data)
 {
     (void) self_data;
 
@@ -35,7 +35,7 @@ static void graft_entity_sdl_context_init(entity_data *self_data)
  * @param self_data
  * @param scene
  */
-static void graft_entity_sdl_context_deinit(entity_data *self_data)
+static void graft_entity_sdl_context_deinit(tarasque_entity *self_data)
 {
     (void) self_data;
 
@@ -48,9 +48,9 @@ static void graft_entity_sdl_context_deinit(entity_data *self_data)
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-entity_user_data graft_entity_sdl_context(void)
+tarasque_entity_specific_data graft_entity_sdl_context(void)
 {
-    return (entity_user_data) {
+    return (tarasque_entity_specific_data) {
         .callbacks = {
                 .on_init = &graft_entity_sdl_context_init,
                 .on_deinit = &graft_entity_sdl_context_deinit,

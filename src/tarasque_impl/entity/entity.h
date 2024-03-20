@@ -20,23 +20,23 @@
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-typedef struct tarasque_entity tarasque_entity;
+typedef struct tarasque_engine_entity tarasque_engine_entity;
 /* Quickhand for a range of entities. */
-typedef range(tarasque_entity *) tarasque_entity_range;
+typedef range(tarasque_engine_entity *) tarasque_entity_range;
 
 /**
  * @brief Entity data structure aggregating user data with engine-related data.
  */
-typedef struct tarasque_entity {
+typedef struct tarasque_engine_entity {
     /** Name of the entity. */
     identifier *id;
     /** Non-owned reference to an eventual parent entity. */
-    tarasque_entity *parent;
+    tarasque_engine_entity *parent;
     /** Array of all of the entity's children. */
     tarasque_entity_range *children;
 
     /** Entity callbacks to be used by the engine. */
-    entity_callbacks callbacks;
+    tarasque_entity_callbacks callbacks;
 
     /** Engine owning the entity, used to redirect user's actions back to the whole engine. */
     tarasque_engine *host_handle;
@@ -45,65 +45,65 @@ typedef struct tarasque_entity {
     size_t data_size;
     /** The user's data. */
     byte data[];
-} tarasque_entity;
+} tarasque_engine_entity;
 
 
-/* Redefinition of the entity_user_data type to signal memory allocation in opposition of the user-managed entity_user_data variables. */
-typedef entity_user_data entity_user_data_copy;
+/* Redefinition of the tarasque_entity_specific_data type to signal memory allocation in opposition of the user-managed tarasque_entity_specific_data variables. */
+typedef tarasque_entity_specific_data tarasque_entity_specific_data_copy;
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
 /* Creates an entity and returns a pointer to it. */
-tarasque_entity *entity_create(const identifier *id, entity_user_data_copy user_data, tarasque_engine *handle, allocator alloc);
+tarasque_engine_entity *tarasque_engine_entity_create(const identifier *id, tarasque_entity_specific_data_copy user_data, tarasque_engine *handle, allocator alloc);
 /* Destroys an entity and nullifies the pointer passed. */
-void entity_destroy(tarasque_entity **target, allocator alloc);
+void tarasque_engine_entity_destroy(tarasque_engine_entity **target, allocator alloc);
 
 // -------------------------------------------------------------------------------------------------
 
 /* Sets an entity to be a child of another. */
-void entity_add_child(tarasque_entity *target, tarasque_entity *new_child, allocator alloc);
+void tarasque_engine_entity_add_child(tarasque_engine_entity *target, tarasque_engine_entity *new_child, allocator alloc);
 /* Removes the links between an entity and its eventual parent. */
-void entity_deparent(tarasque_entity *target);
+void tarasque_engine_entity_deparent(tarasque_engine_entity *target);
 /* Destroys all children of an entity, recursively. */
-void entity_destroy_children(tarasque_entity *target, allocator alloc);
+void tarasque_engine_entity_destroy_children(tarasque_engine_entity *target, allocator alloc);
 
 // -------------------------------------------------------------------------------------------------
 
 /* Finds a child of an entity. */
-tarasque_entity *entity_get_child(tarasque_entity *target, const path *id);
+tarasque_engine_entity *tarasque_engine_entity_get_child(tarasque_engine_entity *target, const path *id);
 /* Find a child that is directly under an entity. */
-tarasque_entity *entity_get_direct_child(tarasque_entity *target, const identifier *id_path);
+tarasque_engine_entity *tarasque_engine_entity_get_direct_child(tarasque_engine_entity *target, const identifier *id_path);
 
 
 /* Returns an allocated range of all children of an entity, recursively. */
-tarasque_entity_range *entity_get_children(tarasque_entity *target, allocator alloc);
+tarasque_entity_range *tarasque_engine_entity_get_children(tarasque_engine_entity *target, allocator alloc);
 
 /* Returns the name of an entity. */
-const identifier *entity_get_name(const tarasque_entity *target);
+const identifier *tarasque_engine_entity_get_name(const tarasque_engine_entity *target);
 
 // -------------------------------------------------------------------------------------------------
 
 /* Execute the on_frame() callback tied to an entity. */
-void entity_step_frame(tarasque_entity *target, f32 elapsed_ms);
+void tarasque_engine_entity_step_frame(tarasque_engine_entity *target, f32 elapsed_ms);
 
 /* Execute an event callback trusted to be linked to an entity. */
-void entity_send_event(tarasque_entity *target, event_subscription_user_data subscription_data, void *event_data);
+void tarasque_engine_entity_send_event(tarasque_engine_entity *target, tarasque_event_subscription_specific_data subscription_data, void *event_data);
 
 /* Execute the on_init() callback tied to an entity */
-void entity_init(tarasque_entity *target);
+void tarasque_engine_entity_init(tarasque_engine_entity *target);
 
 /* Execute the on_deinit() callback tied to an entity */
-void entity_deinit(tarasque_entity *target);
+void tarasque_engine_entity_deinit(tarasque_engine_entity *target);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
 /* Copy entity user data on the heap, and returns a pointer to it. */
-entity_user_data_copy entity_user_data_copy_create(entity_user_data user_data, allocator alloc);
+tarasque_entity_specific_data_copy tarasque_entity_specific_data_copy_create(tarasque_entity_specific_data user_data, allocator alloc);
 /* Destroys some entity user data copy and nullifies the passed pointer. */
-void entity_user_data_copy_destroy(entity_user_data_copy *user_data, allocator alloc);
+void tarasque_entity_specific_data_copy_destroy(tarasque_entity_specific_data_copy *user_data, allocator alloc);
 
 #endif

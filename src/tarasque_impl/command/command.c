@@ -37,7 +37,7 @@ typedef struct command_queue {
  * @param[inout] alloc Allocator used for the allocation of the command.
  * @return a fresh command to be queued.
  */
-command command_create_add_entity(tarasque_entity *source, const char *id_path, const char *id, entity_user_data user_data, allocator alloc)
+command command_create_add_entity(tarasque_engine_entity *source, const char *id_path, const char *id, tarasque_entity_specific_data user_data, allocator alloc)
 {
     command new_cmd = { 0u };
 
@@ -51,7 +51,7 @@ command command_create_add_entity(tarasque_entity *source, const char *id_path, 
             .specific.add_entity = {
                     .id = identifier_from_cstring(id, alloc),
                     .id_path = path_from_cstring(id_path, alloc),
-                    .user_data = entity_user_data_copy_create(user_data, alloc),
+                    .user_data = tarasque_entity_specific_data_copy_create(user_data, alloc),
              },
     };
 
@@ -68,7 +68,7 @@ command command_create_add_entity(tarasque_entity *source, const char *id_path, 
  * @param alloc
  * @return
  */
-command command_create_graft(tarasque_entity *source, const char *id_path, const char *id, graft_user_data graft_data, allocator alloc)
+command command_create_graft(tarasque_engine_entity *source, const char *id_path, const char *id, tarasque_graft_specific_data graft_data, allocator alloc)
 {
     command new_cmd = { 0u };
 
@@ -97,7 +97,7 @@ command command_create_graft(tarasque_entity *source, const char *id_path, const
  * @param[inout] alloc Allocator used for the allocation of the command.
  * @return A fresh command to be queued.
  */
-command command_create_remove_entity(tarasque_entity *source, const char *id_path, allocator alloc)
+command command_create_remove_entity(tarasque_engine_entity *source, const char *id_path, allocator alloc)
 {
     command new_cmd = { 0u };
 
@@ -125,7 +125,7 @@ command command_create_remove_entity(tarasque_entity *source, const char *id_pat
  * @param[inout] alloc Allocator used for the allocation of the command.
  * @return A fresh command to be queued.
  */
-command command_create_subscribe_to_event(tarasque_entity *source, const char *event_name, event_subscription_user_data subscription_data, allocator alloc)
+command command_create_subscribe_to_event(tarasque_engine_entity *source, const char *event_name, tarasque_event_subscription_specific_data subscription_data, allocator alloc)
 {
     command new_cmd = { 0u };
 
@@ -164,7 +164,7 @@ void command_destroy(command *cmd, allocator alloc)
     case COMMAND_ADD_ENTITY:
         range_destroy_dynamic(alloc, &range_to_any(cmd->specific.add_entity.id));
         path_destroy(&(cmd->specific.add_entity.id_path), alloc);
-        entity_user_data_copy_destroy(&(cmd->specific.add_entity.user_data), alloc);
+        tarasque_entity_specific_data_copy_destroy(&(cmd->specific.add_entity.user_data), alloc);
         break;
 
     case COMMAND_GRAFT:
@@ -297,7 +297,7 @@ size_t command_queue_length(const command_queue *queue)
  * @param[in] target Entity the function must remove commands of.
  * @param[inout] alloc Allocator used for the commands destruction.
  */
-void command_queue_remove_commands_of(command_queue *queue, tarasque_entity *target, allocator alloc)
+void command_queue_remove_commands_of(command_queue *queue, tarasque_engine_entity *target, allocator alloc)
 {
     size_t pos = 0u;
 

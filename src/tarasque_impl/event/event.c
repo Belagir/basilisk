@@ -23,7 +23,7 @@
  */
 typedef struct event_stacked {
     /** Entity that stacked the event. Might be NULL. */
-    tarasque_entity *source;
+    tarasque_engine_entity *source;
     /** Actual event. */
     event ev;
 } event_stacked;
@@ -162,7 +162,7 @@ void event_stack_destroy(event_stack **stack, allocator alloc)
  * @param[in] callback Callback subscribed under the event.
  * @param[inout] alloc Allocator to use for eventual list creation or extension.
  */
-void event_broker_subscribe(event_broker *broker, tarasque_entity *subscribed, identifier *target_event_name, event_subscription_user_data subscription_data, allocator alloc)
+void event_broker_subscribe(event_broker *broker, tarasque_engine_entity *subscribed, identifier *target_event_name, tarasque_event_subscription_specific_data subscription_data, allocator alloc)
 {
     size_t list_pos = 0u;
     event_subscription_list created_list = { 0u };
@@ -189,7 +189,7 @@ void event_broker_subscribe(event_broker *broker, tarasque_entity *subscribed, i
  * @param[in] callback Callback previously subscribed to the event.
  * @param[inout] alloc Allocator used for the eventual list deletion.
  */
-void event_broker_unsubscribe(event_broker *broker, tarasque_entity *target, identifier *target_event_name, event_subscription_user_data subscription_data, allocator alloc)
+void event_broker_unsubscribe(event_broker *broker, tarasque_engine_entity *target, identifier *target_event_name, tarasque_event_subscription_specific_data subscription_data, allocator alloc)
 {
     size_t list_pos = 0u;
 
@@ -211,7 +211,7 @@ void event_broker_unsubscribe(event_broker *broker, tarasque_entity *target, ide
  * @param[in] target Entity that might have subscribed callbacks.
  * @param[inout] alloc Allocator used for the eventual list deletion.
  */
-void event_broker_unsubscribe_from_all(event_broker *broker, tarasque_entity *target, allocator alloc)
+void event_broker_unsubscribe_from_all(event_broker *broker, tarasque_engine_entity *target, allocator alloc)
 {
     size_t pos = 0u;
 
@@ -232,7 +232,7 @@ void event_broker_unsubscribe_from_all(event_broker *broker, tarasque_entity *ta
  * @param[inout] broker Target broker.
  * @param[in] ev event sent to the callbacks.
  */
-void event_broker_publish(event_broker *broker, event ev, tarasque_engine *handle)
+void event_broker_publish(event_broker *broker, event ev)
 {
     size_t list_pos = 0u;
 
@@ -241,7 +241,7 @@ void event_broker_publish(event_broker *broker, event ev, tarasque_engine *handl
     }
 
     if (sorted_range_find_in(range_to_any(broker->subs), &identifier_compare, &(ev.name), &list_pos)) {
-        event_subscription_list_publish(broker->subs->data + list_pos, ev, handle);
+        event_subscription_list_publish(broker->subs->data + list_pos, ev);
     }
 }
 
@@ -257,7 +257,7 @@ void event_broker_publish(event_broker *broker, event ev, tarasque_engine *handl
  * @param[in] event_data Event's data (copied) to stack.
  * @param[inout] alloc Allocator used for the copies and eventual stack extension.
  */
-void event_stack_push(event_stack *stack, tarasque_entity *source, const char *str_event_name, size_t event_data_size, const void *event_data, allocator alloc)
+void event_stack_push(event_stack *stack, tarasque_engine_entity *source, const char *str_event_name, size_t event_data_size, const void *event_data, allocator alloc)
 {
     event new_event = { 0u };
 
@@ -298,7 +298,7 @@ event event_stack_pop(event_stack *stack)
  * @param[in] source Entity that might have stacked events.
  * @param[inout] alloc Allocator used to release memory taken by the events.
  */
-void event_stack_remove_events_of(event_stack *stack, tarasque_entity *source, allocator alloc)
+void event_stack_remove_events_of(event_stack *stack, tarasque_engine_entity *source, allocator alloc)
 {
     size_t pos = 0u;
 

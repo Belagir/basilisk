@@ -5,7 +5,7 @@
 
 #include "../entities/graft_entities.h"
 
-void graft_sdl_window(entity_data *entity, void *graft_args)
+void graft_sdl_window(tarasque_entity *entity, void *graft_args)
 {
     if (!graft_args) {
         return;

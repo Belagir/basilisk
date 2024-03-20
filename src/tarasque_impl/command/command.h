@@ -48,7 +48,7 @@ typedef struct command_add_entity {
     /** Name of the new identifier. */
     identifier *id;
     /** Entity user data. */
-    entity_user_data_copy user_data;
+    tarasque_entity_specific_data_copy user_data;
 } command_add_entity;
 
 // -------------------------------------------------------------------------------------------------
@@ -81,9 +81,9 @@ typedef struct command_subscribe_to_event {
     /** Name of the event subscribed. */
     identifier *target_event_name;
     /** Non-owned reference to the subscriber entity. */
-    tarasque_entity *subscribed;
+    tarasque_engine_entity *subscribed;
     /** Registered callback. */
-    event_subscription_user_data subscription_data;
+    tarasque_event_subscription_specific_data subscription_data;
 } command_subscribe_to_event;
 
 // -------------------------------------------------------------------------------------------------
@@ -95,7 +95,7 @@ typedef struct command {
     /** Discrimating flag indicating the nature of the `specific` field. */
     command_flavor flavor;
     /** Entity that sent the command. Might be null. */
-    tarasque_entity *source;
+    tarasque_engine_entity *source;
 
     /** Specific section of the command. */
     union {
@@ -115,13 +115,13 @@ typedef struct command {
 // -------------------------------------------------------------------------------------------------
 
 /* Creates a command to add an entity. */
-command command_create_add_entity(tarasque_entity *source, const char *id_path, const char *id, entity_user_data user_data, allocator alloc);
+command command_create_add_entity(tarasque_engine_entity *source, const char *id_path, const char *id, tarasque_entity_specific_data user_data, allocator alloc);
 /* */
-command command_create_graft(tarasque_entity *source, const char *id_path, const char *id, graft_user_data graft_data, allocator alloc);
+command command_create_graft(tarasque_engine_entity *source, const char *id_path, const char *id, tarasque_graft_specific_data graft_data, allocator alloc);
 /* Creates a command to remove an entity. */
-command command_create_remove_entity(tarasque_entity *source, const char *id_path, allocator alloc);
+command command_create_remove_entity(tarasque_engine_entity *source, const char *id_path, allocator alloc);
 /* Creates a command to subscribe an entity and a callback to an event. */
-command command_create_subscribe_to_event(tarasque_entity *source, const char *event_name, event_subscription_user_data subscription_data, allocator alloc);
+command command_create_subscribe_to_event(tarasque_engine_entity *source, const char *event_name, tarasque_event_subscription_specific_data subscription_data, allocator alloc);
 
 // -------------------------------------------------------------------------------------------------
 
@@ -149,6 +149,6 @@ size_t command_queue_length(const command_queue *queue);
 // -------------------------------------------------------------------------------------------------
 
 /* Removes all commands tied to an entity from the queue. */
-void command_queue_remove_commands_of(command_queue *queue, tarasque_entity *target, allocator alloc);
+void command_queue_remove_commands_of(command_queue *queue, tarasque_engine_entity *target, allocator alloc);
 
 #endif

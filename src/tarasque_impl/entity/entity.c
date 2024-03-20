@@ -28,14 +28,14 @@
  * @param[inout] alloc Allocator used for the creation of the entity.
  * @return entity *
  */
-tarasque_entity *entity_create(const identifier *id, entity_user_data_copy user_data, tarasque_engine *handle, allocator alloc)
+tarasque_engine_entity *tarasque_engine_entity_create(const identifier *id, tarasque_entity_specific_data_copy user_data, tarasque_engine *handle, allocator alloc)
 {
-    tarasque_entity *new_entity = NULL;
+    tarasque_engine_entity *new_entity = NULL;
 
     new_entity = alloc.malloc(alloc, sizeof(*new_entity) + user_data.data_size);
 
     if (new_entity) {
-        *new_entity = (tarasque_entity) {
+        *new_entity = (tarasque_engine_entity) {
                 .id = range_create_dynamic_from_copy_of(alloc, range_to_any(id)),
                 .parent = NULL,
                 .children = range_create_dynamic(alloc, sizeof(*new_entity->children->data), TARASQUE_COLLECTIONS_START_LENGTH),
@@ -55,12 +55,12 @@ tarasque_entity *entity_create(const identifier *id, entity_user_data_copy user_
 
 /**
  * @brief Destroys an entity by releasing its directly-owned memory, and nullifies the pointer passed to it.
- * Calling this function might leave children or a parent with dangling pointers : use with entity_deparent() and entity_destroy_children().
+ * Calling this function might leave children or a parent with dangling pointers : use with tarasque_engine_entity_deparent() and tarasque_engine_entity_destroy_children().
  *
  * @param[inout] target Entity to destroy.
  * @param[inout] alloc Allocator used to release memory.
  */
-void entity_destroy(tarasque_entity **target, allocator alloc)
+void tarasque_engine_entity_destroy(tarasque_engine_entity **target, allocator alloc)
 {
     if (!target || !*target) {
         return;
@@ -82,7 +82,7 @@ void entity_destroy(tarasque_entity **target, allocator alloc)
  * @param[inout] new_child Entity added as child.
  * @param[inout] alloc Allocator used for the children array insertion.
  */
-void entity_add_child(tarasque_entity *target, tarasque_entity *new_child, allocator alloc)
+void tarasque_engine_entity_add_child(tarasque_engine_entity *target, tarasque_engine_entity *new_child, allocator alloc)
 {
     if (!target || !new_child) {
         return;
@@ -99,7 +99,7 @@ void entity_add_child(tarasque_entity *target, tarasque_entity *new_child, alloc
  *
  * @param[inout] target Entity to de-parent.
  */
-void entity_deparent(tarasque_entity *target)
+void tarasque_engine_entity_deparent(tarasque_engine_entity *target)
 {
     if (!target || !target->parent) {
         return;
@@ -116,7 +116,7 @@ void entity_deparent(tarasque_entity *target)
  * @param[inout] target Entity the children are destroyed from.
  * @param[inout] alloc Allocator used to release the memory of the children entities.
  */
-void entity_destroy_children(tarasque_entity *target, allocator alloc)
+void tarasque_engine_entity_destroy_children(tarasque_engine_entity *target, allocator alloc)
 {
     tarasque_entity_range *all_children = NULL;
 
@@ -124,9 +124,9 @@ void entity_destroy_children(tarasque_entity *target, allocator alloc)
         return;
     }
 
-    all_children = entity_get_children(target, alloc);
+    all_children = tarasque_engine_entity_get_children(target, alloc);
     for (int i = (int) all_children->length - 1 ; i >= 0 ; i--) {
-        entity_destroy(all_children->data + i, alloc);
+        tarasque_engine_entity_destroy(all_children->data + i, alloc);
     }
     range_destroy_dynamic(alloc, &range_to_any(all_children));
 
@@ -140,9 +140,9 @@ void entity_destroy_children(tarasque_entity *target, allocator alloc)
  * @param[inout] id_path path of indetifiers leading to the searched entity.
  * @return entity*
  */
-tarasque_entity *entity_get_child(tarasque_entity *target, const path *id_path)
+tarasque_engine_entity *tarasque_engine_entity_get_child(tarasque_engine_entity *target, const path *id_path)
 {
-    tarasque_entity *visited_entity = NULL;
+    tarasque_engine_entity *visited_entity = NULL;
     size_t pos_path = 0u;
 
     if (!target) {
@@ -153,7 +153,7 @@ tarasque_entity *entity_get_child(tarasque_entity *target, const path *id_path)
 
     visited_entity = target;
     while (visited_entity && (pos_path < id_path->length)) {
-        visited_entity = entity_get_direct_child(visited_entity, id_path->data[pos_path]);
+        visited_entity = tarasque_engine_entity_get_direct_child(visited_entity, id_path->data[pos_path]);
         pos_path += (size_t) (visited_entity != NULL);
     }
 
@@ -167,7 +167,7 @@ tarasque_entity *entity_get_child(tarasque_entity *target, const path *id_path)
  * @param[in] id_path Name of the searched child entity.
  * @return entity *
  */
-tarasque_entity *entity_get_direct_child(tarasque_entity *target, const identifier *id)
+tarasque_engine_entity *tarasque_engine_entity_get_direct_child(tarasque_engine_entity *target, const identifier *id)
 {
     bool found_child = false;
     size_t pos_child = 0u;
@@ -195,7 +195,7 @@ tarasque_entity *entity_get_direct_child(tarasque_entity *target, const identifi
  * @param[inout] alloc Allocator used to create the returned range.
  * @return tarasque_entity_range*
  */
-tarasque_entity_range *entity_get_children(tarasque_entity *target, allocator alloc)
+tarasque_entity_range *tarasque_engine_entity_get_children(tarasque_engine_entity *target, allocator alloc)
 {
     size_t child_pos = 0u;
     tarasque_entity_range *entities = NULL;
@@ -221,7 +221,7 @@ tarasque_entity_range *entity_get_children(tarasque_entity *target, allocator al
  * @param[in] target Target entity.
  * @return const identifier *
  */
-const identifier *entity_get_name(const tarasque_entity *target)
+const identifier *tarasque_engine_entity_get_name(const tarasque_engine_entity *target)
 {
     if (!target) {
         return NULL;
@@ -236,7 +236,7 @@ const identifier *entity_get_name(const tarasque_entity *target)
  * @param[inout] target Target entity.
  * @param[in] elapsed_ms Number of elapsed milliseconds, hopefully since the last time the callback was called.
  */
-void entity_step_frame(tarasque_entity *target, f32 elapsed_ms)
+void tarasque_engine_entity_step_frame(tarasque_engine_entity *target, f32 elapsed_ms)
 {
     if (!target) {
         return;
@@ -253,7 +253,7 @@ void entity_step_frame(tarasque_entity *target, f32 elapsed_ms)
  * @param[in] callback Event callback.
  * @param[inout] event_data Event data passed to the callback.
  */
-void entity_send_event(tarasque_entity *target, event_subscription_user_data subscription_data, void *event_data)
+void tarasque_engine_entity_send_event(tarasque_engine_entity *target, tarasque_event_subscription_specific_data subscription_data, void *event_data)
 {
     if (!target || !subscription_data.callback) {
         return;
@@ -267,7 +267,7 @@ void entity_send_event(tarasque_entity *target, event_subscription_user_data sub
  *
  * @param[inout] target Target entity.
  */
-void entity_init(tarasque_entity *target)
+void tarasque_engine_entity_init(tarasque_engine_entity *target)
 {
     if (!target) {
         return;
@@ -283,7 +283,7 @@ void entity_init(tarasque_entity *target)
  *
  * @param[inout] target Target entity.
  */
-void entity_deinit(tarasque_entity *target)
+void tarasque_engine_entity_deinit(tarasque_engine_entity *target)
 {
     if (!target) {
         return;
@@ -305,9 +305,9 @@ void entity_deinit(tarasque_entity *target)
  * @param[inout] alloc Allocator used for the copy.
  * @return
  */
-entity_user_data_copy entity_user_data_copy_create(entity_user_data user_data, allocator alloc)
+tarasque_entity_specific_data_copy tarasque_entity_specific_data_copy_create(tarasque_entity_specific_data user_data, allocator alloc)
 {
-    entity_user_data_copy copy = {
+    tarasque_entity_specific_data_copy copy = {
             .callbacks = {
                     .on_init   = user_data.callbacks.on_init,
                     .on_deinit = user_data.callbacks.on_deinit,
@@ -333,7 +333,7 @@ entity_user_data_copy entity_user_data_copy_create(entity_user_data user_data, a
  * @param[inout] user_data copy of user data.
  * @param[inout] alloc Allocator used to release the object.
  */
-void entity_user_data_copy_destroy(entity_user_data_copy *user_data, allocator alloc)
+void tarasque_entity_specific_data_copy_destroy(tarasque_entity_specific_data_copy *user_data, allocator alloc)
 {
     if (!user_data) {
         return;
@@ -343,5 +343,5 @@ void entity_user_data_copy_destroy(entity_user_data_copy *user_data, allocator a
         alloc.free(alloc, user_data->data);
     }
 
-    *user_data = (entity_user_data_copy) { 0u };
+    *user_data = (tarasque_entity_specific_data_copy) { 0u };
 }

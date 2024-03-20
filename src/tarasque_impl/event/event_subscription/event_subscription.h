@@ -24,9 +24,9 @@
  */
 typedef struct event_subscription {
     /** Reference to an entity thye callback is linked to */
-    tarasque_entity *subscribed;
+    tarasque_engine_entity *subscribed;
     /** Pointer to some callback function to execute code on an event reception. */
-    event_subscription_user_data subscription_data;
+    tarasque_event_subscription_specific_data subscription_data;
 } event_subscription;
 
 /**
@@ -53,18 +53,18 @@ void event_subscription_list_destroy(event_subscription_list *list, allocator al
 // -------------------------------------------------------------------------------------------------
 
 /* Inserts a new entry in the callback list. */
-void event_subscription_list_append(event_subscription_list *list, tarasque_entity *subscribed, event_subscription_user_data subscription_data, allocator alloc);
+void event_subscription_list_append(event_subscription_list *list, tarasque_engine_entity *subscribed, tarasque_event_subscription_specific_data subscription_data, allocator alloc);
 
 /* Removes an entry from the callback list. */
-void event_subscription_list_remove(event_subscription_list *list, tarasque_entity *subscribed, event_subscription_user_data subscription_data);
+void event_subscription_list_remove(event_subscription_list *list, tarasque_engine_entity *subscribed, tarasque_event_subscription_specific_data subscription_data);
 
 /* Removes all entries tied to some entity. */
-void event_subscription_list_remove_all_from(event_subscription_list *list, tarasque_entity *subscribed);
+void event_subscription_list_remove_all_from(event_subscription_list *list, tarasque_engine_entity *subscribed);
 
 // -------------------------------------------------------------------------------------------------
 
 /* Publishes an event to a callback list. The event is trusted to be of the right name as the one of the list. */
-void event_subscription_list_publish(event_subscription_list *list, event ev, tarasque_engine *handle);
+void event_subscription_list_publish(event_subscription_list *list, event ev);
 
 /* Returns the number of callbacks in a list. */
 size_t event_subscription_list_length(const event_subscription_list *list);

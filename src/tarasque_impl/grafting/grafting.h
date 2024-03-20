@@ -6,10 +6,10 @@
 
 #include "../common.h"
 
-typedef graft_user_data graft_user_data_copy;
+typedef tarasque_graft_specific_data graft_user_data_copy;
 
-graft_user_data_copy graft_user_data_copy_create(graft_user_data data, allocator alloc);
+graft_user_data_copy graft_user_data_copy_create(tarasque_graft_specific_data data, allocator alloc);
 
-void graft_user_data_copy_destroy(graft_user_data *data, allocator alloc);
+void graft_user_data_copy_destroy(tarasque_graft_specific_data *data, allocator alloc);
 
 #endif
