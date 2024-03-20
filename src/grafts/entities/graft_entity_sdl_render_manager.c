@@ -41,8 +41,8 @@ static void graft_entity_sdl_render_manager_init(entity_data *self_data)
     init_data->renderer = SDL_CreateRenderer(init_data->init.source_window, -1, init_data->init.flags);
 
     if (init_data->renderer) {
-        tarasque_entity_scene_subscribe_to_event(self_data, "sdl renderer pre draw",  (event_subscription_user_data) { &graft_entity_sdl_render_manager_pre_draw });
-        tarasque_entity_scene_subscribe_to_event(self_data, "sdl renderer post draw", (event_subscription_user_data) { &graft_entity_sdl_render_manager_post_draw });
+        tarasque_entity_subscribe_to_event(self_data, "sdl renderer pre draw",  (event_subscription_user_data) { &graft_entity_sdl_render_manager_pre_draw });
+        tarasque_entity_subscribe_to_event(self_data, "sdl renderer post draw", (event_subscription_user_data) { &graft_entity_sdl_render_manager_post_draw });
     }
 }
 
@@ -66,9 +66,9 @@ static void graft_entity_sdl_render_manager_on_frame(entity_data *self_data, flo
 
     graft_entity_sdl_render_manager_data *data = (graft_entity_sdl_render_manager_data *) self_data;
 
-    tarasque_entity_scene_stack_event(self_data, "sdl renderer post draw", 0u, NULL, false);
-    tarasque_entity_scene_stack_event(self_data, "sdl renderer draw", sizeof(graft_sdl_window_event_draw), &(graft_sdl_window_event_draw) { data->renderer }, false);
-    tarasque_entity_scene_stack_event(self_data, "sdl renderer pre draw", 0u, NULL, false);
+    tarasque_entity_stack_event(self_data, "sdl renderer post draw", 0u, NULL, false);
+    tarasque_entity_stack_event(self_data, "sdl renderer draw", sizeof(graft_sdl_window_event_draw), &(graft_sdl_window_event_draw) { data->renderer }, false);
+    tarasque_entity_stack_event(self_data, "sdl renderer pre draw", 0u, NULL, false);
 }
 
 static void graft_entity_sdl_render_manager_pre_draw(entity_data *self_data, void *event_data)

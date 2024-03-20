@@ -20,9 +20,9 @@ static void graft_entity_sdl_event_relay_on_frame(entity_data *self_data, float 
 
     while (SDL_PollEvent(&event)) {
         if (event.type == SDL_QUIT) {
-            tarasque_entity_scene_stack_event(self_data, "sdl event quit", 0u, NULL, true);
+            tarasque_entity_stack_event(self_data, "sdl event quit", 0u, NULL, true);
         } else {
-            tarasque_entity_scene_stack_event(self_data, "sdl event", sizeof(event), &event, false);
+            tarasque_entity_stack_event(self_data, "sdl event", sizeof(event), &event, false);
         }
     }
 }

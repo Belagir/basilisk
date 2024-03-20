@@ -232,7 +232,7 @@ void tarasque_engine_run(tarasque_engine *handle, int fps) {
  *
  * @param[inout] scene
  */
-void tarasque_entity_scene_quit(entity_data *entity)
+void tarasque_entity_quit(entity_data *entity)
 {
     if (!entity) {
         return;
@@ -258,7 +258,7 @@ void tarasque_entity_scene_quit(entity_data *entity)
  * @param[in] str_id New entity's name (copied), must be unique in respect to its siblings and not contain the character '/'.
  * @param[in] user_data Basic entity information (copied).
  */
-void tarasque_entity_scene_add_entity(entity_data *entity, const char *str_path, const char *str_id, entity_user_data user_data)
+void tarasque_entity_add_child(entity_data *entity, const char *str_path, const char *str_id, entity_user_data user_data)
 {
     if (!entity) {
         return;
@@ -283,7 +283,7 @@ void tarasque_entity_scene_add_entity(entity_data *entity, const char *str_path,
  * @param[inout] scene
  * @param[in] str_path tring (copied) describing a '/'-delimited path to the removeed entity.
  */
-void tarasque_entity_scene_remove_entity(entity_data *entity, const char *str_path)
+void tarasque_entity_remove_child(entity_data *entity, const char *str_path)
 {
     if (!entity) {
         return;
@@ -308,7 +308,7 @@ void tarasque_entity_scene_remove_entity(entity_data *entity, const char *str_pa
  * @param graft_procedure
  * @param graft_args
  */
-void tarasque_entity_scene_graft(entity_data *entity, const char *str_path, const char *str_id, graft_user_data graft_data)
+void tarasque_entity_graft(entity_data *entity, const char *str_path, const char *str_id, graft_user_data graft_data)
 {
     if (!entity) {
         return;
@@ -333,7 +333,7 @@ void tarasque_entity_scene_graft(entity_data *entity, const char *str_path, cons
  * @param[in] str_event_name Name (copied) of the event the entity wants to subscribe a callback to.
  * @param[in] callback Pointer to the callback that will receive the entity's data and event data.
  */
-void tarasque_entity_scene_subscribe_to_event(entity_data *entity,  const char *str_event_name, event_subscription_user_data subscription_data)
+void tarasque_entity_subscribe_to_event(entity_data *entity,  const char *str_event_name, event_subscription_user_data subscription_data)
 {
     if (!entity) {
         return;
@@ -358,7 +358,7 @@ void tarasque_entity_scene_subscribe_to_event(entity_data *entity,  const char *
  * @param[in] event_data Event's specific data (copied).
  * @param[in] is_detached if set, the event will not be removed if the entity that sent it is removed itself.
  */
-void tarasque_entity_scene_stack_event(entity_data *entity, const char *str_event_name, size_t event_data_size, void *event_data, bool is_detached)
+void tarasque_entity_stack_event(entity_data *entity, const char *str_event_name, size_t event_data_size, void *event_data, bool is_detached)
 {
     if (!entity) {
         return;
