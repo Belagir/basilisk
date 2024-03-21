@@ -458,7 +458,7 @@ static void tarasque_engine_annihilate_entity_and_chilren(tarasque_engine *handl
     }
 
     all_children = tarasque_engine_entity_get_children(target, handle->alloc);
-    for (size_t i = 0u ; i < all_children->length ; i++) {
+    for (i64 i = (i64) all_children->length - 1 ; i >= 0 ; i--) {
         tarasque_engine_annihilate_entity(handle, all_children->data[i]);
     }
     range_destroy_dynamic(handle->alloc, &range_to_any(all_children));
