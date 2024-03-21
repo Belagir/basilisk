@@ -11,8 +11,7 @@
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-extern const unsigned char _binary_res_ship_png_start[];
-extern const unsigned char _binary_res_ship_png_end[];
+DECLARE_RES(ship_sprite, "res_ship_png")
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -75,7 +74,7 @@ static void init(tarasque_entity *entity)
         return;
     }
 
-    ship->sprite = IMG_LoadTexture_RW(render_manager->renderer, SDL_RWFromConstMem(_binary_res_ship_png_start, (int) ((size_t) _binary_res_ship_png_end - (size_t) _binary_res_ship_png_start)), 0);
+    ship->sprite = IMG_LoadTexture_RW(render_manager->renderer, SDL_RWFromConstMem(res__ship_sprite_start, (int) ((size_t) res__ship_sprite_end - (size_t) res__ship_sprite_start)), 0);
 
     tarasque_entity_subscribe_to_event(entity, "sdl renderer draw", (tarasque_specific_event_subscription) { .callback = &on_draw });
     tarasque_entity_subscribe_to_event(entity, "sdl event", (tarasque_specific_event_subscription) { .callback = &on_sdl_event });
