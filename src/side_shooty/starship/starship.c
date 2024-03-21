@@ -7,11 +7,14 @@
 
 #include "starship.h"
 
+#include "bullet/bullet.h"
+
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
 DECLARE_RES(ship_sprite, "res_ship_png")
+DECLARE_RES(bullet_sprite, "res_bullet_png")
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -57,6 +60,10 @@ static void on_sdl_event(tarasque_entity *entity, void *event_data)
             && ((event->key.keysym.scancode == SDL_SCANCODE_UP) || (event->key.keysym.scancode == SDL_SCANCODE_DOWN))) {
         ship->vel_y = 0;
     }
+
+    if ((event->type == SDL_KEYUP) && (event->key.keysym.scancode == SDL_SCANCODE_SPACE)) {
+        tarasque_entity_add_child(entity, "", "bullet", bullet_entity(&(bullet) { .x = ship->x, .y = ship->y, .sprite = ship->bullets_sprite }));
+    }
 }
 
 /**
@@ -75,6 +82,7 @@ static void init(tarasque_entity *entity)
     }
 
     ship->sprite = IMG_LoadTexture_RW(render_manager->renderer, SDL_RWFromConstMem(res__ship_sprite_start, (int) ((size_t) res__ship_sprite_end - (size_t) res__ship_sprite_start)), 0);
+    ship->bullets_sprite = IMG_LoadTexture_RW(render_manager->renderer, SDL_RWFromConstMem(res__bullet_sprite_start, (int) ((size_t) res__bullet_sprite_end - (size_t) res__bullet_sprite_start)), 0);
 
     tarasque_entity_subscribe_to_event(entity, "sdl renderer draw", (tarasque_specific_event_subscription) { .callback = &on_draw });
     tarasque_entity_subscribe_to_event(entity, "sdl event", (tarasque_specific_event_subscription) { .callback = &on_sdl_event });
@@ -90,6 +98,7 @@ static void deinit(tarasque_entity *entity)
     starship *ship = (starship *) entity;
 
     SDL_DestroyTexture(ship->sprite);
+    SDL_DestroyTexture(ship->bullets_sprite);
 }
 
 /**

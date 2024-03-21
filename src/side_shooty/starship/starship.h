@@ -11,6 +11,7 @@ typedef struct starship {
     int vel_x, vel_y;
 
     SDL_Texture *sprite;
+    SDL_Texture *bullets_sprite;
 } starship;
 
 tarasque_specific_entity starship_entity(starship *args);
