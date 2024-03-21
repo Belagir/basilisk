@@ -36,6 +36,34 @@ static void on_draw(tarasque_entity *entity, void *event_data)
  * @brief
  *
  * @param entity
+ * @param event_data
+ */
+static void on_sdl_event(tarasque_entity *entity, void *event_data)
+{
+    SDL_Event *event = (SDL_Event *) event_data;
+    starship *ship = (starship *) entity;
+
+    if ((event->type != SDL_KEYDOWN) && (event->type != SDL_KEYUP)) {
+        return;
+    }
+
+    if ((event->type == SDL_KEYDOWN) && (event->key.keysym.scancode == SDL_SCANCODE_UP)) {
+        ship->vel_y = -5;
+    }
+    if ((event->type == SDL_KEYDOWN) && (event->key.keysym.scancode == SDL_SCANCODE_DOWN)) {
+        ship->vel_y =  5;
+    }
+
+    if (((event->type == SDL_KEYUP) && (event->key.keysym.scancode == SDL_SCANCODE_UP))
+            || ((event->type == SDL_KEYUP) && (event->key.keysym.scancode == SDL_SCANCODE_DOWN))) {
+        ship->vel_y = 0;
+    }
+}
+
+/**
+ * @brief
+ *
+ * @param entity
  */
 static void init(tarasque_entity *entity)
 {
@@ -43,10 +71,14 @@ static void init(tarasque_entity *entity)
 
     base_entity_sdl_render_manager_data *render_manager = (base_entity_sdl_render_manager_data *) tarasque_entity_get_parent(entity, "SDL Render Manager");
 
-    if (render_manager) {
-        ship->sprite = IMG_LoadTexture_RW(render_manager->renderer, SDL_RWFromConstMem(_binary_res_ship_png_start, (int) ((size_t) _binary_res_ship_png_end - (size_t) _binary_res_ship_png_start)), 0);
-        tarasque_entity_subscribe_to_event(entity, "sdl renderer draw", (tarasque_specific_event_subscription) { .callback = &on_draw });
+    if (!render_manager) {
+        return;
     }
+
+    ship->sprite = IMG_LoadTexture_RW(render_manager->renderer, SDL_RWFromConstMem(_binary_res_ship_png_start, (int) ((size_t) _binary_res_ship_png_end - (size_t) _binary_res_ship_png_start)), 0);
+
+    tarasque_entity_subscribe_to_event(entity, "sdl renderer draw", (tarasque_specific_event_subscription) { .callback = &on_draw });
+    tarasque_entity_subscribe_to_event(entity, "sdl event", (tarasque_specific_event_subscription) { .callback = &on_sdl_event });
 }
 
 /**
@@ -64,6 +96,19 @@ static void deinit(tarasque_entity *entity)
 /**
  * @brief
  *
+ * @param entity
+ * @param elapsed_ms
+ */
+static void frame(tarasque_entity *entity, float elapsed_ms)
+{
+    starship *ship = (starship *) entity;
+
+    ship->y += ship->vel_y;
+}
+
+/**
+ * @brief
+ *
  * @param args
  * @return
  */
@@ -75,6 +120,7 @@ tarasque_specific_entity starship_entity(starship *args)
             .callbacks = {
                 .on_init = &init,
                 .on_deinit = &deinit,
+                .on_frame = &frame,
             },
     };
 }

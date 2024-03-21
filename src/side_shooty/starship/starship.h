@@ -8,6 +8,7 @@
 
 typedef struct starship {
     int x, y;
+    int vel_x, vel_y;
 
     SDL_Texture *sprite;
 } starship;
