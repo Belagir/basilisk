@@ -9,7 +9,7 @@
 typedef struct starship {
     int x, y;
 
-    SDL_Surface *sprite;
+    SDL_Texture *sprite;
 } starship;
 
 tarasque_specific_entity starship_entity(starship *args);
