@@ -319,14 +319,18 @@ void tarasque_entity_graft(tarasque_entity *entity, const char *str_path, const 
         return;
     }
 
-    command cmd = { 0u };
-    tarasque_engine_entity *full_entity = tarasque_engine_entity_get_containing_full_entity(entity);
-    tarasque_engine *handle = tarasque_engine_entity_get_host_engine_handle(full_entity);
 
-    if (handle) {
-        cmd = command_create_graft(full_entity, str_path, str_id, graft_data, handle->alloc);
-        command_queue_append(handle->commands, cmd, handle->alloc);
-    }
+    graft_data.graft_procedure(entity, graft_data.args);
+
+    // TODO : remove graft command
+    // command cmd = { 0u };
+    // tarasque_engine_entity *full_entity = tarasque_engine_entity_get_containing_full_entity(entity);
+    // tarasque_engine *handle = tarasque_engine_entity_get_host_engine_handle(full_entity);
+
+    // if (handle) {
+    //     cmd = command_create_graft(full_entity, str_path, str_id, graft_data, handle->alloc);
+    //     command_queue_append(handle->commands, cmd, handle->alloc);
+    // }
 }
 
 /**
@@ -399,8 +403,7 @@ tarasque_entity *tarasque_entity_get_parent(tarasque_entity *entity, const char 
         return tarasque_engine_entity_get_parent(full_entity);
     }
 
-    while ((tarasque_engine_entity_get_parent(full_entity) != NULL)
-            && (identifier_compare_to_cstring(tarasque_engine_entity_get_name(full_entity), str_parent_name) != 0)) {
+    while ((full_entity != NULL) && (identifier_compare_to_cstring(tarasque_engine_entity_get_name(full_entity), str_parent_name) != 0)) {
         full_entity = tarasque_engine_entity_get_parent(full_entity);
     }
 
