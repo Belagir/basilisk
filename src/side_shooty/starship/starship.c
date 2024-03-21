@@ -53,8 +53,8 @@ static void on_sdl_event(tarasque_entity *entity, void *event_data)
         ship->vel_y =  5;
     }
 
-    if (((event->type == SDL_KEYUP) && (event->key.keysym.scancode == SDL_SCANCODE_UP))
-            || ((event->type == SDL_KEYUP) && (event->key.keysym.scancode == SDL_SCANCODE_DOWN))) {
+    if ((event->type == SDL_KEYUP)
+            && ((event->key.keysym.scancode == SDL_SCANCODE_UP) || (event->key.keysym.scancode == SDL_SCANCODE_DOWN))) {
         ship->vel_y = 0;
     }
 }
