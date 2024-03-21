@@ -2,13 +2,25 @@
 #include <grafts/sdl2_window.h>
 
 #include "side_shooty.h"
+#include "starship/starship.h"
 
+/**
+ * @brief
+ *
+ * @param entity
+ * @param event_data
+ */
 static void quit_game(tarasque_entity *entity, void *event_data)
 {
     (void) event_data;
     tarasque_entity_quit(entity);
 }
 
+/**
+ * @brief
+ *
+ * @param entity
+ */
 static void init(tarasque_entity *entity)
 {
     tarasque_entity_graft(entity, "", "Window", (tarasque_specific_graft) {
@@ -27,8 +39,15 @@ static void init(tarasque_entity *entity)
     });
 
     tarasque_entity_subscribe_to_event(entity, "sdl event quit", (tarasque_specific_event_subscription) { .callback = &quit_game });
+
+    tarasque_entity_add_child(entity, "", "ship", starship_entity(&(starship) { .x = 10, .y = 10 }));
 }
 
+/**
+ * @brief
+ *
+ * @return tarasque_specific_entity
+ */
 tarasque_specific_entity side_shooty_game(void)
 {
     return (tarasque_specific_entity) {
