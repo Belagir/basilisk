@@ -10,15 +10,15 @@
  * @brief
  *
  */
-typedef struct be_sdl_window_data {
+typedef struct be_window_sdl {
     const char *title;
     size_t x, y;
     size_t w, h;
     SDL_WindowFlags flags;
 
     SDL_Window *window;
-} be_sdl_window_data;
+} be_window_sdl;
 
-tarasque_specific_entity be_sdl_window(be_sdl_window_data *args);
+tarasque_specific_entity be_window_sdl_entity(be_window_sdl *args);
 
 #endif

@@ -7,21 +7,21 @@
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-static void be_sdl_event_relay_on_frame(tarasque_entity *self_data, float elapsed_ms);
+static void be_event_relay_sdl_on_frame(tarasque_entity *self_data, float elapsed_ms);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-static void be_sdl_event_relay_on_frame(tarasque_entity *self_data, float elapsed_ms)
+static void be_event_relay_sdl_on_frame(tarasque_entity *self_data, float elapsed_ms)
 {
     (void) elapsed_ms;
 
-    be_sdl_event_relay_data *relay = (be_sdl_event_relay_data *) self_data;
+    be_event_relay_sdl *relay = (be_event_relay_sdl *) self_data;
     SDL_Event event = { 0u };
     size_t buffer_pos = 0u;
 
-    while ((buffer_pos < BASE_ENTITY_SDL_EVENT_RELAY_BUFFER_SIZE) && SDL_PollEvent(&event)) {
+    while ((buffer_pos < BE_EVENT_RELAY_SDL_BUFFER_SIZE) && SDL_PollEvent(&event)) {
         relay->event_buffer[buffer_pos] = event;
         buffer_pos += 1u;
     }
@@ -39,13 +39,13 @@ static void be_sdl_event_relay_on_frame(tarasque_entity *self_data, float elapse
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-tarasque_specific_entity be_sdl_event_relay(be_sdl_event_relay_data *base)
+tarasque_specific_entity be_event_relay_sdl_entity(be_event_relay_sdl *base)
 {
     return (tarasque_specific_entity) {
             .data_size = sizeof(*base),
             .data = base,
             .callbacks = {
-                    .on_frame = &be_sdl_event_relay_on_frame,
+                    .on_frame = &be_event_relay_sdl_on_frame,
             }
     };
 }

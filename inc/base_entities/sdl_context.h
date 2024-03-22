@@ -4,6 +4,6 @@
 
 #include <tarasque.h>
 
-tarasque_specific_entity be_sdl_context(void);
+tarasque_specific_entity be_context_sdl_entity(void);
 
 #endif
