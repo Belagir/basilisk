@@ -1,0 +1,49 @@
+
+#include "background.h"
+
+#include <SDL2/SDL_image.h>
+#include <ustd/res.h>
+
+#include <base_entities/sdl_render_manager.h>
+
+DECLARE_RES(background_sprite, "res_bg_png")
+
+static void on_draw(tarasque_entity *entity, void *event_data)
+{
+    backround *bg = (backround *) entity;
+    base_entity_sdl_render_manager_event_draw *draw_event = (base_entity_sdl_render_manager_event_draw *) event_data;
+
+    SDL_RenderCopy(draw_event->renderer, bg->texture, NULL, NULL);
+}
+
+static void init(tarasque_entity *entity)
+{
+    backround *bg = (backround *) entity;
+    base_entity_sdl_render_manager_data *render_manager = (base_entity_sdl_render_manager_data *) tarasque_entity_get_parent(entity, "SDL Render Manager");
+
+    bg->texture = IMG_LoadTexture_RW(render_manager->renderer, SDL_RWFromMem((void *) res__background_sprite_start, (int) ((size_t) res__background_sprite_end - (size_t) res__background_sprite_start)), 1);
+
+    if (bg->texture) {
+        tarasque_entity_subscribe_to_event(entity, "sdl renderer draw", (tarasque_specific_event_subscription) { .callback = on_draw, .priority = -1 });
+    }
+}
+
+static void deinit(tarasque_entity *entity)
+{
+    backround *bg = (backround *) entity;
+
+    SDL_DestroyTexture(bg->texture);
+    bg->texture = NULL;
+}
+
+tarasque_specific_entity backround_entity(backround *bg)
+{
+    return (tarasque_specific_entity) {
+            .data_size = sizeof(&bg),
+            .data = bg,
+            .callbacks = {
+                    .on_init = &init,
+                    .on_deinit = &deinit,
+            },
+    };
+}

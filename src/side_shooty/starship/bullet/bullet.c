@@ -23,7 +23,7 @@ static void on_event_draw(tarasque_entity *entity, void *event_data)
  */
 static void init(tarasque_entity *entity)
 {
-    tarasque_entity_subscribe_to_event(entity, "sdl renderer draw", (tarasque_specific_event_subscription) { .callback = &on_event_draw });
+    tarasque_entity_subscribe_to_event(entity, "sdl renderer draw", (tarasque_specific_event_subscription) { .callback = &on_event_draw, .priority = 0, });
 }
 
 /**

@@ -9,6 +9,7 @@
 typedef struct starship {
     int x, y;
     int vel_x, vel_y;
+    bool is_shooting;
 
     SDL_Texture *sprite;
     SDL_Texture *bullets_sprite;
