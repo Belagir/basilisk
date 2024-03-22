@@ -23,7 +23,7 @@
 /* Opaque type to a full entity containing user data and information about how it lives in the engine. */
 typedef struct tarasque_engine_entity tarasque_engine_entity;
 /* Quickhand for a range of entities. */
-typedef range(tarasque_engine_entity *) tarasque_entity_range;
+typedef RANGE(tarasque_engine_entity *) tarasque_entity_range;
 
 /* Redefinition of the tarasque_entity_specific_data type to signal memory allocation in opposition of the user-managed tarasque_entity_specific_data variables. */
 typedef tarasque_specific_entity tarasque_entity_specific_data_copy;

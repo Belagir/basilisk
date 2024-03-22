@@ -461,7 +461,7 @@ static void tarasque_engine_annihilate_entity_and_chilren(tarasque_engine *handl
     for (i64 i = (i64) all_children->length - 1 ; i >= 0 ; i--) {
         tarasque_engine_annihilate_entity(handle, all_children->data[i]);
     }
-    range_destroy_dynamic(handle->alloc, &range_to_any(all_children));
+    range_destroy_dynamic(handle->alloc, &RANGE_TO_ANY(all_children));
 
     tarasque_engine_entity_deparent(target);
     tarasque_engine_annihilate_entity(handle, target);
@@ -683,5 +683,5 @@ static void tarasque_engine_frame_step_entities(tarasque_engine *handle, f32 ela
         tarasque_engine_entity_step_frame(all_entities->data[i], elapsed_ms);
     }
 
-    range_destroy_dynamic(handle->alloc, &range_to_any(all_entities));
+    range_destroy_dynamic(handle->alloc, &RANGE_TO_ANY(all_entities));
 }

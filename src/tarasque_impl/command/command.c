@@ -20,7 +20,7 @@
  */
 typedef struct command_queue {
     /** Range of commands. */
-    range(command) *queue_impl;
+    RANGE(command) *queue_impl;
 } command_queue;
 
 // -------------------------------------------------------------------------------------------------
@@ -162,13 +162,13 @@ void command_destroy(command *cmd, allocator alloc)
 
     switch (cmd->flavor) {
     case COMMAND_ADD_ENTITY:
-        range_destroy_dynamic(alloc, &range_to_any(cmd->specific.add_entity.id));
+        range_destroy_dynamic(alloc, &RANGE_TO_ANY(cmd->specific.add_entity.id));
         path_destroy(&(cmd->specific.add_entity.id_path), alloc);
         tarasque_entity_specific_data_copy_destroy(&(cmd->specific.add_entity.user_data), alloc);
         break;
 
     case COMMAND_GRAFT:
-        range_destroy_dynamic(alloc, &range_to_any(cmd->specific.graft.id));
+        range_destroy_dynamic(alloc, &RANGE_TO_ANY(cmd->specific.graft.id));
         path_destroy(&(cmd->specific.graft.id_path), alloc);
         graft_user_data_copy_destroy(&(cmd->specific.graft.graft_data), alloc);
         break;
@@ -178,7 +178,7 @@ void command_destroy(command *cmd, allocator alloc)
         break;
 
     case COMMAND_SUBSCRIBE_TO_EVENT:
-        range_destroy_dynamic(alloc, &range_to_any(cmd->specific.subscribe_to_event.target_event_name));
+        range_destroy_dynamic(alloc, &RANGE_TO_ANY(cmd->specific.subscribe_to_event.target_event_name));
         break;
 
     default:
@@ -229,7 +229,7 @@ void command_queue_destroy(command_queue **queue, allocator alloc)
         command_destroy((*queue)->queue_impl->data + i, alloc);
     }
 
-    range_destroy_dynamic(alloc, &range_to_any((*queue)->queue_impl));
+    range_destroy_dynamic(alloc, &RANGE_TO_ANY((*queue)->queue_impl));
     alloc.free(alloc, *queue);
     *queue = NULL;
 }
@@ -249,8 +249,8 @@ void command_queue_append(command_queue *queue, command cmd, allocator alloc)
         return;
     }
 
-    queue->queue_impl = range_ensure_capacity(alloc, range_to_any(queue->queue_impl), 1);
-    range_insert_value(range_to_any(queue->queue_impl), queue->queue_impl->length, &cmd);
+    queue->queue_impl = range_ensure_capacity(alloc, RANGE_TO_ANY(queue->queue_impl), 1);
+    range_insert_value(RANGE_TO_ANY(queue->queue_impl), queue->queue_impl->length, &cmd);
 }
 
 /**
@@ -268,7 +268,7 @@ command command_queue_pop_front(command_queue *queue)
     }
 
     popped_command = queue->queue_impl->data[0u];
-    range_remove(range_to_any(queue->queue_impl), 0u);
+    range_remove(RANGE_TO_ANY(queue->queue_impl), 0u);
 
     return popped_command;
 }
@@ -308,7 +308,7 @@ void command_queue_remove_commands_of(command_queue *queue, tarasque_engine_enti
     while (pos < queue->queue_impl->length) {
         if (queue->queue_impl->data[pos].source == target) {
             command_destroy(queue->queue_impl->data + pos, alloc);
-            range_remove(range_to_any(queue->queue_impl), pos);
+            range_remove(RANGE_TO_ANY(queue->queue_impl), pos);
         } else {
             pos += 1;
         }

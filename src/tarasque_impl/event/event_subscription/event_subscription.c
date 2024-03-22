@@ -39,7 +39,7 @@ event_subscription_list event_subscription_list_create(identifier *event_name, a
     }
 
     new_list = (event_subscription_list) {
-            .event_name = range_create_dynamic_from_copy_of(alloc, range_to_any(event_name)),
+            .event_name = range_create_dynamic_from_copy_of(alloc, RANGE_TO_ANY(event_name)),
             .subscription_list = range_create_dynamic(alloc, sizeof(*(new_list.subscription_list->data)), TARASQUE_COLLECTIONS_START_LENGTH),
     };
 
@@ -58,8 +58,8 @@ void event_subscription_list_destroy(event_subscription_list *list, allocator al
         return;
     }
 
-    range_destroy_dynamic(alloc, &range_to_any(list->event_name));
-    range_destroy_dynamic(alloc, &range_to_any(list->subscription_list));
+    range_destroy_dynamic(alloc, &RANGE_TO_ANY(list->event_name));
+    range_destroy_dynamic(alloc, &RANGE_TO_ANY(list->subscription_list));
 
     *list = (event_subscription_list) { 0u };
 }
@@ -80,8 +80,8 @@ void event_subscription_list_append(event_subscription_list *list, tarasque_engi
         return;
     }
 
-    list->subscription_list = range_ensure_capacity(alloc, range_to_any(list->subscription_list), 1);
-    sorted_range_insert_in(range_to_any(list->subscription_list), &event_subscription_compare, &(event_subscription) {
+    list->subscription_list = range_ensure_capacity(alloc, RANGE_TO_ANY(list->subscription_list), 1);
+    sorted_range_insert_in(RANGE_TO_ANY(list->subscription_list), &event_subscription_compare, &(event_subscription) {
             .priority = subscription_data.priority,
             .subscribed = subscribed,
             .subscription_data = subscription_data, });
@@ -100,7 +100,7 @@ void event_subscription_list_remove(event_subscription_list *list, tarasque_engi
         return;
     }
 
-    sorted_range_remove_from(range_to_any(list->subscription_list), &event_subscription_compare, &(event_subscription) {
+    sorted_range_remove_from(RANGE_TO_ANY(list->subscription_list), &event_subscription_compare, &(event_subscription) {
             .priority = subscription_data.priority,
             .subscribed = subscribed,
             .subscription_data = subscription_data, });
@@ -123,7 +123,7 @@ void event_subscription_list_remove_all_from(event_subscription_list *list, tara
 
     while (pos < list->subscription_list->length) {
         if (list->subscription_list->data[pos].subscribed == subscribed) {
-            range_remove(range_to_any(list->subscription_list), pos);
+            range_remove(RANGE_TO_ANY(list->subscription_list), pos);
         } else {
             pos += 1u;
         }

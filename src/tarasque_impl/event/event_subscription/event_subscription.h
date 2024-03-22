@@ -39,7 +39,7 @@ typedef struct event_subscription_list{
     identifier *event_name;
 
     /** All existing callbacks associated to the event name. */
-    range(event_subscription) *subscription_list;
+    RANGE(event_subscription) *subscription_list;
 } event_subscription_list;
 
 // -------------------------------------------------------------------------------------------------

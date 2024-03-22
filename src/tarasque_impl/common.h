@@ -30,12 +30,12 @@
 /**
  * @brief String of characters representing a name.
  */
-typedef range(char) identifier;
+typedef RANGE(char) identifier;
 
 /**
  * @brief Array of identifiers representing a path of entities.
  */
-typedef range(identifier *) path;
+typedef RANGE(identifier *) path;
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------

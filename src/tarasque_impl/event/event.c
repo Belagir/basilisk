@@ -35,7 +35,7 @@ typedef struct event_stacked {
  */
 typedef struct event_broker {
     /** Collection of all lists of subscriptions. */
-    range(event_subscription_list) *subs;
+    RANGE(event_subscription_list) *subs;
 } event_broker;
 
 // -------------------------------------------------------------------------------------------------
@@ -45,7 +45,7 @@ typedef struct event_broker {
  */
 typedef struct event_stack {
     /** Actual stack implementation with a range. */
-    range(event_stacked) *stack_impl;
+    RANGE(event_stacked) *stack_impl;
 } event_stack;
 
 // -------------------------------------------------------------------------------------------------
@@ -99,7 +99,7 @@ void event_broker_destroy(event_broker **broker, allocator alloc)
         event_subscription_list_destroy((*broker)->subs->data + i, alloc);
     }
 
-    range_destroy_dynamic(alloc, &range_to_any((*broker)->subs));
+    range_destroy_dynamic(alloc, &RANGE_TO_ANY((*broker)->subs));
     alloc.free(alloc, *broker);
 
     *broker = NULL;
@@ -144,7 +144,7 @@ void event_stack_destroy(event_stack **stack, allocator alloc)
         event_destroy(&(*stack)->stack_impl->data[i].ev, alloc);
     }
 
-    range_destroy_dynamic(alloc, &range_to_any((*stack)->stack_impl));
+    range_destroy_dynamic(alloc, &RANGE_TO_ANY((*stack)->stack_impl));
 
     alloc.free(alloc, *stack);
     *stack = NULL;
@@ -171,10 +171,10 @@ void event_broker_subscribe(event_broker *broker, tarasque_engine_entity *subscr
         return;
     }
 
-    if (!sorted_range_find_in(range_to_any(broker->subs), &identifier_compare, &target_event_name, &list_pos)) {
+    if (!sorted_range_find_in(RANGE_TO_ANY(broker->subs), &identifier_compare, &target_event_name, &list_pos)) {
         created_list = event_subscription_list_create(target_event_name, alloc);
-        broker->subs = range_ensure_capacity(alloc, range_to_any(broker->subs), 1);
-        list_pos = sorted_range_insert_in(range_to_any(broker->subs), &identifier_compare, &created_list);
+        broker->subs = range_ensure_capacity(alloc, RANGE_TO_ANY(broker->subs), 1);
+        list_pos = sorted_range_insert_in(RANGE_TO_ANY(broker->subs), &identifier_compare, &created_list);
     }
 
     event_subscription_list_append(broker->subs->data + list_pos, subscribed, subscription_data, alloc);
@@ -197,7 +197,7 @@ void event_broker_unsubscribe(event_broker *broker, tarasque_engine_entity *targ
         return;
     }
 
-    if (sorted_range_find_in(range_to_any(broker->subs), &identifier_compare, &target_event_name, &list_pos)) {
+    if (sorted_range_find_in(RANGE_TO_ANY(broker->subs), &identifier_compare, &target_event_name, &list_pos)) {
         event_subscription_list_remove(broker->subs->data + list_pos, target, subscription_data);
     }
 
@@ -240,7 +240,7 @@ void event_broker_publish(event_broker *broker, event ev)
         return;
     }
 
-    if (sorted_range_find_in(range_to_any(broker->subs), &identifier_compare, &(ev.name), &list_pos)) {
+    if (sorted_range_find_in(RANGE_TO_ANY(broker->subs), &identifier_compare, &(ev.name), &list_pos)) {
         event_subscription_list_publish(broker->subs->data + list_pos, ev);
     }
 }
@@ -267,8 +267,8 @@ void event_stack_push(event_stack *stack, tarasque_engine_entity *source, const 
 
     new_event = event_create(str_event_name, event_data_size, event_data, alloc);
 
-    stack->stack_impl = range_ensure_capacity(alloc, range_to_any(stack->stack_impl), 1);
-    range_insert_value(range_to_any(stack->stack_impl), stack->stack_impl->length, &(event_stacked) { .source = source, .ev = new_event });
+    stack->stack_impl = range_ensure_capacity(alloc, RANGE_TO_ANY(stack->stack_impl), 1);
+    range_insert_value(RANGE_TO_ANY(stack->stack_impl), stack->stack_impl->length, &(event_stacked) { .source = source, .ev = new_event });
 }
 
 /**
@@ -286,7 +286,7 @@ event event_stack_pop(event_stack *stack)
     }
 
     returned_event = stack->stack_impl->data[stack->stack_impl->length - 1u].ev;
-    range_remove(range_to_any(stack->stack_impl), stack->stack_impl->length - 1u);
+    range_remove(RANGE_TO_ANY(stack->stack_impl), stack->stack_impl->length - 1u);
 
     return returned_event;
 }
@@ -309,7 +309,7 @@ void event_stack_remove_events_of(event_stack *stack, tarasque_engine_entity *so
     while (pos < stack->stack_impl->length) {
         if (stack->stack_impl->data[pos].source == source) {
             event_destroy(&(stack->stack_impl->data[pos].ev), alloc);
-            range_remove(range_to_any(stack->stack_impl), pos);
+            range_remove(RANGE_TO_ANY(stack->stack_impl), pos);
         } else {
             pos += 1u;
         }
@@ -343,7 +343,7 @@ void event_destroy(event *ev, allocator alloc)
         return;
     }
 
-    range_destroy_dynamic(alloc, &range_to_any(ev->name));
+    range_destroy_dynamic(alloc, &RANGE_TO_ANY(ev->name));
 
     if (ev->data) {
         alloc.free(alloc, ev->data);
@@ -397,7 +397,7 @@ static void event_broker_cleanup_empty_subscriptions(event_broker *broker, alloc
     while (pos < broker->subs->length) {
         if (broker->subs->data[pos].subscription_list->length == 0u) {
             event_subscription_list_destroy(broker->subs->data + pos, alloc);
-            range_remove(range_to_any(broker->subs), pos);
+            range_remove(RANGE_TO_ANY(broker->subs), pos);
         } else {
             pos += 1u;
         }
