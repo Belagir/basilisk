@@ -8,9 +8,9 @@
 // -------------------------------------------------------------------------------------------------
 
 /*  */
-static void base_entity_sdl_context_init(tarasque_entity *self_data);
+static void be_context_sdl_init(tarasque_entity *self_data);
 /*  */
-static void base_entity_sdl_context_deinit(tarasque_entity *self_data);
+static void be_context_sdl_deinit(tarasque_entity *self_data);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -22,7 +22,7 @@ static void base_entity_sdl_context_deinit(tarasque_entity *self_data);
  * @param self_data
  * @param scene
  */
-static void base_entity_sdl_context_init(tarasque_entity *self_data)
+static void be_context_sdl_init(tarasque_entity *self_data)
 {
     (void) self_data;
 
@@ -35,7 +35,7 @@ static void base_entity_sdl_context_init(tarasque_entity *self_data)
  * @param self_data
  * @param scene
  */
-static void base_entity_sdl_context_deinit(tarasque_entity *self_data)
+static void be_context_sdl_deinit(tarasque_entity *self_data)
 {
     (void) self_data;
 
@@ -48,12 +48,12 @@ static void base_entity_sdl_context_deinit(tarasque_entity *self_data)
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-tarasque_specific_entity base_entity_sdl_context(void)
+tarasque_specific_entity be_context_sdl_entity(void)
 {
     return (tarasque_specific_entity) {
         .callbacks = {
-                .on_init = &base_entity_sdl_context_init,
-                .on_deinit = &base_entity_sdl_context_deinit,
+                .on_init = &be_context_sdl_init,
+                .on_deinit = &be_context_sdl_deinit,
         }
     };
 }

@@ -4,6 +4,14 @@
 
 #include <tarasque.h>
 
-tarasque_specific_entity base_entity_sdl_event_relay(void);
+#include <SDL2/SDL.h>
+
+#define BE_EVENT_RELAY_SDL_BUFFER_SIZE (64)
+
+typedef struct be_event_relay_sdl {
+    SDL_Event event_buffer[BE_EVENT_RELAY_SDL_BUFFER_SIZE];
+} be_event_relay_sdl;
+
+tarasque_specific_entity be_event_relay_sdl_entity(be_event_relay_sdl *base);
 
 #endif
