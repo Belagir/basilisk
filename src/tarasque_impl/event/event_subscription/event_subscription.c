@@ -81,7 +81,10 @@ void event_subscription_list_append(event_subscription_list *list, tarasque_engi
     }
 
     list->subscription_list = range_ensure_capacity(alloc, range_to_any(list->subscription_list), 1);
-    sorted_range_insert_in(range_to_any(list->subscription_list), &event_subscription_compare, &(event_subscription) { .subscribed = subscribed, .subscription_data = subscription_data, });
+    sorted_range_insert_in(range_to_any(list->subscription_list), &event_subscription_compare, &(event_subscription) {
+            .priority = subscription_data.priority,
+            .subscribed = subscribed,
+            .subscription_data = subscription_data, });
 }
 
 /**
@@ -97,7 +100,10 @@ void event_subscription_list_remove(event_subscription_list *list, tarasque_engi
         return;
     }
 
-    sorted_range_remove_from(range_to_any(list->subscription_list), &event_subscription_compare, &(event_subscription) { .subscribed = subscribed, .subscription_data = subscription_data, });
+    sorted_range_remove_from(range_to_any(list->subscription_list), &event_subscription_compare, &(event_subscription) {
+            .priority = subscription_data.priority,
+            .subscribed = subscribed,
+            .subscription_data = subscription_data, });
 }
 
 /**
@@ -108,18 +114,19 @@ void event_subscription_list_remove(event_subscription_list *list, tarasque_engi
  */
 void event_subscription_list_remove_all_from(event_subscription_list *list, tarasque_engine_entity *subscribed)
 {
-    size_t subs_index = 0u;
+    // size_t subs_index = 0u;
+    size_t pos = 0u;
 
     if (!list || !subscribed) {
         return;
     }
 
-    if (!sorted_range_find_in(range_to_any(list->subscription_list), &event_subscription_compare, &(event_subscription) { .subscribed = subscribed, .subscription_data = { NULL }, }, &subs_index)) {
-        return;
-    }
-
-    while ((subs_index < list->subscription_list->length) && (list->subscription_list->data[subs_index].subscribed == subscribed)) {
-        range_remove(range_to_any(list->subscription_list), subs_index);
+    while (pos < list->subscription_list->length) {
+        if (list->subscription_list->data[pos].subscribed == subscribed) {
+            range_remove(range_to_any(list->subscription_list), pos);
+        } else {
+            pos += 1u;
+        }
     }
 }
 
@@ -169,15 +176,31 @@ size_t event_subscription_list_length(const event_subscription_list *list)
 
 static i32 event_subscription_compare(const void *lhs, const void *rhs)
 {
-    i32 event_name_cmp = 0;
+    // i32 event_name_cmp = 0;
+    // i32 callback_cmp = 0;
+    // i32 entity_cmp = 0;
 
-    event_subscription *sub_lhs = (event_subscription *) lhs;
-    event_subscription *sub_rhs = (event_subscription *) rhs;
+    // event_subscription *sub_lhs = (event_subscription *) lhs;
+    // event_subscription *sub_rhs = (event_subscription *) rhs;
 
-    event_name_cmp = identifier_compare_doubleref(sub_lhs, sub_rhs);
+    // entity_cmp = (((uintptr_t) sub_lhs->subscribed) > ((uintptr_t) sub_rhs->subscribed))
+    //         - (((uintptr_t) sub_lhs->subscribed) < ((uintptr_t) sub_rhs->subscribed));
+    // if (entity_cmp != 0) {
+    //     return entity_cmp;
+    // }
 
-    if ((event_name_cmp == 0) && sub_lhs->subscription_data.callback && sub_rhs->subscription_data.callback) {
-        return (((uintptr_t) sub_lhs->subscription_data.callback) > ((uintptr_t) sub_rhs->subscription_data.callback)) - (((uintptr_t) sub_lhs->subscription_data.callback) < ((uintptr_t) sub_rhs->subscription_data.callback));
-    }
-    return event_name_cmp;
+    // event_name_cmp = identifier_compare_doubleref(sub_lhs, sub_rhs);
+    // if ((event_name_cmp != 0) || !sub_lhs->subscription_data.callback || !sub_rhs->subscription_data.callback) {
+    //     return event_name_cmp;
+    // }
+
+    // callback_cmp = (((uintptr_t) sub_lhs->subscription_data.callback) > ((uintptr_t) sub_rhs->subscription_data.callback))
+    //         - (((uintptr_t) sub_lhs->subscription_data.callback) < ((uintptr_t) sub_rhs->subscription_data.callback));
+    // return callback_cmp;
+
+
+    i32 prio_lhs = ((event_subscription *) lhs)->priority;
+    i32 prio_rhs = ((event_subscription *) rhs)->priority;
+
+    return (prio_lhs > prio_rhs) - (prio_lhs < prio_rhs);
 }

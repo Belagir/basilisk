@@ -69,13 +69,13 @@ static void tarasque_engine_annihilate_entity(tarasque_engine *handle, tarasque_
 /* Processes a general command, applying its effects and then destroying it. */
 static void tarasque_engine_process_command(tarasque_engine *handle, command cmd);
 /* Processes a specific command to add an entity in the engine, changing the state of the game tree. */
-static void tarasque_engine_process_command_add_entity(tarasque_engine *handle, tarasque_engine_entity *subject, command_add_entity cmd);
+static void tarasque_engine_process_command_add_entity(tarasque_engine *handle, tarasque_engine_entity *subject, command_add_entity *cmd);
 
-static void tarasque_engine_process_command_graft(tarasque_engine *handle, tarasque_engine_entity *subject, command_graft cmd);
+static void tarasque_engine_process_command_graft(tarasque_engine *handle, tarasque_engine_entity *subject, command_graft *cmd);
 /* Processes a specific command to remove an entity from the engine, changing the state of the game tree. */
-static void tarasque_engine_process_command_remove_entity(tarasque_engine *handle, tarasque_engine_entity *subject, command_remove_entity cmd);
+static void tarasque_engine_process_command_remove_entity(tarasque_engine *handle, tarasque_engine_entity *subject, command_remove_entity *cmd);
 /* Processes a specific command to subscribe an entity to an event, changing the state of the publisher / susbcriber collection. */
-static void tarasque_engine_process_command_subscribe_to_event(tarasque_engine *handle, command_subscribe_to_event cmd);
+static void tarasque_engine_process_command_subscribe_to_event(tarasque_engine *handle, command_subscribe_to_event *cmd);
 
 // -------------------------------------------------------------------------------------------------
 
@@ -319,14 +319,18 @@ void tarasque_entity_graft(tarasque_entity *entity, const char *str_path, const 
         return;
     }
 
-    command cmd = { 0u };
-    tarasque_engine_entity *full_entity = tarasque_engine_entity_get_containing_full_entity(entity);
-    tarasque_engine *handle = tarasque_engine_entity_get_host_engine_handle(full_entity);
 
-    if (handle) {
-        cmd = command_create_graft(full_entity, str_path, str_id, graft_data, handle->alloc);
-        command_queue_append(handle->commands, cmd, handle->alloc);
-    }
+    graft_data.graft_procedure(entity, graft_data.args);
+
+    // TODO : remove graft command
+    // command cmd = { 0u };
+    // tarasque_engine_entity *full_entity = tarasque_engine_entity_get_containing_full_entity(entity);
+    // tarasque_engine *handle = tarasque_engine_entity_get_host_engine_handle(full_entity);
+
+    // if (handle) {
+    //     cmd = command_create_graft(full_entity, str_path, str_id, graft_data, handle->alloc);
+    //     command_queue_append(handle->commands, cmd, handle->alloc);
+    // }
 }
 
 /**
@@ -399,8 +403,7 @@ tarasque_entity *tarasque_entity_get_parent(tarasque_entity *entity, const char 
         return tarasque_engine_entity_get_parent(full_entity);
     }
 
-    while ((tarasque_engine_entity_get_parent(full_entity) != NULL)
-            && (identifier_compare_to_cstring(tarasque_engine_entity_get_name(full_entity), str_parent_name) != 0)) {
+    while ((full_entity != NULL) && (identifier_compare_to_cstring(tarasque_engine_entity_get_name(full_entity), str_parent_name) != 0)) {
         full_entity = tarasque_engine_entity_get_parent(full_entity);
     }
 
@@ -455,7 +458,7 @@ static void tarasque_engine_annihilate_entity_and_chilren(tarasque_engine *handl
     }
 
     all_children = tarasque_engine_entity_get_children(target, handle->alloc);
-    for (size_t i = 0u ; i < all_children->length ; i++) {
+    for (i64 i = (i64) all_children->length - 1 ; i >= 0 ; i--) {
         tarasque_engine_annihilate_entity(handle, all_children->data[i]);
     }
     range_destroy_dynamic(handle->alloc, &range_to_any(all_children));
@@ -501,16 +504,16 @@ static void tarasque_engine_process_command(tarasque_engine *handle, command cmd
 
     switch (cmd.flavor) {
     case COMMAND_ADD_ENTITY:
-        tarasque_engine_process_command_add_entity(handle, subject, cmd.specific.add_entity);
+        tarasque_engine_process_command_add_entity(handle, subject, &(cmd.specific.add_entity));
         break;
     case COMMAND_GRAFT:
-        tarasque_engine_process_command_graft(handle, subject, cmd.specific.graft);
+        tarasque_engine_process_command_graft(handle, subject, &(cmd.specific.graft));
         break;
     case COMMAND_REMOVE_ENTITY:
-        tarasque_engine_process_command_remove_entity(handle, subject, cmd.specific.remove_entity);
+        tarasque_engine_process_command_remove_entity(handle, subject, &(cmd.specific.remove_entity));
         break;
     case COMMAND_SUBSCRIBE_TO_EVENT:
-        tarasque_engine_process_command_subscribe_to_event(handle, cmd.specific.subscribe_to_event);
+        tarasque_engine_process_command_subscribe_to_event(handle, &(cmd.specific.subscribe_to_event));
         break;
     default:
         break;
@@ -526,27 +529,28 @@ static void tarasque_engine_process_command(tarasque_engine *handle, command cmd
  * @param[in] subject Entity that sent the command.
  * @param[in] cmd Command containing the addition data.
  */
-static void tarasque_engine_process_command_add_entity(tarasque_engine *handle, tarasque_engine_entity *subject, command_add_entity cmd)
+static void tarasque_engine_process_command_add_entity(tarasque_engine *handle, tarasque_engine_entity *subject, command_add_entity *cmd)
 {
     tarasque_engine_entity *new_entity = NULL;
     tarasque_engine_entity *found_parent = NULL;
 
-    if (!handle) {
+    if (!handle || !cmd) {
         return;
     }
 
-    found_parent = tarasque_engine_entity_get_child(subject, cmd.id_path);
+    found_parent = tarasque_engine_entity_get_child(subject, cmd->id_path);
 
     if (!found_parent) {
-        logger_log(handle->logger, LOGGER_SEVERITY_ERRO, "Could not find parent to add entity \"%s\".\n", cmd.id->data);
+        logger_log(handle->logger, LOGGER_SEVERITY_ERRO, "Could not find parent to add entity \"%s\".\n", cmd->id->data);
         return;
 
-    } else if (tarasque_engine_entity_get_direct_child(found_parent, cmd.id) != NULL) {
-        logger_log(handle->logger, LOGGER_SEVERITY_ERRO, "Parent \"%s\" already has child named \"%s\".\n", tarasque_engine_entity_get_name(found_parent)->data, cmd.id->data);
-        return;
     }
 
-    new_entity = tarasque_engine_entity_create(cmd.id, cmd.user_data, handle, handle->alloc);
+    while (tarasque_engine_entity_get_direct_child(found_parent, cmd->id) != NULL) {
+        identifier_increment(&(cmd->id), handle->alloc);
+    }
+
+    new_entity = tarasque_engine_entity_create(cmd->id, cmd->user_data, handle, handle->alloc);
     tarasque_engine_entity_add_child(found_parent, new_entity, handle->alloc);
     tarasque_engine_entity_init(new_entity);
 
@@ -560,28 +564,28 @@ static void tarasque_engine_process_command_add_entity(tarasque_engine *handle, 
  * @param subject
  * @param cmd
  */
-static void tarasque_engine_process_command_graft(tarasque_engine *handle, tarasque_engine_entity *subject, command_graft cmd)
+static void tarasque_engine_process_command_graft(tarasque_engine *handle, tarasque_engine_entity *subject, command_graft *cmd)
 {
     tarasque_engine_entity *graft_parent = NULL;
     tarasque_engine_entity *graft_root = NULL;
 
-    if (!handle) {
+    if (!handle || !cmd) {
         return;
     }
 
-    graft_parent = tarasque_engine_entity_get_child(subject, cmd.id_path);
+    graft_parent = tarasque_engine_entity_get_child(subject, cmd->id_path);
 
     if (!graft_parent) {
         return;
     }
 
-    graft_root = tarasque_engine_entity_create(cmd.id, (tarasque_entity_specific_data_copy) { 0u }, handle, handle->alloc);
+    graft_root = tarasque_engine_entity_create(cmd->id, (tarasque_entity_specific_data_copy) { 0u }, handle, handle->alloc);
     tarasque_engine_entity_add_child(graft_parent, graft_root, handle->alloc);
-    tarasque_engine_entity_init(graft_parent);
+    tarasque_engine_entity_init(graft_root);
 
-    cmd.graft_data.graft_procedure(tarasque_engine_entity_get_specific_data(graft_root), cmd.graft_data.args);
+    cmd->graft_data.graft_procedure(tarasque_engine_entity_get_specific_data(graft_root), cmd->graft_data.args);
 
-    logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Added graft \"%s\" under parent \"%s\".\n", cmd.id->data, tarasque_engine_entity_get_name(graft_parent)->data);
+    logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Added graft \"%s\" under parent \"%s\".\n", cmd->id->data, tarasque_engine_entity_get_name(graft_parent)->data);
 }
 
 /**
@@ -591,15 +595,15 @@ static void tarasque_engine_process_command_graft(tarasque_engine *handle, taras
  * @param[in] subject Entity that sent the command.
  * @param[in] cmd Command containing the removal data.
  */
-static void tarasque_engine_process_command_remove_entity(tarasque_engine *handle, tarasque_engine_entity *subject, command_remove_entity cmd)
+static void tarasque_engine_process_command_remove_entity(tarasque_engine *handle, tarasque_engine_entity *subject, command_remove_entity *cmd)
 {
     tarasque_engine_entity *found_entity = NULL;
 
-    if (!handle) {
+    if (!handle || !cmd) {
         return;
     }
 
-    found_entity = tarasque_engine_entity_get_child(subject, cmd.id_path);
+    found_entity = tarasque_engine_entity_get_child(subject, cmd->id_path);
 
     if (found_entity == handle->root_entity) {
         logger_log(handle->logger, LOGGER_SEVERITY_ERRO, "Cannot remove root entity.\n");
@@ -622,14 +626,14 @@ static void tarasque_engine_process_command_remove_entity(tarasque_engine *handl
  * @param[in] subject Entity that sent the command.
  * @param[in] cmd Command containing the subscribtion data.
  */
-static void tarasque_engine_process_command_subscribe_to_event(tarasque_engine *handle, command_subscribe_to_event cmd)
+static void tarasque_engine_process_command_subscribe_to_event(tarasque_engine *handle, command_subscribe_to_event *cmd)
 {
     if (!handle) {
         return;
     }
 
-    event_broker_subscribe(handle->pub_sub, cmd.subscribed, cmd.target_event_name, cmd.subscription_data, handle->alloc);
-    logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Entity \"%s\" subscribed callback %#010x to event \"%s\".\n", tarasque_engine_entity_get_name(cmd.subscribed)->data, cmd.subscription_data, cmd.target_event_name->data);
+    event_broker_subscribe(handle->pub_sub, cmd->subscribed, cmd->target_event_name, cmd->subscription_data, handle->alloc);
+    logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Entity \"%s\" subscribed callback %#010x to event \"%s\".\n", tarasque_engine_entity_get_name(cmd->subscribed)->data, cmd->subscription_data.callback, cmd->target_event_name->data);
 }
 
 // -------------------------------------------------------------------------------------------------

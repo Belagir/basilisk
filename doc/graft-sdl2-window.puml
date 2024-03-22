@@ -13,7 +13,7 @@ package SDL2_Window_Graft as "SDL2 Window Graft" {
     () SDL_Event as "SDL Event Relay"
     note bottom of SDL_Event : sends SDL events\ncaptured by the window\nthrough the engine
 
-    () Render_Manager as "Render Manager"
+    () Render_Manager as "SDL Render Manager"
     note bottom of Render_Manager : Sends draw events\nentities can respond to
 
     root -down- SDL

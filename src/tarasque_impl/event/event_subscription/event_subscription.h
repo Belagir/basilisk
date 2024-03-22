@@ -23,6 +23,8 @@
  * @brief Store an entity-related callback to an event.
  */
 typedef struct event_subscription {
+
+    i32 priority;
     /** Reference to an entity thye callback is linked to */
     tarasque_engine_entity *subscribed;
     /** Pointer to some callback function to execute code on an event reception. */

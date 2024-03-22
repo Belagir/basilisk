@@ -9,8 +9,10 @@
  *
  */
 #include <stdio.h>
+#include <math.h>
 
 #include "common.h"
+
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -125,6 +127,36 @@ void path_destroy(path **p, allocator alloc)
 // -------------------------------------------------------------------------------------------------
 
 /**
+ * @brief
+ *
+ * @param base
+ * @param alloc
+ */
+void identifier_increment(identifier **base, allocator alloc)
+{
+    i64 index = 0u;
+
+    if (!base || !*base) {
+        return;
+    }
+
+    index = (i64) (*base)->length - 1;
+    while ((index > 0) && ((*base)->data[index - 1] == '9')) {
+        (*base)->data[index - 1] = '0';
+        index -= 1;
+    }
+
+    if (character_is_num((*base)->data[index - 1])) {
+        (*base)->data[index - 1] += 1;
+    } else {
+        *base = range_ensure_capacity(alloc, range_to_any(*base), 1);
+        range_insert_value(range_to_any(*base), (size_t) index, &(char) { '1' });
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+/**
  * @brief Prints an indentifier to stdout.
  *
  * @param id
@@ -204,6 +236,13 @@ i32 identifier_compare(const void *lhs, const void *rhs)
     identifier *name_rhs = { *(identifier **) rhs };
 
     return range_compare(&range_to_any(name_lhs), &range_to_any(name_rhs), &identifier_compare_character);
+}
+
+// -------------------------------------------------------------------------------------------------
+
+bool character_is_num(char c)
+{
+    return (c >= '0') && (c <= '9');
 }
 
 // -------------------------------------------------------------------------------------------------

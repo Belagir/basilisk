@@ -40,6 +40,7 @@ CFLAGS += -lc
 ## linker flags
 LFLAGS += -lm
 LFLAGS += `sdl2-config --cflags --libs`
+LFLAGS += -lSDL2_image
 LFLAGS += -lGL
 # resource packing flags
 RESFLAGS = -r -b binary -z noexecstack
