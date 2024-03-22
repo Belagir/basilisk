@@ -6,12 +6,12 @@
 
 #include <SDL2/SDL.h>
 
-#define BASE_ENTITY_SDL_EVENT_RELAY_BUFFER_SIZE (64)
+#define BE_EVENT_RELAY_SDL_BUFFER_SIZE (64)
 
-typedef struct be_sdl_event_relay_data {
-    SDL_Event event_buffer[BASE_ENTITY_SDL_EVENT_RELAY_BUFFER_SIZE];
-} be_sdl_event_relay_data;
+typedef struct be_event_relay_sdl {
+    SDL_Event event_buffer[BE_EVENT_RELAY_SDL_BUFFER_SIZE];
+} be_event_relay_sdl;
 
-tarasque_specific_entity be_sdl_event_relay(be_sdl_event_relay_data *base);
+tarasque_specific_entity be_event_relay_sdl_entity(be_event_relay_sdl *base);
 
 #endif

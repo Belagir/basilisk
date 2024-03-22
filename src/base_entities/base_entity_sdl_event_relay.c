@@ -7,22 +7,27 @@
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-static void be_sdl_event_relay_on_frame(tarasque_entity *self_data, float elapsed_ms);
+static void be_event_relay_sdl_on_frame(tarasque_entity *self_data, float elapsed_ms);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-static void be_sdl_event_relay_on_frame(tarasque_entity *self_data, float elapsed_ms)
+static void be_event_relay_sdl_on_frame(tarasque_entity *self_data, float elapsed_ms)
 {
     (void) self_data;
     (void) elapsed_ms;
 
-    be_sdl_event_relay_data *relay = (be_sdl_event_relay_data *) self_data;
+    be_event_relay_sdl *relay = (be_event_relay_sdl *) self_data;
     SDL_Event event = { 0u };
 
-    while (SDL_PollEvent(&event)) {
-        if (event.type == SDL_QUIT) {
+    while ((buffer_pos < BE_EVENT_RELAY_SDL_BUFFER_SIZE) && SDL_PollEvent(&event)) {
+        relay->event_buffer[buffer_pos] = event;
+        buffer_pos += 1u;
+    }
+
+    for ( ; buffer_pos > 0 ; buffer_pos--) {
+        if (relay->event_buffer[buffer_pos - 1].type == SDL_QUIT) {
             tarasque_entity_stack_event(self_data, "sdl event quit", (tarasque_specific_event) { .is_detached = true });
         } else {
             tarasque_entity_stack_event(self_data, "sdl event", (tarasque_specific_event) { .is_detached = false, .data_size = sizeof(event), .data = &event, });
@@ -34,11 +39,11 @@ static void be_sdl_event_relay_on_frame(tarasque_entity *self_data, float elapse
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-tarasque_specific_entity be_sdl_event_relay(be_sdl_event_relay_data *base)
+tarasque_specific_entity be_event_relay_sdl_entity(be_event_relay_sdl *base)
 {
     return (tarasque_specific_entity) {
             .callbacks = {
-                    .on_frame = &be_sdl_event_relay_on_frame,
+                    .on_frame = &be_event_relay_sdl_on_frame,
             }
     };
 }
