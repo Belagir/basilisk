@@ -170,14 +170,24 @@ size_t event_subscription_list_length(const event_subscription_list *list)
 static i32 event_subscription_compare(const void *lhs, const void *rhs)
 {
     i32 event_name_cmp = 0;
+    i32 callback_cmp = 0;
+    i32 entity_cmp = 0;
 
     event_subscription *sub_lhs = (event_subscription *) lhs;
     event_subscription *sub_rhs = (event_subscription *) rhs;
 
-    event_name_cmp = identifier_compare_doubleref(sub_lhs, sub_rhs);
-
-    if ((event_name_cmp == 0) && sub_lhs->subscription_data.callback && sub_rhs->subscription_data.callback) {
-        return (((uintptr_t) sub_lhs->subscription_data.callback) > ((uintptr_t) sub_rhs->subscription_data.callback)) - (((uintptr_t) sub_lhs->subscription_data.callback) < ((uintptr_t) sub_rhs->subscription_data.callback));
+    entity_cmp = (((uintptr_t) sub_lhs->subscribed) > ((uintptr_t) sub_rhs->subscribed))
+            - (((uintptr_t) sub_lhs->subscribed) < ((uintptr_t) sub_rhs->subscribed));
+    if (entity_cmp != 0) {
+        return entity_cmp;
     }
-    return event_name_cmp;
+
+    event_name_cmp = identifier_compare_doubleref(sub_lhs, sub_rhs);
+    if ((event_name_cmp != 0) || !sub_lhs->subscription_data.callback || !sub_rhs->subscription_data.callback) {
+        return event_name_cmp;
+    }
+
+    callback_cmp = (((uintptr_t) sub_lhs->subscription_data.callback) > ((uintptr_t) sub_rhs->subscription_data.callback))
+            - (((uintptr_t) sub_lhs->subscription_data.callback) < ((uintptr_t) sub_rhs->subscription_data.callback));
+    return callback_cmp;
 }
