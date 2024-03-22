@@ -65,7 +65,7 @@ tarasque_engine_entity *tarasque_engine_entity_create(const identifier *id, tara
 
     if (new_entity) {
         *new_entity = (tarasque_engine_entity) {
-                .id = range_create_dynamic_from_copy_of(alloc, range_to_any(id)),
+                .id = range_create_dynamic_from_copy_of(alloc, RANGE_TO_ANY(id)),
                 .parent = NULL,
                 .children = range_create_dynamic(alloc, sizeof(*new_entity->children->data), TARASQUE_COLLECTIONS_START_LENGTH),
 
@@ -95,8 +95,8 @@ void tarasque_engine_entity_destroy(tarasque_engine_entity **target, allocator a
         return;
     }
 
-    range_destroy_dynamic(alloc, &range_to_any((*target)->children));
-    range_destroy_dynamic(alloc, &range_to_any((*target)->id));
+    range_destroy_dynamic(alloc, &RANGE_TO_ANY((*target)->children));
+    range_destroy_dynamic(alloc, &RANGE_TO_ANY((*target)->id));
 
     alloc.free(alloc, *target);
     *target = NULL;
@@ -116,7 +116,7 @@ tarasque_engine_entity *tarasque_engine_entity_get_containing_full_entity(tarasq
         return NULL;
     }
 
-    return container_of(entity, tarasque_engine_entity, data);
+    return CONTAINER_OF(entity, tarasque_engine_entity, data);
 }
 
 /**
@@ -194,8 +194,8 @@ void tarasque_engine_entity_add_child(tarasque_engine_entity *target, tarasque_e
         return;
     }
 
-    target->children = range_ensure_capacity(alloc, range_to_any(target->children), 1);
-    (void) sorted_range_insert_in(range_to_any(target->children), &identifier_compare_doubleref, &new_child);
+    target->children = range_ensure_capacity(alloc, RANGE_TO_ANY(target->children), 1);
+    (void) sorted_range_insert_in(RANGE_TO_ANY(target->children), &identifier_compare_doubleref, &new_child);
     new_child->parent = target;
 }
 
@@ -211,7 +211,7 @@ void tarasque_engine_entity_deparent(tarasque_engine_entity *target)
         return;
     }
 
-    (void) sorted_range_remove_from(range_to_any(target->parent->children), &identifier_compare_doubleref, &target);
+    (void) sorted_range_remove_from(RANGE_TO_ANY(target->parent->children), &identifier_compare_doubleref, &target);
     target->parent = NULL;
 }
 
@@ -234,7 +234,7 @@ void tarasque_engine_entity_destroy_children(tarasque_engine_entity *target, all
     for (int i = (int) all_children->length - 1 ; i >= 0 ; i--) {
         tarasque_engine_entity_destroy(all_children->data + i, alloc);
     }
-    range_destroy_dynamic(alloc, &range_to_any(all_children));
+    range_destroy_dynamic(alloc, &RANGE_TO_ANY(all_children));
 
     target->children->length = 0u;
 }
@@ -283,7 +283,7 @@ tarasque_engine_entity *tarasque_engine_entity_get_direct_child(tarasque_engine_
     }
 
     found_child = sorted_range_find_in(
-            range_to_any(target->children),
+            RANGE_TO_ANY(target->children),
             &identifier_compare_doubleref,
             &(const identifier **) { &id },
             &pos_child);
@@ -310,11 +310,11 @@ tarasque_entity_range *tarasque_engine_entity_get_children(tarasque_engine_entit
         return NULL;
     }
 
-    entities = range_create_dynamic_from_copy_of(alloc, range_to_any(target->children));
+    entities = range_create_dynamic_from_copy_of(alloc, RANGE_TO_ANY(target->children));
 
     while (child_pos < entities->length) {
-        entities = range_ensure_capacity(alloc, range_to_any(entities), entities->data[child_pos]->children->length);
-        range_insert_range(range_to_any(entities), entities->length, range_to_any(entities->data[child_pos]->children));
+        entities = range_ensure_capacity(alloc, RANGE_TO_ANY(entities), entities->data[child_pos]->children->length);
+        range_insert_range(RANGE_TO_ANY(entities), entities->length, RANGE_TO_ANY(entities->data[child_pos]->children));
         child_pos += 1u;
     }
 

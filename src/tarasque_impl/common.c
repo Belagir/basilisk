@@ -18,7 +18,7 @@
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-static const range(const char, 1) identifier_root_impl = range_create_static_fit(const char, {'\0'});
+static const RANGE(const char, 1) identifier_root_impl = RANGE_CREATE_STATIC_FIT(const char, {'\0'});
 const identifier *const identifier_root = (const identifier *const) &identifier_root_impl;
 
 // -------------------------------------------------------------------------------------------------
@@ -45,10 +45,10 @@ static identifier *identifier_create_base(const char *str, allocator alloc, bool
 identifier *identifier_from_cstring(const char *str, allocator alloc)
 {
     identifier *new_id = identifier_create_base(str, alloc, true);
-    bool is_id_allowed = (range_count(range_to_any(new_id), &identifier_compare_character, &(const char) { '/' },  0u) == 0u);
+    bool is_id_allowed = (range_count(RANGE_TO_ANY(new_id), &identifier_compare_character, &(const char) { '/' },  0u) == 0u);
 
     if (!is_id_allowed) {
-        range_destroy_dynamic(alloc, &range_to_any(new_id));
+        range_destroy_dynamic(alloc, &RANGE_TO_ANY(new_id));
     }
 
     return new_id;
@@ -80,18 +80,18 @@ path *path_from_cstring(const char *str, allocator alloc)
     // search for tokens
     while (end_of_token < source_string->length) {
         end_of_token = range_index_of(
-                range_to_any(source_string),
+                RANGE_TO_ANY(source_string),
                 &identifier_compare_character,
                 &(const char) { '/' },
                 end_of_token + 1);
 
         if (start_of_token < end_of_token) {
             token = range_create_dynamic_from(alloc, sizeof(*token->data), (end_of_token - start_of_token) + 1u, (end_of_token - start_of_token), source_string->data + start_of_token);
-            range_insert_value(range_to_any(token), token->length, &(const char) { '\0' });
+            range_insert_value(RANGE_TO_ANY(token), token->length, &(const char) { '\0' });
 
             if (token) {
-                new_path = range_ensure_capacity(alloc, range_to_any(new_path), 1);
-                (void) range_insert_value(range_to_any(new_path), new_path->length, &token);
+                new_path = range_ensure_capacity(alloc, RANGE_TO_ANY(new_path), 1);
+                (void) range_insert_value(RANGE_TO_ANY(new_path), new_path->length, &token);
             }
         }
 
@@ -99,7 +99,7 @@ path *path_from_cstring(const char *str, allocator alloc)
     }
 
     // cleanup
-    range_destroy_dynamic(alloc, &range_to_any(source_string));
+    range_destroy_dynamic(alloc, &RANGE_TO_ANY(source_string));
 
     return new_path;
 }
@@ -117,10 +117,10 @@ void path_destroy(path **p, allocator alloc)
     }
 
     for (size_t i = 0u ; i < (*p)->length ; i++) {
-        range_destroy_dynamic(alloc, &range_to_any((*p)->data[i]));
+        range_destroy_dynamic(alloc, &RANGE_TO_ANY((*p)->data[i]));
     }
 
-    range_destroy_dynamic(alloc, &range_to_any(*p));
+    range_destroy_dynamic(alloc, &RANGE_TO_ANY(*p));
     *p = NULL;
 }
 
@@ -149,8 +149,8 @@ void identifier_increment(identifier **base, allocator alloc)
     if (character_is_num((*base)->data[index - 1])) {
         (*base)->data[index - 1] += 1;
     } else {
-        *base = range_ensure_capacity(alloc, range_to_any(*base), 1);
-        range_insert_value(range_to_any(*base), (size_t) index, &(char) { '1' });
+        *base = range_ensure_capacity(alloc, RANGE_TO_ANY(*base), 1);
+        range_insert_value(RANGE_TO_ANY(*base), (size_t) index, &(char) { '1' });
     }
 }
 
@@ -235,7 +235,7 @@ i32 identifier_compare(const void *lhs, const void *rhs)
     identifier *name_lhs = { *(identifier **) lhs };
     identifier *name_rhs = { *(identifier **) rhs };
 
-    return range_compare(&range_to_any(name_lhs), &range_to_any(name_rhs), &identifier_compare_character);
+    return range_compare(&RANGE_TO_ANY(name_lhs), &RANGE_TO_ANY(name_rhs), &identifier_compare_character);
 }
 
 // -------------------------------------------------------------------------------------------------
