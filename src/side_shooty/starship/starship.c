@@ -63,6 +63,7 @@ static void on_sdl_event(tarasque_entity *entity, void *event_data)
 
     if ((event->type == SDL_KEYUP) && (event->key.keysym.scancode == SDL_SCANCODE_SPACE)) {
         tarasque_entity_add_child(entity, "", "bullet", bullet_entity(&(bullet) { .x = ship->x, .y = ship->y, .sprite = ship->bullets_sprite }));
+        tarasque_entity_add_child(entity, "", "bullet", bullet_entity(&(bullet) { .x = ship->x, .y = ship->y + 32, .sprite = ship->bullets_sprite }));
     }
 }
 
