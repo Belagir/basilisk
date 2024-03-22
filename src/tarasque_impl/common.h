@@ -30,7 +30,7 @@
 /**
  * @brief String of characters representing a name.
  */
-typedef range(const char) identifier;
+typedef range(char) identifier;
 
 /**
  * @brief Array of identifiers representing a path of entities.
@@ -52,6 +52,10 @@ void path_destroy(path **p, allocator alloc);
 
 // -------------------------------------------------------------------------------------------------
 
+void identifier_increment(identifier **base, allocator alloc);
+
+// -------------------------------------------------------------------------------------------------
+
 /* Prints an indentifier to stdout. */
 void print_identifier(const identifier *id);
 
@@ -67,6 +71,10 @@ i32 identifier_compare_doubleref(const void *lhs, const void *rhs);
 
 /* Compares two identifiers. */
 i32 identifier_compare(const void *lhs, const void *rhs);
+
+// -------------------------------------------------------------------------------------------------
+
+bool character_is_num(char c);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
