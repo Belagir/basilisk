@@ -69,6 +69,7 @@ typedef struct tarasque_specific_graft {
  * @brief Data representing the behavior to realize on an event.
  */
 typedef struct tarasque_specific_event_subscription {
+    int priority;
     void (*callback)(tarasque_entity *self_data, void *event_data);
 } tarasque_specific_event_subscription;
 

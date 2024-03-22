@@ -633,7 +633,7 @@ static void tarasque_engine_process_command_subscribe_to_event(tarasque_engine *
     }
 
     event_broker_subscribe(handle->pub_sub, cmd->subscribed, cmd->target_event_name, cmd->subscription_data, handle->alloc);
-    logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Entity \"%s\" subscribed callback %#010x to event \"%s\".\n", tarasque_engine_entity_get_name(cmd->subscribed)->data, cmd->subscription_data, cmd->target_event_name->data);
+    logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Entity \"%s\" subscribed callback %#010x to event \"%s\".\n", tarasque_engine_entity_get_name(cmd->subscribed)->data, cmd->subscription_data.callback, cmd->target_event_name->data);
 }
 
 // -------------------------------------------------------------------------------------------------
