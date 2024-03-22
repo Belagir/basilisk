@@ -7,17 +7,17 @@
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-static void base_entity_sdl_event_relay_on_frame(tarasque_entity *self_data, float elapsed_ms);
+static void be_sdl_event_relay_on_frame(tarasque_entity *self_data, float elapsed_ms);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-static void base_entity_sdl_event_relay_on_frame(tarasque_entity *self_data, float elapsed_ms)
+static void be_sdl_event_relay_on_frame(tarasque_entity *self_data, float elapsed_ms)
 {
     (void) elapsed_ms;
 
-    base_entity_sdl_event_relay_data *relay = (base_entity_sdl_event_relay_data *) self_data;
+    be_sdl_event_relay_data *relay = (be_sdl_event_relay_data *) self_data;
     SDL_Event event = { 0u };
     size_t buffer_pos = 0u;
 
@@ -39,13 +39,13 @@ static void base_entity_sdl_event_relay_on_frame(tarasque_entity *self_data, flo
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-tarasque_specific_entity base_entity_sdl_event_relay(base_entity_sdl_event_relay_data *base)
+tarasque_specific_entity be_sdl_event_relay(be_sdl_event_relay_data *base)
 {
     return (tarasque_specific_entity) {
             .data_size = sizeof(*base),
             .data = base,
             .callbacks = {
-                    .on_frame = &base_entity_sdl_event_relay_on_frame,
+                    .on_frame = &be_sdl_event_relay_on_frame,
             }
     };
 }

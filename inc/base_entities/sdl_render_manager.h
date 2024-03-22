@@ -9,23 +9,23 @@
  * @brief
  *
  */
-typedef struct base_entity_sdl_render_manager_event_draw {
+typedef struct be_sdl_render_manager_ev_draw {
     SDL_Renderer *renderer;
-} base_entity_sdl_render_manager_event_draw;
+} be_sdl_render_manager_ev_draw;
 
 
 /**
  * @brief
  *
  */
-typedef struct base_entity_sdl_render_manager_data {
+typedef struct be_sdl_render_manager_data {
     SDL_Color clear_color;
     SDL_RendererFlags flags;
     const char *window_entity_name;
 
     SDL_Renderer *renderer;
-} base_entity_sdl_render_manager_data;
+} be_sdl_render_manager_data;
 
-tarasque_specific_entity base_entity_sdl_render_manager(base_entity_sdl_render_manager_data *args);
+tarasque_specific_entity be_sdl_render_manager(be_sdl_render_manager_data *args);
 
 #endif
