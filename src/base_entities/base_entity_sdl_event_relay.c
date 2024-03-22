@@ -7,17 +7,18 @@
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-static void base_entity_sdl_event_relay_on_frame(tarasque_entity *self_data, float elapsed_ms);
+static void be_sdl_event_relay_on_frame(tarasque_entity *self_data, float elapsed_ms);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-static void base_entity_sdl_event_relay_on_frame(tarasque_entity *self_data, float elapsed_ms)
+static void be_sdl_event_relay_on_frame(tarasque_entity *self_data, float elapsed_ms)
 {
     (void) self_data;
     (void) elapsed_ms;
 
+    be_sdl_event_relay_data *relay = (be_sdl_event_relay_data *) self_data;
     SDL_Event event = { 0u };
 
     while (SDL_PollEvent(&event)) {
@@ -33,11 +34,11 @@ static void base_entity_sdl_event_relay_on_frame(tarasque_entity *self_data, flo
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-tarasque_specific_entity base_entity_sdl_event_relay(void)
+tarasque_specific_entity be_sdl_event_relay(be_sdl_event_relay_data *base)
 {
     return (tarasque_specific_entity) {
             .callbacks = {
-                    .on_frame = &base_entity_sdl_event_relay_on_frame,
+                    .on_frame = &be_sdl_event_relay_on_frame,
             }
     };
 }

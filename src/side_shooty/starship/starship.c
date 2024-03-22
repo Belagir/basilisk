@@ -29,7 +29,7 @@ DECLARE_RES(bullet_sprite, "res_bullet_png")
 static void on_draw(tarasque_entity *entity, void *event_data)
 {
     starship *ship = (starship *) entity;
-    base_entity_sdl_render_manager_event_draw *event_draw = (base_entity_sdl_render_manager_event_draw *) event_data;
+    be_sdl_render_manager_ev_draw *event_draw = (be_sdl_render_manager_ev_draw *) event_data;
 
     SDL_RenderCopy(event_draw->renderer, ship->sprite, NULL, &(const SDL_Rect) { ship->x, ship->y, 64, 64 });
 }
@@ -45,10 +45,6 @@ static void on_sdl_event(tarasque_entity *entity, void *event_data)
     SDL_Event *event = (SDL_Event *) event_data;
     starship *ship = (starship *) entity;
 
-    if ((event->type != SDL_KEYDOWN) && (event->type != SDL_KEYUP)) {
-        return;
-    }
-
     if ((event->type == SDL_KEYDOWN) && (event->key.keysym.scancode == SDL_SCANCODE_UP)) {
         ship->vel_y = -5;
     }
@@ -56,8 +52,11 @@ static void on_sdl_event(tarasque_entity *entity, void *event_data)
         ship->vel_y =  5;
     }
 
-    if ((event->type == SDL_KEYUP)
-            && ((event->key.keysym.scancode == SDL_SCANCODE_UP) || (event->key.keysym.scancode == SDL_SCANCODE_DOWN))) {
+    if ((event->type == SDL_KEYUP) && (event->key.keysym.scancode == SDL_SCANCODE_UP)) {
+        ship->vel_y = 0;
+    }
+
+    if ((event->type == SDL_KEYUP) && (event->key.keysym.scancode == SDL_SCANCODE_DOWN)) {
         ship->vel_y = 0;
     }
 
@@ -75,7 +74,7 @@ static void init(tarasque_entity *entity)
 {
     starship *ship = (starship *) entity;
 
-    base_entity_sdl_render_manager_data *render_manager = (base_entity_sdl_render_manager_data *) tarasque_entity_get_parent(entity, "SDL Render Manager");
+    be_sdl_render_manager_data *render_manager = (be_sdl_render_manager_data *) tarasque_entity_get_parent(entity, "SDL Render Manager");
 
     if (!render_manager) {
         return;
