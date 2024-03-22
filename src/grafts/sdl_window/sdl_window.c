@@ -28,7 +28,7 @@ void graft_sdl_window(tarasque_entity *entity, void *graft_args)
                     .window_entity_name = "SDL Window" }));
 
     tarasque_entity_add_child(entity, "SDL Context/SDL Window", "SDL Event Relay",
-            base_entity_sdl_event_relay());
+            base_entity_sdl_event_relay(&(base_entity_sdl_event_relay_data) { 0u }));
 }
 
 // -------------------------------------------------------------------------------------------------
