@@ -3,7 +3,7 @@
 #include <SDL2/SDL_image.h>
 
 #include <ustd/res.h>
-#include <base_entities/sdl_render_manager.h>
+#include <grafts/sdl_window.h>
 
 #include "starship.h"
 
