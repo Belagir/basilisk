@@ -57,7 +57,7 @@ typedef struct tarasque_engine_entity {
  * @param[inout] alloc Allocator used for the creation of the entity.
  * @return entity *
  */
-tarasque_engine_entity *tarasque_engine_entity_create(const identifier *id, tarasque_entity_specific_data_copy user_data, tarasque_engine *handle, allocator alloc)
+tarasque_engine_entity *tarasque_engine_entity_create(const identifier *id, tarasque_specific_entity_copy user_data, tarasque_engine *handle, allocator alloc)
 {
     tarasque_engine_entity *new_entity = NULL;
 
@@ -396,9 +396,9 @@ void tarasque_engine_entity_deinit(tarasque_engine_entity *target)
  * @param[inout] alloc Allocator used for the copy.
  * @return
  */
-tarasque_entity_specific_data_copy tarasque_entity_specific_data_copy_create(tarasque_specific_entity user_data, allocator alloc)
+tarasque_specific_entity_copy tarasque_specific_entity_copy_create(tarasque_specific_entity user_data, allocator alloc)
 {
-    tarasque_entity_specific_data_copy copy = {
+    tarasque_specific_entity_copy copy = {
             .callbacks = {
                     .on_init   = user_data.callbacks.on_init,
                     .on_deinit = user_data.callbacks.on_deinit,
@@ -424,7 +424,7 @@ tarasque_entity_specific_data_copy tarasque_entity_specific_data_copy_create(tar
  * @param[inout] user_data copy of user data.
  * @param[inout] alloc Allocator used to release the object.
  */
-void tarasque_entity_specific_data_copy_destroy(tarasque_entity_specific_data_copy *user_data, allocator alloc)
+void tarasque_specific_entity_copy_destroy(tarasque_specific_entity_copy *user_data, allocator alloc)
 {
     if (!user_data) {
         return;
@@ -434,5 +434,5 @@ void tarasque_entity_specific_data_copy_destroy(tarasque_entity_specific_data_co
         alloc.free(alloc, user_data->data);
     }
 
-    *user_data = (tarasque_entity_specific_data_copy) { 0u };
+    *user_data = (tarasque_specific_entity_copy) { 0u };
 }

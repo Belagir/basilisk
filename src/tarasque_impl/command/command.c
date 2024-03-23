@@ -51,39 +51,8 @@ command command_create_add_entity(tarasque_engine_entity *source, const char *id
             .specific.add_entity = {
                     .id = identifier_from_cstring(id, alloc),
                     .id_path = path_from_cstring(id_path, alloc),
-                    .user_data = tarasque_entity_specific_data_copy_create(user_data, alloc),
+                    .user_data = tarasque_specific_entity_copy_create(user_data, alloc),
              },
-    };
-
-    return new_cmd;
-}
-
-/**
- * @brief
- *
- * @param source
- * @param id_path
- * @param id
- * @param graft_data
- * @param alloc
- * @return
- */
-command command_create_graft(tarasque_engine_entity *source, const char *id_path, const char *id, tarasque_specific_graft graft_data, allocator alloc)
-{
-    command new_cmd = { 0u };
-
-    if (!id_path || !id) {
-        return (command) { .flavor = COMMAND_INVALID };
-    }
-
-    new_cmd = (command) {
-            .flavor = COMMAND_GRAFT,
-            .source = source,
-            .specific.graft = {
-                    .id = identifier_from_cstring(id, alloc),
-                    .id_path = path_from_cstring(id_path, alloc),
-                    .graft_data = graft_user_data_copy_create(graft_data, alloc),
-            },
     };
 
     return new_cmd;
@@ -164,13 +133,7 @@ void command_destroy(command *cmd, allocator alloc)
     case COMMAND_ADD_ENTITY:
         range_destroy_dynamic(alloc, &RANGE_TO_ANY(cmd->specific.add_entity.id));
         path_destroy(&(cmd->specific.add_entity.id_path), alloc);
-        tarasque_entity_specific_data_copy_destroy(&(cmd->specific.add_entity.user_data), alloc);
-        break;
-
-    case COMMAND_GRAFT:
-        range_destroy_dynamic(alloc, &RANGE_TO_ANY(cmd->specific.graft.id));
-        path_destroy(&(cmd->specific.graft.id_path), alloc);
-        graft_user_data_copy_destroy(&(cmd->specific.graft.graft_data), alloc);
+        tarasque_specific_entity_copy_destroy(&(cmd->specific.add_entity.user_data), alloc);
         break;
 
     case COMMAND_REMOVE_ENTITY:

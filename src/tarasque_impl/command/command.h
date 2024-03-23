@@ -32,7 +32,6 @@ typedef struct command_queue command_queue;
 typedef enum command_flavor {
     COMMAND_INVALID = 0,            /// flags an error value
     COMMAND_ADD_ENTITY,             /// flags a command to add an entity
-    COMMAND_GRAFT,                  /// flags a command to add a graft
     COMMAND_REMOVE_ENTITY,          /// flags a command to remove an entity
     COMMAND_SUBSCRIBE_TO_EVENT,     /// flags a command to subscribe an entity to an event
 } command_flavor;
@@ -48,19 +47,8 @@ typedef struct command_add_entity {
     /** Name of the new identifier. */
     identifier *id;
     /** Entity user data. */
-    tarasque_entity_specific_data_copy user_data;
+    tarasque_specific_entity_copy user_data;
 } command_add_entity;
-
-// -------------------------------------------------------------------------------------------------
-
-typedef struct command_graft {
-    /** Range of identifiers leading to the removal location. */
-    path *id_path;
-    /** Name of the new identifier. */
-    identifier *id;
-
-    graft_user_data_copy graft_data;
-} command_graft;
 
 // -------------------------------------------------------------------------------------------------
 
@@ -101,8 +89,6 @@ typedef struct command {
     union {
         /** COMMAND_ADD_ENTITY */
         command_add_entity add_entity;
-        /** COMMAND_GRAFT */
-        command_graft graft;
         /** COMMAND_REMOVE_ENTITY */
         command_remove_entity remove_entity;
         /** COMMAND_SUBSCRIBE_TO_EVENT */
@@ -116,8 +102,6 @@ typedef struct command {
 
 /* Creates a command to add an entity. */
 command command_create_add_entity(tarasque_engine_entity *source, const char *id_path, const char *id, tarasque_specific_entity user_data, allocator alloc);
-/* */
-command command_create_graft(tarasque_engine_entity *source, const char *id_path, const char *id, tarasque_specific_graft graft_data, allocator alloc);
 /* Creates a command to remove an entity. */
 command command_create_remove_entity(tarasque_engine_entity *source, const char *id_path, allocator alloc);
 /* Creates a command to subscribe an entity and a callback to an event. */

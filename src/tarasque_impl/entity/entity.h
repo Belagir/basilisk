@@ -26,14 +26,14 @@ typedef struct tarasque_engine_entity tarasque_engine_entity;
 typedef RANGE(tarasque_engine_entity *) tarasque_entity_range;
 
 /* Redefinition of the tarasque_entity_specific_data type to signal memory allocation in opposition of the user-managed tarasque_entity_specific_data variables. */
-typedef tarasque_specific_entity tarasque_entity_specific_data_copy;
+typedef tarasque_specific_entity tarasque_specific_entity_copy;
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
 /* Creates an entity and returns a pointer to it. */
-tarasque_engine_entity *tarasque_engine_entity_create(const identifier *id, tarasque_entity_specific_data_copy user_data, tarasque_engine *handle, allocator alloc);
+tarasque_engine_entity *tarasque_engine_entity_create(const identifier *id, tarasque_specific_entity_copy user_data, tarasque_engine *handle, allocator alloc);
 /* Destroys an entity and nullifies the pointer passed. */
 void tarasque_engine_entity_destroy(tarasque_engine_entity **target, allocator alloc);
 
@@ -87,8 +87,8 @@ void tarasque_engine_entity_deinit(tarasque_engine_entity *target);
 // -------------------------------------------------------------------------------------------------
 
 /* Copy entity user data on the heap, and returns a pointer to it. */
-tarasque_entity_specific_data_copy tarasque_entity_specific_data_copy_create(tarasque_specific_entity user_data, allocator alloc);
+tarasque_specific_entity_copy tarasque_specific_entity_copy_create(tarasque_specific_entity user_data, allocator alloc);
 /* Destroys some entity user data copy and nullifies the passed pointer. */
-void tarasque_entity_specific_data_copy_destroy(tarasque_entity_specific_data_copy *user_data, allocator alloc);
+void tarasque_specific_entity_copy_destroy(tarasque_specific_entity_copy *user_data, allocator alloc);
 
 #endif
