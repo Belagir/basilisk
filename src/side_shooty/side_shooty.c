@@ -41,8 +41,8 @@ static void init(tarasque_entity *entity)
 
     tarasque_entity_subscribe_to_event(entity, "sdl event quit", (tarasque_specific_event_subscription) { .callback = &quit_game });
 
-    tarasque_entity_add_child(entity, "SDL Context/SDL Window/SDL Render Manager", "ship", starship_entity(&(starship) { .x = 10, .y = 10 }));
-    tarasque_entity_add_child(entity, "SDL Context/SDL Window/SDL Render Manager", "background", backround_entity(&(backround) { 0u }));
+    tarasque_entity_add_child(entity, "Context/Window/Render Manager", "ship", starship_entity(&(starship) { .x = 10, .y = 10 }));
+    tarasque_entity_add_child(entity, "Context/Window/Render Manager", "background", backround_entity(&(backround) { 0u }));
 }
 
 /**

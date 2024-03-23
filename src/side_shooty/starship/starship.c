@@ -74,7 +74,7 @@ static void init(tarasque_entity *entity)
 {
     starship *ship = (starship *) entity;
 
-    be_render_manager_sdl *render_manager = (be_render_manager_sdl *) tarasque_entity_get_parent(entity, "SDL Render Manager");
+    be_render_manager_sdl *render_manager = (be_render_manager_sdl *) tarasque_entity_get_parent(entity, "Render Manager");
 
     if (!render_manager) {
         return;
