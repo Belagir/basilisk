@@ -51,6 +51,7 @@ typedef struct tarasque_specific_entity {
     /** Specific callbacks. */
     tarasque_specific_entity_callbacks callbacks;
 } tarasque_specific_entity;
+
 /**
  * @brief Data representing how to change the game tree to accomodate for a specific graft.
  */
@@ -61,15 +62,18 @@ typedef struct tarasque_specific_graft {
     functions that take the containing struct type. */
     void *args;
 
-    /** procedure called to add the graft. */
+    /** Procedure called to add the graft. */
     void (*graft_procedure)(tarasque_entity *entity, void *graft_args);
 } tarasque_specific_graft;
 
 /**
- * @brief Data representing the behavior to realize on an event.
+ * @brief Data representing the behavior to of an entity on receiving an event.
  */
 typedef struct tarasque_specific_event_subscription {
+    // TODO : either change the feild's name or invert priority order to higher --> earlier
+    /** Relative priority (to other callbacks) of the callback when receiving an event. The higher, the later the callback will receive the event. */
     int priority;
+    /** Fucntion executed when an event is received. */
     void (*callback)(tarasque_entity *self_data, void *event_data);
 } tarasque_specific_event_subscription;
 
@@ -98,7 +102,7 @@ void tarasque_engine_destroy(tarasque_engine **handle);
 
 // -------------------------------------------------------------------------------------------------
 
-/* Returns the data bound to the root entity. This pointer has no memory behind it and cannot be dereferenced. */
+/* Returns the data bound to the root entity. This pointer has no memory behind it and should not be dereferenced. */
 tarasque_entity *tarasque_engine_root_entity(tarasque_engine *handle);
 /* Starts the main loop of the engine, resolving pending commands, sending events and stepping
 entities. */
@@ -113,10 +117,10 @@ void tarasque_entity_quit(tarasque_entity *entity);
 void tarasque_entity_add_child(tarasque_entity *entity, const char *str_path, const char *str_id, tarasque_specific_entity user_data);
 /* Adds a pending command to remove an entity from the game tree relative to another. */
 void tarasque_entity_remove_child(tarasque_entity *entity, const char *str_path);
-/* Adds a pending command to graft a set of entities in the game tree relative to another. */
+/* Realizes a graft in the game tree relative to an entity. */
 void tarasque_entity_graft(tarasque_entity *entity, const char *str_path, const char *str_id, tarasque_specific_graft graft_data);
 
-/* Adds a pending command to subscribe a callback to an event by the event's name. */
+/* Adds a pending command to subscribe a callback to an event, by the event's name. */
 void tarasque_entity_subscribe_to_event(tarasque_entity *entity, const char *str_event_name, tarasque_specific_event_subscription subscription_data);
 /* Sends an event to subscribed entities. */
 void tarasque_entity_stack_event(tarasque_entity *entity, const char *str_event_name, tarasque_specific_event event_data);
@@ -125,7 +129,7 @@ void tarasque_entity_stack_event(tarasque_entity *entity, const char *str_event_
 
 /* Search for a parent of a certain name the entity might be related to. If the name is NULL, the first parent is returned. */
 tarasque_entity *tarasque_entity_get_parent(tarasque_entity *entity, const char *str_parent_name);
-/*  */
+/* Search for a child entity located at a specific path relative to an entity. */
 tarasque_entity *tarasque_entity_get_child(tarasque_entity *entity, const char *str_path);
 
 #endif
