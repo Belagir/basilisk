@@ -25,10 +25,10 @@ const identifier *const identifier_root = (const identifier *const) &identifier_
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-/*  */
+/* Comapares two characters by their position in the ASCII table. */
 static i32 identifier_compare_character(const void *lhs, const void *rhs);
 
-/*  */
+/* Versatile utility to create identifiers from NULL-terminated strings with finer control. */
 static identifier *identifier_create_base(const char *str, allocator alloc, bool keep_terminator);
 
 // -------------------------------------------------------------------------------------------------
@@ -37,6 +37,7 @@ static identifier *identifier_create_base(const char *str, allocator alloc, bool
 
 /**
  * @brief Allocates an identifier that copies the contents of a NULL-terminated string.
+ * The function will return NULL if the identifier is empty or contains at least one '/'.
  *
  * @param[in] str NULL-terminated string to copy
  * @param[inout] alloc Allocator used for the copy.
@@ -45,7 +46,7 @@ static identifier *identifier_create_base(const char *str, allocator alloc, bool
 identifier *identifier_from_cstring(const char *str, allocator alloc)
 {
     identifier *new_id = identifier_create_base(str, alloc, true);
-    bool is_id_allowed = (range_count(RANGE_TO_ANY(new_id), &identifier_compare_character, &(const char) { '/' },  0u) == 0u);
+    bool is_id_allowed = (new_id->length > 0u) && (range_count(RANGE_TO_ANY(new_id), &identifier_compare_character, &(const char) { '/' },  0u) == 0u);
 
     if (!is_id_allowed) {
         range_destroy_dynamic(alloc, &RANGE_TO_ANY(new_id));
@@ -79,11 +80,7 @@ path *path_from_cstring(const char *str, allocator alloc)
 
     // search for tokens
     while (end_of_token < source_string->length) {
-        end_of_token = range_index_of(
-                RANGE_TO_ANY(source_string),
-                &identifier_compare_character,
-                &(const char) { '/' },
-                end_of_token + 1);
+        end_of_token = range_index_of(RANGE_TO_ANY(source_string), &identifier_compare_character, &(const char) { '/' }, end_of_token + 1);
 
         if (start_of_token < end_of_token) {
             token = range_create_dynamic_from(alloc, sizeof(*token->data), (end_of_token - start_of_token) + 1u, (end_of_token - start_of_token), source_string->data + start_of_token);
@@ -127,10 +124,11 @@ void path_destroy(path **p, allocator alloc)
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief
+ * @brief Increments a the trailing number of an identifier by one.
+ * If there is no number at the end of an identifier, then a '1' is appended at the end.
  *
- * @param base
- * @param alloc
+ * @param[inout] base Pointer to an identifier to increment.
+ * @param[inout] alloc Allocator used for the potential extension of the identifier.
  */
 void identifier_increment(identifier **base, allocator alloc)
 {
@@ -194,6 +192,13 @@ void print_path(const path *p)
 
 // -------------------------------------------------------------------------------------------------
 
+/**
+ * @brief Compares an identifier to a NULL-terminated string.
+ *
+ * @param id
+ * @param str
+ * @return i32
+ */
 i32 identifier_compare_to_cstring(const identifier *id, const char *str)
 {
     size_t pos = 0u;

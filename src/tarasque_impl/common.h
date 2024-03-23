@@ -1,7 +1,7 @@
 /**
  * @file common.h
  * @author gabriel ()
- * @brief Collection of transversal utilities widely used in the project.
+ * @brief Collection of transversal and lightweight utilities widely used in the project.
  * @version 0.1
  * @date 2024-03-07
  *
@@ -28,7 +28,7 @@
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief String of characters representing a name.
+ * @brief String of characters representing a name. The identifier contains a trailing '\0' to ease interop with stdlib.
  */
 typedef RANGE(char) identifier;
 
@@ -52,6 +52,7 @@ void path_destroy(path **p, allocator alloc);
 
 // -------------------------------------------------------------------------------------------------
 
+/* Increments the trailing number behind an identifier. */
 void identifier_increment(identifier **base, allocator alloc);
 
 // -------------------------------------------------------------------------------------------------
@@ -64,6 +65,7 @@ void print_path(const path *p);
 
 // -------------------------------------------------------------------------------------------------
 
+/* Compares an identifier to a simple NULL_terminated string. Useful to circumvent memory allocation. */
 i32 identifier_compare_to_cstring(const identifier *id, const char *str);
 
 /* Compares two identifiers hidden between two indirections. */
@@ -74,6 +76,7 @@ i32 identifier_compare(const void *lhs, const void *rhs);
 
 // -------------------------------------------------------------------------------------------------
 
+/* Returns true if the given ASCII character is in the range 0-9. */
 bool character_is_num(char c);
 
 // -------------------------------------------------------------------------------------------------
