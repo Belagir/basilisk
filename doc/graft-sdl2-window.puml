@@ -4,23 +4,44 @@
 package SDL2_Window_Graft as "SDL2 Window Graft" {
     <> root
 
-    () SDL as "SDL Context"
-    note right of SDL : manages the essential\nSDL library lifetime calls
+    () Context as "Context"
+    note right of Context : manages the essential\nSDL library lifetime calls
 
-    () SDL_Window as "SDL Window"
-    note right of SDL_Window : manages the\nwindow lifetime
+    () Window as "Window"
+    note right of Window : manages the\nwindow lifetime
 
-    () SDL_Event as "SDL Event Relay"
-    note bottom of SDL_Event : sends SDL events\ncaptured by the window\nthrough the engine
+    () Event_Relay as "Event Relay"
+    note bottom of Event_Relay : sends SDL events\ncaptured by the window\nthrough the engine
 
-    () Render_Manager as "SDL Render Manager"
+    () Render_Manager as "Render Manager"
     note bottom of Render_Manager : Sends draw events\nentities can respond to
 
-    root -down- SDL
-        SDL -down- SDL_Window
-            SDL_Window -down- SDL_Event
-            SDL_Window .down. Render_Manager
+    root -down- Context
+        Context -down- Window
+            Window -down- Event_Relay
+            Window -down- Render_Manager
 }
 
+struct SDL_Event { }
+note left of SDL_Event : implementation defined\nby the SDL library
+note bottom of SDL_Event : sent when SDL receives\ninput events
+() Event_Quit as "empty data"
+note bottom of Event_Quit : sent when SDL\nreceives a quit event
+
+Event_Relay .left.> Event_Quit : 'sdl event quit'
+Event_Relay .left.> SDL_Event : 'sdl event'
+
+() Render_Manager_Event_PreDraw as "empty data"
+note bottom of Render_Manager_Event_PreDraw : sent to prepare\ndrawing operations
+struct Render_Manager_Event_Draw as "be_render_manager_sdl_event_draw" {
+    + SDL_Renderer *renderer
+}
+note bottom of Render_Manager_Event_Draw : sent to execute\ndrawing operations
+() Render_Manager_Event_PostDraw as "empty data"
+note bottom of Render_Manager_Event_PostDraw : sent to finalize\ndrawing operations
+
+Render_Manager .right.> Render_Manager_Event_PreDraw : 'sdl renderer pre draw'
+Render_Manager .right.> Render_Manager_Event_Draw : 'sdl renderer draw'
+Render_Manager .right.> Render_Manager_Event_PostDraw : 'sdl renderer post draw'
 
 @enduml
