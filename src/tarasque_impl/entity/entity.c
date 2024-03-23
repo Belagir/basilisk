@@ -165,10 +165,10 @@ const identifier *tarasque_engine_entity_get_name(const tarasque_engine_entity *
 }
 
 /**
- * @brief
+ * @brief Returns the direct parent of the entity.
  *
- * @param target
- * @return
+ * @param[in] target Target entity.
+ * @return tarasque_engine_entity *
  */
 tarasque_engine_entity *tarasque_engine_entity_get_parent(tarasque_engine_entity *target)
 {
@@ -244,7 +244,7 @@ void tarasque_engine_entity_destroy_children(tarasque_engine_entity *target, all
  *
  * @param[inout] target Supposed parent of the searched entity.
  * @param[inout] id_path path of indetifiers leading to the searched entity.
- * @return entity*
+ * @return tarasque_engine_entity*
  */
 tarasque_engine_entity *tarasque_engine_entity_get_child(tarasque_engine_entity *target, const path *id_path)
 {
@@ -271,7 +271,7 @@ tarasque_engine_entity *tarasque_engine_entity_get_child(tarasque_engine_entity 
  *
  * @param[in] target Target parent entity.
  * @param[in] id_path Name of the searched child entity.
- * @return entity *
+ * @return tarasque_engine_entity *
  */
 tarasque_engine_entity *tarasque_engine_entity_get_direct_child(tarasque_engine_entity *target, const identifier *id)
 {

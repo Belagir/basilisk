@@ -28,7 +28,7 @@ typedef struct command_queue {
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief Creates a command to add an entity in the game tree later.
+ * @brief Creates a command to add an entity in the game tree.
  *
  * @param[in] source Entity that sent the command.
  * @param[in] id_path Zero-terminated string (copied) representing a path of entities names separated by '/'.
@@ -59,7 +59,7 @@ command command_create_add_entity(tarasque_engine_entity *source, const char *id
 }
 
 /**
- * @brief Creates a command to remove an entity from the game tree later.
+ * @brief Creates a command to remove an entity from the game tree.
  *
  * @param[in] source Entity that sent the command.
  * @param[in] id_path Zero-terminated string (copied) representing a path of entities names separated by '/'.
@@ -90,7 +90,7 @@ command command_create_remove_entity(tarasque_engine_entity *source, const char 
  *
  * @param[in] source Entity that sent the command.
  * @param[in] event_name Name (copied) of the event the entity subscribes its callback to.
- * @param[in] callback Registered callback.
+ * @param[in] subscription_data Callback information.
  * @param[inout] alloc Allocator used for the allocation of the command.
  * @return A fresh command to be queued.
  */

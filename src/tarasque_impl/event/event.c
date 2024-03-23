@@ -159,7 +159,7 @@ void event_stack_destroy(event_stack **stack, allocator alloc)
  * @param[inout] broker Broker to store the subscription.
  * @param[in] subscribed Entity that adds the subscription.
  * @param[in] target_event_name Event the entity subscribes the callback to.
- * @param[in] callback Callback subscribed under the event.
+ * @param[in] subscription_data Callback data subscribed under the event.
  * @param[inout] alloc Allocator to use for eventual list creation or extension.
  */
 void event_broker_subscribe(event_broker *broker, tarasque_engine_entity *subscribed, identifier *target_event_name, tarasque_specific_event_subscription subscription_data, allocator alloc)
@@ -186,7 +186,7 @@ void event_broker_subscribe(event_broker *broker, tarasque_engine_entity *subscr
  * @param[inout] broker Broker currently storing the subscription.
  * @param[in] target Entity that subscribed the callback.
  * @param[in] target_event_name Event the callback is subscribed to.
- * @param[in] callback Callback previously subscribed to the event.
+ * @param[in] subscription_data Callback data previously subscribed to the event.
  * @param[inout] alloc Allocator used for the eventual list deletion.
  */
 void event_broker_unsubscribe(event_broker *broker, tarasque_engine_entity *target, identifier *target_event_name, tarasque_specific_event_subscription subscription_data, allocator alloc)

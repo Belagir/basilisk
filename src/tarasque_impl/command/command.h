@@ -45,7 +45,7 @@ typedef struct command_add_entity {
     path *id_path;
     /** Name of the new identifier. */
     identifier *id;
-    /** Entity user data. */
+    /** Copy of the entity user data. */
     tarasque_specific_entity_copy user_data;
 } command_add_entity;
 
@@ -69,7 +69,7 @@ typedef struct command_subscribe_to_event {
     identifier *target_event_name;
     /** Non-owned reference to the subscriber entity. */
     tarasque_engine_entity *subscribed;
-    /** Registered callback. */
+    /** Registered callback information. */
     tarasque_specific_event_subscription subscription_data;
 } command_subscribe_to_event;
 

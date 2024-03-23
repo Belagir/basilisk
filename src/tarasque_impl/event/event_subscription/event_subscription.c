@@ -71,7 +71,7 @@ void event_subscription_list_destroy(event_subscription_list *list, allocator al
  *
  * @param[inout] list List receiving the new pair.
  * @param[in] subscribed Entity subscribing a callback to the event.
- * @param[in] callback Function called to receive the event.
+ * @param[in] subscription_data Data about the function called to receive the event.
  * @param[inout] alloc Allocator used to eventually extend the list.
  */
 void event_subscription_list_append(event_subscription_list *list, tarasque_engine_entity *subscribed, tarasque_specific_event_subscription subscription_data, allocator alloc)
@@ -92,7 +92,7 @@ void event_subscription_list_append(event_subscription_list *list, tarasque_engi
  *
  * @param[inout] list List containing the element to remove.
  * @param[in] subscribed Entity that subscribed a callback.
- * @param[in] callback Callback previously registered.
+ * @param[in] subscription_data Data about the function called to receive the event.
  */
 void event_subscription_list_remove(event_subscription_list *list, tarasque_engine_entity *subscribed, tarasque_specific_event_subscription subscription_data)
 {
@@ -176,29 +176,6 @@ size_t event_subscription_list_length(const event_subscription_list *list)
 
 static i32 event_subscription_compare(const void *lhs, const void *rhs)
 {
-    // i32 event_name_cmp = 0;
-    // i32 callback_cmp = 0;
-    // i32 entity_cmp = 0;
-
-    // event_subscription *sub_lhs = (event_subscription *) lhs;
-    // event_subscription *sub_rhs = (event_subscription *) rhs;
-
-    // entity_cmp = (((uintptr_t) sub_lhs->subscribed) > ((uintptr_t) sub_rhs->subscribed))
-    //         - (((uintptr_t) sub_lhs->subscribed) < ((uintptr_t) sub_rhs->subscribed));
-    // if (entity_cmp != 0) {
-    //     return entity_cmp;
-    // }
-
-    // event_name_cmp = identifier_compare_doubleref(sub_lhs, sub_rhs);
-    // if ((event_name_cmp != 0) || !sub_lhs->subscription_data.callback || !sub_rhs->subscription_data.callback) {
-    //     return event_name_cmp;
-    // }
-
-    // callback_cmp = (((uintptr_t) sub_lhs->subscription_data.callback) > ((uintptr_t) sub_rhs->subscription_data.callback))
-    //         - (((uintptr_t) sub_lhs->subscription_data.callback) < ((uintptr_t) sub_rhs->subscription_data.callback));
-    // return callback_cmp;
-
-
     i32 prio_lhs = ((event_subscription *) lhs)->priority;
     i32 prio_rhs = ((event_subscription *) rhs)->priority;
 

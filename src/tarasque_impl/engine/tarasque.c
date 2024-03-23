@@ -116,8 +116,9 @@ tarasque_engine *tarasque_engine_create(void)
     allocator used_alloc = make_system_allocator();
     tarasque_engine *new_engine = NULL;
 
-    new_engine = used_alloc.malloc(used_alloc, sizeof(*new_engine));
+    signal(SIGINT, &cockatrice_engine_int_handler);
 
+    new_engine = used_alloc.malloc(used_alloc, sizeof(*new_engine));
     if (new_engine) {
         *new_engine = (tarasque_engine) {
                 .logger = logger_create(stdout, LOGGER_ON_DESTROY_DO_NOTHING),
@@ -135,8 +136,6 @@ tarasque_engine *tarasque_engine_create(void)
 
         logger_log(new_engine->logger, LOGGER_SEVERITY_INFO, "Engine is ready.\n");
     }
-
-    signal(SIGINT, &cockatrice_engine_int_handler);
 
     return new_engine;
 }
@@ -258,7 +257,7 @@ void tarasque_entity_quit(tarasque_entity *entity)
  * @param[in] entity Target to-be-parent entity.
  * @param[in] str_path String (copied) describing a '/'-delimited path to an entity that will be the direct parent of the new entity.
  *  The path "" represents the entity passed as argument.
- * @param[in] str_id New entity's name (copied), must be unique in respect to its siblings and not contain the character '/'.
+ * @param[in] str_id New entity's name (copied), must not contain the character '/' or be empty. The name can be modified if there is already an entity with the name at the same path.
  * @param[in] user_data Basic entity information (copied).
  */
 void tarasque_entity_add_child(tarasque_entity *entity, const char *str_path, const char *str_id, tarasque_specific_entity user_data)
@@ -373,10 +372,12 @@ void tarasque_entity_stack_event(tarasque_entity *entity, const char *str_event_
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief
+ * @brief Returns the first parent entity of the provided name. If the name is NULL, the first parent is returned.
+ * If no corresponding parent is found, the function returns NULL.
  *
- * @param entity
- * @param str_parent_name
+ * @param[in] entity
+ * @param[in] str_parent_name
+ * @param tarasque_entity *
  */
 tarasque_entity *tarasque_entity_get_parent(tarasque_entity *entity, const char *str_parent_name)
 {
@@ -398,11 +399,12 @@ tarasque_entity *tarasque_entity_get_parent(tarasque_entity *entity, const char 
 }
 
 /**
- * @brief
+ * @brief Returns the child of the entity at the end of the provided path. If no such child is found, returns NULL.
+ * If the given path is empty, the root is returned : it is the entity given as argument.
  *
- * @param entity
- * @param path
- * @return
+ * @param[in] entity
+ * @param[in] path
+ * @return tarasque_entity *
  */
 tarasque_entity *tarasque_entity_get_child(tarasque_entity *entity, const char *str_path)
 {
@@ -450,15 +452,23 @@ static void tarasque_engine_annihilate_entity_and_chilren(tarasque_engine *handl
     }
     range_destroy_dynamic(handle->alloc, &RANGE_TO_ANY(all_children));
 
-    tarasque_engine_entity_deparent(target);
     tarasque_engine_annihilate_entity(handle, target);
 }
 
+/**
+ * @brief Removes an entity from the engine : removes it from the game tree and its associated commands and events.
+ * The function will not touch the entity's children but will still deparent the entity.
+ *
+ * @param[inout] handle Engine handle.
+ * @param[inout] target Entity to remove.
+ */
 static void tarasque_engine_annihilate_entity(tarasque_engine *handle, tarasque_engine_entity *target)
 {
     if (!handle) {
         return;
     }
+
+    tarasque_engine_entity_deparent(target);
 
     tarasque_engine_entity_deinit(target);
     event_stack_remove_events_of(handle->events, target, handle->alloc);
