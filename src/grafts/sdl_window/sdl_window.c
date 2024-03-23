@@ -1,9 +1,30 @@
+/**
+ * @file sdl_window.c
+ * @author gabriel ()
+ * @brief Implementation file for the SDL window graft procedure.
+ * @version 0.1
+ * @date 2024-03-23
+ *
+ * @copyright Copyright (c) 2024
+ *
+ */
 
 #include <SDL2/SDL.h>
 
-#include <grafts/sdl2_window.h>
+#include <grafts/sdl_window.h>
 
-void graft_sdl_window(tarasque_entity *entity, void *graft_args)
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+
+/* Executes the actual graft by adding commands to the engine. */
+static void graft_sdl_window_callback(tarasque_entity *entity, void *graft_args);
+
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+
+static void graft_sdl_window_callback(tarasque_entity *entity, void *graft_args)
 {
     if (!graft_args) {
         return;
@@ -34,3 +55,18 @@ void graft_sdl_window(tarasque_entity *entity, void *graft_args)
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
+
+/**
+ * @brief Creates a graft configuration to pass to the engine to execute the graft.
+ *
+ * @param[inout] args
+ * @return tarasque_specific_graft
+ */
+tarasque_specific_graft graft_sdl_window(graft_sdl_window_args *args)
+{
+        return (tarasque_specific_graft) {
+                .args = args,
+				.args_size = sizeof(*args),
+				.graft_procedure = &graft_sdl_window_callback,
+        };
+}
