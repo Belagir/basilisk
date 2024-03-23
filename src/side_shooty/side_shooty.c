@@ -1,5 +1,5 @@
 
-#include <grafts/sdl2_window.h>
+#include <grafts/sdl_window.h>
 
 #include "side_shooty.h"
 #include "starship/starship.h"
@@ -24,20 +24,15 @@ static void quit_game(tarasque_entity *entity, void *event_data)
  */
 static void init(tarasque_entity *entity)
 {
-    tarasque_entity_graft(entity, "", "Window", (tarasque_specific_graft) {
-            .args = &(graft_sdl_window_args) {
-                    .for_window = {
-                            .title = "shooty",
-                            .x = SDL_WINDOWPOS_CENTERED, .y = SDL_WINDOWPOS_CENTERED,
-                            .w = 1200, .h = 800,
-                    },
-                    .for_renderer = {
-                            .clear_color = { 20u, 20u, 20u, 255u },
-                    }
+    tarasque_entity_graft(entity, "", "Window", graft_sdl_window(&(graft_sdl_window_args) {
+            .for_window = {
+                    .title = "shooty",
+                    .x = SDL_WINDOWPOS_CENTERED, .y = SDL_WINDOWPOS_CENTERED,
+                    .w = 1200, .h = 800,
             },
-            .args_size = GRAFT_SDL_WINDOW_ARGS_SIZE,
-            .graft_procedure = &graft_sdl_window
-    });
+            .for_renderer = {
+                    .clear_color = { 20u, 20u, 20u, 255u },
+            } }));
 
     tarasque_entity_subscribe_to_event(entity, "sdl event quit", (tarasque_specific_event_subscription) { .callback = &quit_game });
 

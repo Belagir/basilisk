@@ -1,5 +1,5 @@
 
-#include <base_entities/sdl_render_manager.h>
+#include <grafts/sdl_window.h>
 #include "bullet.h"
 
 /**
