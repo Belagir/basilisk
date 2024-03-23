@@ -25,7 +25,6 @@ static void quit_game(tarasque_entity *entity, void *event_data)
 static void init(tarasque_entity *entity)
 {
     tarasque_entity_graft(entity, "", "Window", graft_sdl_window(&(graft_sdl_window_args) {
-<<<<<<< HEAD
             .for_window = {
                     .title = "shooty",
                     .x = SDL_WINDOWPOS_CENTERED, .y = SDL_WINDOWPOS_CENTERED,
@@ -34,16 +33,6 @@ static void init(tarasque_entity *entity)
             .for_renderer = {
                     .clear_color = { 20u, 20u, 20u, 255u },
             } }));
-=======
-                    .for_window = {
-                            .title = "shooty",
-                            .x = SDL_WINDOWPOS_CENTERED, .y = SDL_WINDOWPOS_CENTERED,
-                            .w = 1200, .h = 800,
-                    },
-                    .for_renderer = {
-                            .clear_color = { 20u, 20u, 20u, 255u },
-                    } }));
->>>>>>> c7542b84d6256abf67aa4c317b6f8b71ea6381e3
 
     tarasque_entity_subscribe_to_event(entity, "sdl event quit", (tarasque_specific_event_subscription) { .callback = &quit_game });
 
