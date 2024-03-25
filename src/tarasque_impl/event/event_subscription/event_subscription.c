@@ -82,7 +82,7 @@ void event_subscription_list_append(event_subscription_list *list, tarasque_engi
 
     list->subscription_list = range_ensure_capacity(alloc, RANGE_TO_ANY(list->subscription_list), 1);
     sorted_range_insert_in(RANGE_TO_ANY(list->subscription_list), &event_subscription_compare, &(event_subscription) {
-            .priority = subscription_data.priority,
+            .index = subscription_data.index,
             .subscribed = subscribed,
             .subscription_data = subscription_data, });
 }
@@ -101,7 +101,7 @@ void event_subscription_list_remove(event_subscription_list *list, tarasque_engi
     }
 
     sorted_range_remove_from(RANGE_TO_ANY(list->subscription_list), &event_subscription_compare, &(event_subscription) {
-            .priority = subscription_data.priority,
+            .index = subscription_data.index,
             .subscribed = subscribed,
             .subscription_data = subscription_data, });
 }
@@ -176,8 +176,8 @@ size_t event_subscription_list_length(const event_subscription_list *list)
 
 static i32 event_subscription_compare(const void *lhs, const void *rhs)
 {
-    i32 prio_lhs = ((event_subscription *) lhs)->priority;
-    i32 prio_rhs = ((event_subscription *) rhs)->priority;
+    i32 prio_lhs = ((event_subscription *) lhs)->index;
+    i32 prio_rhs = ((event_subscription *) rhs)->index;
 
     return (prio_lhs > prio_rhs) - (prio_lhs < prio_rhs);
 }

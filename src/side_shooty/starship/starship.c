@@ -83,7 +83,7 @@ static void init(tarasque_entity *entity)
     ship->sprite = IMG_LoadTexture_RW(render_manager->renderer, SDL_RWFromConstMem(res__ship_sprite_start, (int) ((size_t) res__ship_sprite_end - (size_t) res__ship_sprite_start)), 1);
     ship->bullets_sprite = IMG_LoadTexture_RW(render_manager->renderer, SDL_RWFromConstMem(res__bullet_sprite_start, (int) ((size_t) res__bullet_sprite_end - (size_t) res__bullet_sprite_start)), 1);
 
-    tarasque_entity_queue_subscribe_to_event(entity, "sdl renderer draw", (tarasque_specific_event_subscription) { .callback = &on_draw, .priority = 1 });
+    tarasque_entity_queue_subscribe_to_event(entity, "sdl renderer draw", (tarasque_specific_event_subscription) { .callback = &on_draw, .index = 1 });
     tarasque_entity_queue_subscribe_to_event(entity, "sdl event", (tarasque_specific_event_subscription) { .callback = &on_sdl_event });
 }
 

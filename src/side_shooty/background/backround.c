@@ -24,7 +24,7 @@ static void init(tarasque_entity *entity)
     bg->texture = IMG_LoadTexture_RW(render_manager->renderer, SDL_RWFromMem((void *) res__background_sprite_start, (int) ((size_t) res__background_sprite_end - (size_t) res__background_sprite_start)), 1);
 
     if (bg->texture) {
-        tarasque_entity_queue_subscribe_to_event(entity, "sdl renderer draw", (tarasque_specific_event_subscription) { .callback = on_draw, .priority = -1 });
+        tarasque_entity_queue_subscribe_to_event(entity, "sdl renderer draw", (tarasque_specific_event_subscription) { .callback = on_draw, .index = -1 });
     }
 }
 

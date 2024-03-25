@@ -36,6 +36,9 @@
  * to any engine-owned memory.
  */
 typedef struct tarasque_engine {
+    /** Allocator object used for all memory operations done by the engine instance. */
+    allocator alloc;
+
     /** Logger object to communicate to the outside world. */
     logger *logger;
     /** Command queue containing pending operations that will change the state of other collections. */
@@ -48,11 +51,13 @@ typedef struct tarasque_engine {
     /** Root of the game tree as an empty entity. */
     tarasque_engine_entity *root_entity;
 
+    /** Buffer of references to entities to use for the main loop. */
+    tarasque_engine_entity_range *active_entities;
+    /** Flags that the active entities buffer needs to be reloaded. */
+    bool update_active_entities;
+
     /** Flag signaling wether the engine should exit or not the main loop. */
     bool should_quit;
-
-    /** Allocator object used for all memory operations done by the engine instance. */
-    allocator alloc;
 } tarasque_engine;
 
 // -------------------------------------------------------------------------------------------------
@@ -82,6 +87,11 @@ static void tarasque_engine_process_event(tarasque_engine *handle, event process
 
 /* Steps all entities forward in time with their on_frame() callback. */
 static void tarasque_engine_frame_step_entities(tarasque_engine *handle, f32 elapsed_time);
+
+// -------------------------------------------------------------------------------------------------
+
+/* Updates the active entities buffer if needed. */
+static void tarasque_engine_update_active_entities(tarasque_engine *handle);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -119,6 +129,8 @@ tarasque_engine *tarasque_engine_create(void)
     new_engine = used_alloc.malloc(used_alloc, sizeof(*new_engine));
     if (new_engine) {
         *new_engine = (tarasque_engine) {
+                .alloc = used_alloc,
+
                 .logger = logger_create(stdout, LOGGER_ON_DESTROY_DO_NOTHING),
 
                 .commands = command_queue_create(used_alloc),
@@ -127,9 +139,10 @@ tarasque_engine *tarasque_engine_create(void)
 
                 .root_entity = tarasque_engine_entity_create(identifier_root, (tarasque_specific_entity) { 0u }, new_engine, used_alloc),
 
-                .should_quit = false,
+                .active_entities = NULL,
+                .update_active_entities = false,
 
-                .alloc = used_alloc,
+                .should_quit = false,
         };
 
         logger_log(new_engine->logger, LOGGER_SEVERITY_INFO, "Engine is ready.\n");
@@ -220,6 +233,8 @@ void tarasque_engine_run(tarasque_engine *handle, int fps) {
             tarasque_engine_process_event(handle, event_stack_pop(handle->events));
         }
 
+        tarasque_engine_update_active_entities(handle);
+
         tarasque_engine_frame_step_entities(handle, (f32) frame_delay);
 
         (void) nanosleep(&(struct timespec) { .tv_nsec = (long) (frame_delay * 1000000.f) }, NULL);
@@ -284,6 +299,8 @@ tarasque_entity *tarasque_entity_add_child(tarasque_entity *entity, const char *
     logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Added entity \"%s\" under parent \"%s\".\n", tarasque_engine_entity_get_name(new_entity)->data, tarasque_engine_entity_get_name(full_entity)->data);
 
     range_destroy_dynamic(handle->alloc, &RANGE_TO_ANY(new_entity_id));
+
+    handle->update_active_entities = true;
 
     return tarasque_engine_entity_get_specific_data(new_entity);
 }
@@ -448,7 +465,7 @@ tarasque_entity *tarasque_entity_get_child(tarasque_entity *entity, const char *
  */
 static void tarasque_engine_annihilate_entity_and_chilren(tarasque_engine *handle, tarasque_engine_entity *target)
 {
-    tarasque_entity_range *all_children = NULL;
+    tarasque_engine_entity_range *all_children = NULL;
 
     if (!handle) {
         return;
@@ -541,6 +558,7 @@ static void tarasque_engine_process_command_remove_entity(tarasque_engine *handl
 
     logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Removed entity \"%s\".\n", tarasque_engine_entity_get_name(subject)->data);
     tarasque_engine_annihilate_entity_and_chilren(handle, cmd->removed);
+    handle->update_active_entities = true;
 }
 
 /**
@@ -590,22 +608,32 @@ static void tarasque_engine_process_event(tarasque_engine *handle, event process
  */
 static void tarasque_engine_frame_step_entities(tarasque_engine *handle, f32 elapsed_ms)
 {
-    tarasque_entity_range *all_entities = NULL;
+    tarasque_engine_entity_range *all_entities = NULL;
 
-    if (!handle) {
+    if (!handle ||!handle->active_entities) {
         return;
     }
 
-    // TODO (low priority because of possible big impact on implementation) : children collections should be updated on entities change, not every frame
-    all_entities = tarasque_engine_entity_get_children(handle->root_entity, handle->alloc);
+    for (size_t i = 0u ; i < handle->active_entities->length ; i++) {
+        tarasque_engine_entity_step_frame(handle->active_entities->data[i], elapsed_ms);
+    }
+}
 
-    if (!all_entities) {
+/**
+ * @brief Fills the internal entities buffer collection if it was marked as dirty.
+ * The active entities collection is filled from parent to children from the root entity.
+ *
+ * @param[in] handle Traget engine instance.
+ */
+static void tarasque_engine_update_active_entities(tarasque_engine *handle)
+{
+    if (!handle || !handle->update_active_entities) {
         return;
     }
 
-    for (size_t i = 0u ; i < all_entities->length ; i++) {
-        tarasque_engine_entity_step_frame(all_entities->data[i], elapsed_ms);
+    if (handle->active_entities) {
+        range_destroy_dynamic(handle->alloc, &RANGE_TO_ANY(handle->active_entities));
     }
 
-    range_destroy_dynamic(handle->alloc, &RANGE_TO_ANY(all_entities));
+    handle->active_entities = tarasque_engine_entity_get_children(handle->root_entity, handle->alloc);
 }
