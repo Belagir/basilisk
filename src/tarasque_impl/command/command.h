@@ -40,8 +40,8 @@ typedef enum command_flavor {
  * @brief Specific data layout for a command to remove an entity at some location.
  */
 typedef struct command_remove_entity {
-    /** Range of identifiers leading to the removal location. */
-    path *id_path;
+    /** Entity to be removed. */
+    tarasque_engine_entity *removed;
 } command_remove_entity;
 
 // -------------------------------------------------------------------------------------------------
@@ -83,7 +83,7 @@ typedef struct command {
 // -------------------------------------------------------------------------------------------------
 
 /* Creates a command to remove an entity. */
-command command_create_remove_entity(tarasque_engine_entity *source, const char *id_path, allocator alloc);
+command command_create_remove_entity(tarasque_engine_entity *source, allocator alloc);
 /* Creates a command to subscribe an entity and a callback to an event. */
 command command_create_subscribe_to_event(tarasque_engine_entity *source, const char *event_name, tarasque_specific_event_subscription subscription_data, allocator alloc);
 

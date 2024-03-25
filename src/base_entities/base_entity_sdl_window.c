@@ -62,7 +62,7 @@ static void be_window_sdl_deinit(tarasque_entity *self_data)
 static void be_window_sdl_quit(tarasque_entity *self_data, void *event_data)
 {
     SDL_QuitSubSystem(SDL_INIT_VIDEO);
-    tarasque_entity_queue_remove_child(self_data, "");
+    tarasque_entity_queue_remove(self_data);
 }
 
 // -------------------------------------------------------------------------------------------------

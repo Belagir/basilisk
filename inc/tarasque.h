@@ -116,10 +116,11 @@ void tarasque_entity_quit(tarasque_entity *entity);
 /* Adds another entity to the game tree as a child of another. */
 tarasque_entity *tarasque_entity_add_child(tarasque_entity *entity, const char *str_id, tarasque_specific_entity user_data);
 
-/* Adds a pending command to remove an entity from the game tree relative to another. */
-void tarasque_entity_queue_remove_child(tarasque_entity *entity, const char *str_path);
+/* Adds a pending command to remove an entity from the game tree. */
+void tarasque_entity_queue_remove(tarasque_entity *entity);
+
 /* Realizes a graft in the game tree relative to an entity. */
-void tarasque_entity_graft(tarasque_entity *entity, const char *str_path, const char *str_id, tarasque_specific_graft graft_data);
+void tarasque_entity_graft(tarasque_entity *entity, const char *str_id, tarasque_specific_graft graft_data);
 
 /* Adds a pending command to subscribe a callback to an event, by the event's name. */
 void tarasque_entity_queue_subscribe_to_event(tarasque_entity *entity, const char *str_event_name, tarasque_specific_event_subscription subscription_data);

@@ -283,18 +283,17 @@ tarasque_entity *tarasque_entity_add_child(tarasque_entity *entity, const char *
 
     logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Added entity \"%s\" under parent \"%s\".\n", tarasque_engine_entity_get_name(new_entity)->data, tarasque_engine_entity_get_name(full_entity)->data);
 
+    range_destroy_dynamic(handle->alloc, &RANGE_TO_ANY(new_entity_id));
+
     return tarasque_engine_entity_get_specific_data(new_entity);
 }
 
 /**
- * @brief Queue a command to remove an entity into the game tree.
- * The path is relative to the entity passed as argument. If this entity is removed before the operation is done, the
- * command is also removed.
+ * @brief
  *
- * @param[in] entity Target entity to be removed. The path "" represents the entity passed as argument.
- * @param[in] str_path string (copied) describing a '/'-delimited path to the removeed entity.
+ * @param entity
  */
-void tarasque_entity_queue_remove_child(tarasque_entity *entity, const char *str_path)
+void tarasque_entity_queue_remove(tarasque_entity *entity)
 {
     if (!entity) {
         return;
@@ -305,7 +304,7 @@ void tarasque_entity_queue_remove_child(tarasque_entity *entity, const char *str
     tarasque_engine *handle = tarasque_engine_entity_get_host_engine_handle(full_entity);
 
     if (handle) {
-        cmd = command_create_remove_entity(full_entity, str_path, handle->alloc);
+        cmd = command_create_remove_entity(full_entity, handle->alloc);
         command_queue_append(handle->commands, cmd, handle->alloc);
     }
 }
@@ -316,11 +315,10 @@ void tarasque_entity_queue_remove_child(tarasque_entity *entity, const char *str
  * Grafts are usually used to add entities in bulk.
  *
  * @param[in] entity Target entity from which the graft will take place.
- * @param[in] str_path Path (copied) from which the graft is executed.
  * @param[in] str_id Name (copied) to give to the root of the graft.
  * @param[in] graft_data Data (copied) describing the graft and its arguments.
  */
-void tarasque_entity_graft(tarasque_entity *entity, const char *str_path, const char *str_id, tarasque_specific_graft graft_data)
+void tarasque_entity_graft(tarasque_entity *entity, const char *str_id, tarasque_specific_graft graft_data)
 {
     if (!entity || !graft_data.graft_procedure) {
         return;
@@ -532,26 +530,17 @@ static void tarasque_engine_process_command(tarasque_engine *handle, command cmd
  */
 static void tarasque_engine_process_command_remove_entity(tarasque_engine *handle, tarasque_engine_entity *subject, command_remove_entity *cmd)
 {
-    tarasque_engine_entity *found_entity = NULL;
-
     if (!handle || !cmd) {
         return;
     }
 
-    found_entity = tarasque_engine_entity_get_child(subject, cmd->id_path);
-
-    if (found_entity == handle->root_entity) {
+    if (cmd->removed == handle->root_entity) {
         logger_log(handle->logger, LOGGER_SEVERITY_ERRO, "Cannot remove root entity.\n");
         return;
     }
 
-    if (!found_entity) {
-        logger_log(handle->logger, LOGGER_SEVERITY_WARN, "Could not find entity \"%s\" to remove.\n", tarasque_engine_entity_get_name(subject)->data);
-        return;
-    }
-
     logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Removed entity \"%s\".\n", tarasque_engine_entity_get_name(subject)->data);
-    tarasque_engine_annihilate_entity_and_chilren(handle, found_entity);
+    tarasque_engine_annihilate_entity_and_chilren(handle, cmd->removed);
 }
 
 /**

@@ -31,15 +31,15 @@ typedef struct command_queue {
  * @brief Creates a command to remove an entity from the game tree.
  *
  * @param[in] source Entity that sent the command.
- * @param[in] id_path Zero-terminated string (copied) representing a path of entities names separated by '/'.
+ * @param[in] id_path POinter to some entity to be removed.
  * @param[inout] alloc Allocator used for the allocation of the command.
  * @return A fresh command to be queued.
  */
-command command_create_remove_entity(tarasque_engine_entity *source, const char *id_path, allocator alloc)
+command command_create_remove_entity(tarasque_engine_entity *source, allocator alloc)
 {
     command new_cmd = { 0u };
 
-    if (!id_path) {
+    if (!source) {
         return (command) { .flavor = COMMAND_INVALID };
     }
 
@@ -47,7 +47,7 @@ command command_create_remove_entity(tarasque_engine_entity *source, const char 
             .flavor = COMMAND_REMOVE_ENTITY,
             .source = source,
             .specific.remove_entity = {
-                    .id_path = path_from_cstring(id_path, alloc),
+                    .removed = source,
             },
     };
 
@@ -101,7 +101,6 @@ void command_destroy(command *cmd, allocator alloc)
     switch (cmd->flavor) {
 
     case COMMAND_REMOVE_ENTITY:
-        path_destroy(&(cmd->specific.remove_entity.id_path), alloc);
         break;
 
     case COMMAND_SUBSCRIBE_TO_EVENT:

@@ -39,7 +39,7 @@ static void frame(tarasque_entity *entity, float elapsed_ms)
     self->x += 20;
 
     if (self->x > 2000) {
-        tarasque_entity_queue_remove_child(entity, "");
+        tarasque_entity_queue_remove(entity);
     }
 }
 

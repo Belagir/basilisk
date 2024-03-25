@@ -24,7 +24,7 @@ static void quit_game(tarasque_entity *entity, void *event_data)
  */
 static void init(tarasque_entity *entity)
 {
-    tarasque_entity_graft(entity, "", "Window", graft_sdl_window(&(graft_sdl_window_args) {
+    tarasque_entity_graft(entity, "Window", graft_sdl_window(&(graft_sdl_window_args) {
             .for_window = {
                     .title = "shooty",
                     .x = SDL_WINDOWPOS_CENTERED, .y = SDL_WINDOWPOS_CENTERED,
