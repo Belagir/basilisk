@@ -114,7 +114,10 @@ void tarasque_engine_run(tarasque_engine *handle, int fps);
 void tarasque_entity_quit(tarasque_entity *entity);
 
 /* Adds a pending command to add another entity to the game tree relative to another. */
-void tarasque_entity_add_child(tarasque_entity *entity, const char *str_path, const char *str_id, tarasque_specific_entity user_data);
+void tarasque_entity_add_child_defered(tarasque_entity *entity, const char *str_path, const char *str_id, tarasque_specific_entity user_data);
+
+tarasque_entity *tarasque_entity_add_child(tarasque_entity *entity, const char *str_id, tarasque_specific_entity user_data);
+
 /* Adds a pending command to remove an entity from the game tree relative to another. */
 void tarasque_entity_remove_child(tarasque_entity *entity, const char *str_path);
 /* Realizes a graft in the game tree relative to an entity. */

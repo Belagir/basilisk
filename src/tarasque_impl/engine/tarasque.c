@@ -260,7 +260,7 @@ void tarasque_entity_quit(tarasque_entity *entity)
  * @param[in] str_id New entity's name (copied), must not contain the character '/' or be empty. The name can be modified if there is already an entity with the name at the same path.
  * @param[in] user_data Basic entity information (copied).
  */
-void tarasque_entity_add_child(tarasque_entity *entity, const char *str_path, const char *str_id, tarasque_specific_entity user_data)
+void tarasque_entity_add_child_defered(tarasque_entity *entity, const char *str_path, const char *str_id, tarasque_specific_entity user_data)
 {
     if (!entity) {
         return;
@@ -274,6 +274,45 @@ void tarasque_entity_add_child(tarasque_entity *entity, const char *str_path, co
         cmd = command_create_add_entity(full_entity, str_path, str_id, user_data, handle->alloc);
         command_queue_append(handle->commands, cmd, handle->alloc);
     }
+}
+
+/**
+ * @brief
+ *
+ * @param entity
+ * @param str_id
+ * @param user_data
+ * @return
+ */
+tarasque_entity *tarasque_entity_add_child(tarasque_entity *entity, const char *str_id, tarasque_specific_entity user_data)
+{
+    tarasque_entity *new_entity = NULL;
+    identifier *new_entity_id = NULL;
+
+    tarasque_engine_entity *full_entity = tarasque_engine_entity_get_containing_full_entity(entity);
+    tarasque_engine *handle = tarasque_engine_entity_get_host_engine_handle(full_entity);
+
+    if (!full_entity || !handle) {
+        return NULL;
+    }
+
+    new_entity_id = identifier_from_cstring(str_id, handle->alloc);
+
+    if (!new_entity_id) {
+        return NULL;
+    }
+
+    while (tarasque_engine_entity_get_direct_child(full_entity, new_entity_id) != NULL) {
+        identifier_increment(&new_entity_id, handle->alloc);
+    }
+
+    new_entity = tarasque_engine_entity_create(new_entity_id, user_data, handle, handle->alloc);
+    tarasque_engine_entity_add_child(full_entity, new_entity, handle->alloc);
+    tarasque_engine_entity_init(new_entity);
+
+    logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Added entity \"%s\" under parent \"%s\".\n", tarasque_engine_entity_get_name(new_entity)->data, tarasque_engine_entity_get_name(full_entity)->data);
+
+    return tarasque_engine_entity_get_specific_data(new_entity);
 }
 
 /**
@@ -423,7 +462,7 @@ tarasque_entity *tarasque_entity_get_child(tarasque_entity *entity, const char *
         path_destroy(&child_path, handle->alloc);
     }
 
-    return found_entity;
+    return tarasque_engine_entity_get_specific_data(found_entity);
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -26,30 +26,33 @@ static void graft_sdl_window_callback(tarasque_entity *entity, void *graft_args)
 
 static void graft_sdl_window_callback(tarasque_entity *entity, void *graft_args)
 {
+    tarasque_entity *context = NULL;
+    tarasque_entity *window = NULL;
+    tarasque_entity *render_manager = NULL;
+    tarasque_entity *event_relay = NULL;
+
     if (!graft_args) {
         return;
     }
 
     const graft_sdl_window_args sdl_win_args = *(const graft_sdl_window_args *) graft_args;
 
-    tarasque_entity_add_child(entity, "", "Context",
-            be_context_sdl_entity());
+    context = tarasque_entity_add_child(entity, "Context", be_context_sdl_entity());
 
-    tarasque_entity_add_child(entity, "Context", "Window",
+    window = tarasque_entity_add_child(context, "Window",
             be_window_sdl_entity(&(be_window_sdl) {
                     .title = sdl_win_args.for_window.title,
                     .x = sdl_win_args.for_window.x, .y = sdl_win_args.for_window.y,
                     .w = sdl_win_args.for_window.w, .h = sdl_win_args.for_window.h,
                     .flags = sdl_win_args.for_window.flags }));
 
-    tarasque_entity_add_child(entity, "Context/Window", "Render Manager",
+    render_manager = tarasque_entity_add_child(window, "Render Manager",
             be_render_manager_sdl_entity(&(be_render_manager_sdl) {
                     .clear_color = sdl_win_args.for_renderer.clear_color,
                     .flags = sdl_win_args.for_renderer.flags,
                     .window_entity_name = "Window" }));
 
-    tarasque_entity_add_child(entity, "Context/Window", "Event Relay",
-            be_event_relay_sdl_entity(&(be_event_relay_sdl) { 0u }));
+    event_relay = tarasque_entity_add_child(window, "Event Relay", be_event_relay_sdl_entity(&(be_event_relay_sdl) { 0u }));
 }
 
 // -------------------------------------------------------------------------------------------------
