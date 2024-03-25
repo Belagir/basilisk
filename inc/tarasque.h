@@ -113,18 +113,16 @@ void tarasque_engine_run(tarasque_engine *handle, int fps);
 /* Flags the engine to exit next frame. */
 void tarasque_entity_quit(tarasque_entity *entity);
 
-/* Adds a pending command to add another entity to the game tree relative to another. */
-void tarasque_entity_add_child_defered(tarasque_entity *entity, const char *str_path, const char *str_id, tarasque_specific_entity user_data);
-
+/* Adds another entity to the game tree as a child of another. */
 tarasque_entity *tarasque_entity_add_child(tarasque_entity *entity, const char *str_id, tarasque_specific_entity user_data);
 
 /* Adds a pending command to remove an entity from the game tree relative to another. */
-void tarasque_entity_remove_child(tarasque_entity *entity, const char *str_path);
+void tarasque_entity_queue_remove_child(tarasque_entity *entity, const char *str_path);
 /* Realizes a graft in the game tree relative to an entity. */
 void tarasque_entity_graft(tarasque_entity *entity, const char *str_path, const char *str_id, tarasque_specific_graft graft_data);
 
 /* Adds a pending command to subscribe a callback to an event, by the event's name. */
-void tarasque_entity_subscribe_to_event(tarasque_entity *entity, const char *str_event_name, tarasque_specific_event_subscription subscription_data);
+void tarasque_entity_queue_subscribe_to_event(tarasque_entity *entity, const char *str_event_name, tarasque_specific_event_subscription subscription_data);
 /* Sends an event to subscribed entities. */
 void tarasque_entity_stack_event(tarasque_entity *entity, const char *str_event_name, tarasque_specific_event event_data);
 

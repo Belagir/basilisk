@@ -41,8 +41,8 @@ static void be_render_manager_sdl_init(tarasque_entity *self_data)
     init_data->renderer = SDL_CreateRenderer(parent_window->window, -1, init_data->flags);
 
     if (init_data->renderer) {
-        tarasque_entity_subscribe_to_event(self_data, "sdl renderer pre draw",  (tarasque_specific_event_subscription) { .callback = &be_render_manager_sdl_pre_draw });
-        tarasque_entity_subscribe_to_event(self_data, "sdl renderer post draw", (tarasque_specific_event_subscription) { .callback = &be_render_manager_sdl_post_draw });
+        tarasque_entity_queue_subscribe_to_event(self_data, "sdl renderer pre draw",  (tarasque_specific_event_subscription) { .callback = &be_render_manager_sdl_pre_draw });
+        tarasque_entity_queue_subscribe_to_event(self_data, "sdl renderer post draw", (tarasque_specific_event_subscription) { .callback = &be_render_manager_sdl_post_draw });
     }
 }
 

@@ -28,37 +28,6 @@ typedef struct command_queue {
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief Creates a command to add an entity in the game tree.
- *
- * @param[in] source Entity that sent the command.
- * @param[in] id_path Zero-terminated string (copied) representing a path of entities names separated by '/'.
- * @param[in] id Zero-terminated string (copied) representing the name of the new entity.
- * @param[in] user_data User-defined data for the entity.
- * @param[inout] alloc Allocator used for the allocation of the command.
- * @return a fresh command to be queued.
- */
-command command_create_add_entity(tarasque_engine_entity *source, const char *id_path, const char *id, tarasque_specific_entity user_data, allocator alloc)
-{
-    command new_cmd = { 0u };
-
-    if (!id_path || !id) {
-        return (command) { .flavor = COMMAND_INVALID };
-    }
-
-    new_cmd = (command) {
-            .flavor = COMMAND_ADD_ENTITY,
-            .source = source,
-            .specific.add_entity = {
-                    .id = identifier_from_cstring(id, alloc),
-                    .id_path = path_from_cstring(id_path, alloc),
-                    .user_data = tarasque_specific_entity_copy_create(user_data, alloc),
-             },
-    };
-
-    return new_cmd;
-}
-
-/**
  * @brief Creates a command to remove an entity from the game tree.
  *
  * @param[in] source Entity that sent the command.
@@ -130,11 +99,6 @@ void command_destroy(command *cmd, allocator alloc)
     }
 
     switch (cmd->flavor) {
-    case COMMAND_ADD_ENTITY:
-        range_destroy_dynamic(alloc, &RANGE_TO_ANY(cmd->specific.add_entity.id));
-        path_destroy(&(cmd->specific.add_entity.id_path), alloc);
-        tarasque_specific_entity_copy_destroy(&(cmd->specific.add_entity.user_data), alloc);
-        break;
 
     case COMMAND_REMOVE_ENTITY:
         path_destroy(&(cmd->specific.remove_entity.id_path), alloc);

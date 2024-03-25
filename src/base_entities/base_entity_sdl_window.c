@@ -38,7 +38,7 @@ static void be_window_sdl_init(tarasque_entity *self_data)
             (int) window_data->w, (int) window_data->h,
             window_data->flags);
 
-    tarasque_entity_subscribe_to_event(self_data, "sdl event quit", (tarasque_specific_event_subscription) { .callback = &be_window_sdl_quit });
+    tarasque_entity_queue_subscribe_to_event(self_data, "sdl event quit", (tarasque_specific_event_subscription) { .callback = &be_window_sdl_quit });
 }
 
 /**
@@ -62,7 +62,7 @@ static void be_window_sdl_deinit(tarasque_entity *self_data)
 static void be_window_sdl_quit(tarasque_entity *self_data, void *event_data)
 {
     SDL_QuitSubSystem(SDL_INIT_VIDEO);
-    tarasque_entity_remove_child(self_data, "");
+    tarasque_entity_queue_remove_child(self_data, "");
 }
 
 // -------------------------------------------------------------------------------------------------

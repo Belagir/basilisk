@@ -68,8 +68,6 @@ static void tarasque_engine_annihilate_entity(tarasque_engine *handle, tarasque_
 
 /* Processes a general command, applying its effects and then destroying it. */
 static void tarasque_engine_process_command(tarasque_engine *handle, command cmd);
-/* Processes a specific command to add an entity in the engine, changing the state of the game tree. */
-static void tarasque_engine_process_command_add_entity(tarasque_engine *handle, tarasque_engine_entity *subject, command_add_entity *cmd);
 /* Processes a specific command to remove an entity from the engine, changing the state of the game tree. */
 static void tarasque_engine_process_command_remove_entity(tarasque_engine *handle, tarasque_engine_entity *subject, command_remove_entity *cmd);
 /* Processes a specific command to subscribe an entity to an event, changing the state of the publisher / susbcriber collection. */
@@ -250,33 +248,6 @@ void tarasque_entity_quit(tarasque_entity *entity)
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief Queues a command to add an entity into the game tree.
- * The path is relative to the entity passed as argument. If this entity is removed before the operation is done, the
- * command is also removed.
- *
- * @param[in] entity Target to-be-parent entity.
- * @param[in] str_path String (copied) describing a '/'-delimited path to an entity that will be the direct parent of the new entity.
- *  The path "" represents the entity passed as argument.
- * @param[in] str_id New entity's name (copied), must not contain the character '/' or be empty. The name can be modified if there is already an entity with the name at the same path.
- * @param[in] user_data Basic entity information (copied).
- */
-void tarasque_entity_add_child_defered(tarasque_entity *entity, const char *str_path, const char *str_id, tarasque_specific_entity user_data)
-{
-    if (!entity) {
-        return;
-    }
-
-    command cmd = { 0u };
-    tarasque_engine_entity *full_entity = tarasque_engine_entity_get_containing_full_entity(entity);
-    tarasque_engine *handle = tarasque_engine_entity_get_host_engine_handle(full_entity);
-
-    if (handle) {
-        cmd = command_create_add_entity(full_entity, str_path, str_id, user_data, handle->alloc);
-        command_queue_append(handle->commands, cmd, handle->alloc);
-    }
-}
-
-/**
  * @brief
  *
  * @param entity
@@ -323,7 +294,7 @@ tarasque_entity *tarasque_entity_add_child(tarasque_entity *entity, const char *
  * @param[in] entity Target entity to be removed. The path "" represents the entity passed as argument.
  * @param[in] str_path string (copied) describing a '/'-delimited path to the removeed entity.
  */
-void tarasque_entity_remove_child(tarasque_entity *entity, const char *str_path)
+void tarasque_entity_queue_remove_child(tarasque_entity *entity, const char *str_path)
 {
     if (!entity) {
         return;
@@ -366,7 +337,7 @@ void tarasque_entity_graft(tarasque_entity *entity, const char *str_path, const 
  * @param[in] str_event_name Name (copied) of the event the entity wants to subscribe a callback to.
  * @param[in] callback Pointer to the callback that will receive the entity's data and event data.
  */
-void tarasque_entity_subscribe_to_event(tarasque_entity *entity,  const char *str_event_name, tarasque_specific_event_subscription subscription_data)
+void tarasque_entity_queue_subscribe_to_event(tarasque_entity *entity,  const char *str_event_name, tarasque_specific_event_subscription subscription_data)
 {
     if (!entity) {
         return;
@@ -539,9 +510,6 @@ static void tarasque_engine_process_command(tarasque_engine *handle, command cmd
     }
 
     switch (cmd.flavor) {
-    case COMMAND_ADD_ENTITY:
-        tarasque_engine_process_command_add_entity(handle, subject, &(cmd.specific.add_entity));
-        break;
     case COMMAND_REMOVE_ENTITY:
         tarasque_engine_process_command_remove_entity(handle, subject, &(cmd.specific.remove_entity));
         break;
@@ -553,41 +521,6 @@ static void tarasque_engine_process_command(tarasque_engine *handle, command cmd
     }
 
     command_destroy(&cmd, handle->alloc);
-}
-
-/**
- * @brief Processes a command trusted to be a command to add an entity to the game tree at some position.
- *
- * @param[inout] handle Engine handle.
- * @param[in] subject Entity that sent the command.
- * @param[in] cmd Command containing the addition data.
- */
-static void tarasque_engine_process_command_add_entity(tarasque_engine *handle, tarasque_engine_entity *subject, command_add_entity *cmd)
-{
-    tarasque_engine_entity *new_entity = NULL;
-    tarasque_engine_entity *found_parent = NULL;
-
-    if (!handle || !cmd) {
-        return;
-    }
-
-    found_parent = tarasque_engine_entity_get_child(subject, cmd->id_path);
-
-    if (!found_parent) {
-        logger_log(handle->logger, LOGGER_SEVERITY_ERRO, "Could not find parent to add entity \"%s\".\n", cmd->id->data);
-        return;
-
-    }
-
-    while (tarasque_engine_entity_get_direct_child(found_parent, cmd->id) != NULL) {
-        identifier_increment(&(cmd->id), handle->alloc);
-    }
-
-    new_entity = tarasque_engine_entity_create(cmd->id, cmd->user_data, handle, handle->alloc);
-    tarasque_engine_entity_add_child(found_parent, new_entity, handle->alloc);
-    tarasque_engine_entity_init(new_entity);
-
-    logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Added entity \"%s\" under parent \"%s\".\n", tarasque_engine_entity_get_name(new_entity)->data, tarasque_engine_entity_get_name(found_parent)->data);
 }
 
 /**

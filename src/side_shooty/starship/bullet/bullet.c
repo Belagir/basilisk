@@ -23,7 +23,7 @@ static void on_event_draw(tarasque_entity *entity, void *event_data)
  */
 static void init(tarasque_entity *entity)
 {
-    tarasque_entity_subscribe_to_event(entity, "sdl renderer draw", (tarasque_specific_event_subscription) { .callback = &on_event_draw, .priority = 0, });
+    tarasque_entity_queue_subscribe_to_event(entity, "sdl renderer draw", (tarasque_specific_event_subscription) { .callback = &on_event_draw, .priority = 0, });
 }
 
 /**
@@ -39,7 +39,7 @@ static void frame(tarasque_entity *entity, float elapsed_ms)
     self->x += 20;
 
     if (self->x > 2000) {
-        tarasque_entity_remove_child(entity, "");
+        tarasque_entity_queue_remove_child(entity, "");
     }
 }
 
