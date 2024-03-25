@@ -90,8 +90,8 @@
         + tarasque_engine_entity *tarasque_engine_entity_get_containing_full_entity(tarasque_entity *entity)
         + tarasque_entity *tarasque_engine_entity_get_specific_data(tarasque_engine_entity *target)
         + tarasque_engine *tarasque_engine_entity_get_host_engine_handle(tarasque_engine_entity *target)
-        + const identifier *tarasque_engine_entity_get_name(const tarasque_engine_entity *target)
-        + arasque_engine_entity *tarasque_engine_entity_get_parent(tarasque_engine_entity *target)
+        + identifier *tarasque_engine_entity_get_name(const tarasque_engine_entity *target)
+        + tarasque_engine_entity *tarasque_engine_entity_get_parent(tarasque_engine_entity *target)
         ..
         + void tarasque_engine_entity_add_child(tarasque_engine_entity *target, tarasque_engine_entity *new_child, allocator alloc)
         + void tarasque_engine_entity_deparent(tarasque_engine_entity *target)
@@ -115,21 +115,9 @@
 
 ' package command {
 
-    struct command_add_entity {
-        + path *id_path
-        + identifier *id
-        + tarasque_specific_entity_copy user_data
-    }
-    command_add_entity::user_data --* "1" tarasque_specific_entity_copy
-    command_add_entity::id_path --* "1" path
-    command_add_entity::id --* "1" identifier
-
-    ' ------------------------------------------------------------------------------
-
     struct command_remove_entity {
-        + path *id_path
+        + tarasque_entity *removed
     }
-    command_remove_entity::id_path --* "1" path
 
     ' ------------------------------------------------------------------------------
 
@@ -146,11 +134,9 @@
 
     enum command_flavor {
         COMMAND_INVALID
-        COMMAND_ADD_ENTITY
         COMMAND_REMOVE_ENTITY
         COMMAND_SUBSCRIBE_TO_EVENT
     }
-    command_flavor::ADD_ENTITY .. command_add_entity
     command_flavor::REMOVE_ENTITY .. command_remove_entity
     command_flavor::SUBSCRIBE_TO_EVENT .. command_subscribe_to_event
 
@@ -159,9 +145,8 @@
     struct command {
         + command_flavor flavor
         + tarasque_engine_entity *source
-        + union { command_add_entity, command_remove_entity, command_subscribe_to_event } cmd
+        + union { command_remove_entity, command_subscribe_to_event } cmd
         __
-        + command command_create_add_entity(tarasque_engine_entity *source, const char *id_path, const char *id, tarasque_specific_entity user_data, allocator alloc)
         + command command_create_remove_entity(tarasque_engine_entity *source, const char *id_path, allocator alloc)
         + command command_create_subscribe_to_event(tarasque_engine_entity *source, const char *event_name, tarasque_specific_event_subscription subscription_data, allocator alloc)
         ..
@@ -169,7 +154,6 @@
     }
     command::flavor -- command_flavor
     command::source --o "1" tarasque_engine_entity
-    command::cmd --* command_add_entity
     command::cmd --* command_remove_entity
     command::cmd --* command_subscribe_to_event
 
@@ -288,10 +272,10 @@
         void
         __
         + void tarasque_entity_quit(tarasque_entity *entity)
-        + void tarasque_entity_add_child(tarasque_entity *entity, const char *str_path, const char *str_id, tarasque_specific_entity user_data)
-        + void tarasque_entity_remove_child(tarasque_entity *entity, const char *str_path)
-        + void tarasque_entity_graft(tarasque_entity *entity, const char *str_path, const char *str_id, tarasque_specific_graft graft_data)
-        + void tarasque_entity_subscribe_to_event(tarasque_entity *entity, const char *str_event_name, tarasque_specific_event_subscription subscription_data)
+        + void tarasque_entity_add_child(tarasque_entity *entity, const char *str_id, tarasque_specific_entity user_data)
+        + void tarasque_entity_queue_remove(tarasque_entity *entity)
+        + void tarasque_entity_graft(tarasque_entity *entity, const char *str_id, tarasque_specific_graft graft_data)
+        + void tarasque_entity_queue_subscribe_to_event(tarasque_entity *entity, const char *str_event_name, tarasque_specific_event_subscription subscription_data)
         + void tarasque_entity_stack_event(tarasque_entity *entity, const char *str_event_name, tarasque_specific_event event_data)
         + tarasque_entity *tarasque_entity_get_parent(tarasque_entity *entity, const char *str_parent_name)
         + tarasque_entity *tarasque_entity_get_child(tarasque_entity *entity, const char *str_path)

@@ -248,12 +248,12 @@ void tarasque_entity_quit(tarasque_entity *entity)
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief
+ * @brief Immediately builds an entity and adds it as a child to another, and returns a pointer to the new entity.
  *
- * @param entity
- * @param str_id
- * @param user_data
- * @return
+ * @param[in] entity Entity soon-to-be parent.
+ * @param[in] str_id Name (copied) of the new entity.
+ * @param[in] user_data Definition (copied) of the entity.
+ * @return tarasque_entity *
  */
 tarasque_entity *tarasque_entity_add_child(tarasque_entity *entity, const char *str_id, tarasque_specific_entity user_data)
 {
@@ -289,9 +289,9 @@ tarasque_entity *tarasque_entity_add_child(tarasque_entity *entity, const char *
 }
 
 /**
- * @brief
+ * @brief Queues a command to remove an entity from the game tree. All children of the entity will be also removed.
  *
- * @param entity
+ * @param[in] entity Entity to remove.
  */
 void tarasque_entity_queue_remove(tarasque_entity *entity)
 {
@@ -383,9 +383,9 @@ void tarasque_entity_stack_event(tarasque_entity *entity, const char *str_event_
  * @brief Returns the first parent entity of the provided name. If the name is NULL, the first parent is returned.
  * If no corresponding parent is found, the function returns NULL.
  *
- * @param[in] entity
- * @param[in] str_parent_name
- * @param tarasque_entity *
+ * @param[in] entity Entity from which to search for the parent.
+ * @param[in] str_parent_name Name of the potential parent.
+ * @return tarasque_entity *
  */
 tarasque_entity *tarasque_entity_get_parent(tarasque_entity *entity, const char *str_parent_name)
 {
@@ -410,8 +410,8 @@ tarasque_entity *tarasque_entity_get_parent(tarasque_entity *entity, const char 
  * @brief Returns the child of the entity at the end of the provided path. If no such child is found, returns NULL.
  * If the given path is empty, the root is returned : it is the entity given as argument.
  *
- * @param[in] entity
- * @param[in] path
+ * @param[in] entity Entity from which to search for the child.
+ * @param[in] path Path to the potential child entity.
  * @return tarasque_entity *
  */
 tarasque_entity *tarasque_entity_get_child(tarasque_entity *entity, const char *str_path)

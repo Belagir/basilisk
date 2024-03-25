@@ -30,8 +30,7 @@ typedef struct command_queue {
 /**
  * @brief Creates a command to remove an entity from the game tree.
  *
- * @param[in] source Entity that sent the command.
- * @param[in] id_path POinter to some entity to be removed.
+ * @param[in] source Entity that sent the command and to be removed.
  * @param[inout] alloc Allocator used for the allocation of the command.
  * @return A fresh command to be queued.
  */

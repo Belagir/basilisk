@@ -17,6 +17,7 @@
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
+// INTERFACE TYPES
 
 /* Opaque type of an engine handle. Those are used to carry around references to the engine's data. */
 typedef struct tarasque_engine tarasque_engine;
@@ -25,6 +26,9 @@ typedef struct tarasque_engine tarasque_engine;
 typedef void tarasque_entity;
 
 // -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+// CONSTRUCTOR DATA STRUCTURES
 
 /**
  * @brief Collection of callbacks that make an entity function in the engine.
@@ -77,7 +81,6 @@ typedef struct tarasque_specific_event_subscription {
     void (*callback)(tarasque_entity *self_data, void *event_data);
 } tarasque_specific_event_subscription;
 
-
 /**
  * @brief Data representing a new event to add to the stack.
  */
@@ -94,6 +97,10 @@ typedef struct tarasque_specific_event {
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
+// ---- INTERFACE METHODS
+
+// -------------------------------------------------------------------------------------------------
+// LIFETIME FUNCTIONS
 
 /* Creates an instance of the engine on the heap. */
 tarasque_engine *tarasque_engine_create(void);
@@ -101,6 +108,7 @@ tarasque_engine *tarasque_engine_create(void);
 void tarasque_engine_destroy(tarasque_engine **handle);
 
 // -------------------------------------------------------------------------------------------------
+// ENGINE METHODS
 
 /* Returns the data bound to the root entity. This pointer has no memory behind it and should not be dereferenced. */
 tarasque_entity *tarasque_engine_root_entity(tarasque_engine *handle);
@@ -109,25 +117,27 @@ entities. */
 void tarasque_engine_run(tarasque_engine *handle, int fps);
 
 // -------------------------------------------------------------------------------------------------
+// ENTITY INTERACTIONS
 
 /* Flags the engine to exit next frame. */
 void tarasque_entity_quit(tarasque_entity *entity);
-
-/* Adds another entity to the game tree as a child of another. */
-tarasque_entity *tarasque_entity_add_child(tarasque_entity *entity, const char *str_id, tarasque_specific_entity user_data);
-
-/* Adds a pending command to remove an entity from the game tree. */
-void tarasque_entity_queue_remove(tarasque_entity *entity);
-
-/* Realizes a graft in the game tree relative to an entity. */
-void tarasque_entity_graft(tarasque_entity *entity, const char *str_id, tarasque_specific_graft graft_data);
-
 /* Adds a pending command to subscribe a callback to an event, by the event's name. */
 void tarasque_entity_queue_subscribe_to_event(tarasque_entity *entity, const char *str_event_name, tarasque_specific_event_subscription subscription_data);
 /* Sends an event to subscribed entities. */
 void tarasque_entity_stack_event(tarasque_entity *entity, const char *str_event_name, tarasque_specific_event event_data);
 
 // -------------------------------------------------------------------------------------------------
+// ENTITY HIERARCHY MODIFICATIONS
+
+/* Adds another entity to the game tree as a child of another. */
+tarasque_entity *tarasque_entity_add_child(tarasque_entity *entity, const char *str_id, tarasque_specific_entity user_data);
+/* Adds a pending command to remove an entity from the game tree. */
+void tarasque_entity_queue_remove(tarasque_entity *entity);
+/* Realizes a graft in the game tree relative to an entity. */
+void tarasque_entity_graft(tarasque_entity *entity, const char *str_id, tarasque_specific_graft graft_data);
+
+// -------------------------------------------------------------------------------------------------
+// ENTITY SEARCHING
 
 /* Search for a parent of a certain name the entity might be related to. If the name is NULL, the first parent is returned. */
 tarasque_entity *tarasque_entity_get_parent(tarasque_entity *entity, const char *str_parent_name);
