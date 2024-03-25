@@ -23,7 +23,7 @@
 /* Opaque type to a full entity containing user data and information about how it lives in the engine. */
 typedef struct tarasque_engine_entity tarasque_engine_entity;
 /* Quickhand for a range of entities. */
-typedef RANGE(tarasque_engine_entity *) tarasque_entity_range;
+typedef RANGE(tarasque_engine_entity *) tarasque_engine_entity_range;
 
 /* Redefinition of the tarasque_entity_specific_data type to signal memory allocation in opposition of the user-managed tarasque_entity_specific_data variables. */
 typedef tarasque_specific_entity tarasque_specific_entity_copy;
@@ -70,7 +70,7 @@ tarasque_engine_entity *tarasque_engine_entity_get_child(tarasque_engine_entity 
 /* Find a child that is directly under an entity. */
 tarasque_engine_entity *tarasque_engine_entity_get_direct_child(tarasque_engine_entity *target, const identifier *id_path);
 /* Returns an allocated range of all children of an entity, recursively. */
-tarasque_entity_range *tarasque_engine_entity_get_children(tarasque_engine_entity *target, allocator alloc);
+tarasque_engine_entity_range *tarasque_engine_entity_get_children(tarasque_engine_entity *target, allocator alloc);
 
 // -------------------------------------------------------------------------------------------------
 // CALLBACKS EXECUTION

@@ -74,9 +74,8 @@ typedef struct tarasque_specific_graft {
  * @brief Data representing the behavior to of an entity on receiving an event.
  */
 typedef struct tarasque_specific_event_subscription {
-    // TODO : either change the feild's name or invert priority order to higher --> earlier
     /** Relative priority (to other callbacks) of the callback when receiving an event. The higher, the later the callback will receive the event. */
-    int priority;
+    int index;
     /** Fucntion executed when an event is received. */
     void (*callback)(tarasque_entity *self_data, void *event_data);
 } tarasque_specific_event_subscription;

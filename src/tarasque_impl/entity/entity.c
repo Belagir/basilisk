@@ -30,7 +30,7 @@ typedef struct tarasque_engine_entity {
     /** Non-owned reference to an eventual parent entity. */
     tarasque_engine_entity *parent;
     /** Array of all of the entity's children. */
-    tarasque_entity_range *children;
+    tarasque_engine_entity_range *children;
 
     /** Entity callbacks to be used by the engine. */
     tarasque_specific_entity_callbacks callbacks;
@@ -224,7 +224,7 @@ void tarasque_engine_entity_deparent(tarasque_engine_entity *target)
  */
 void tarasque_engine_entity_destroy_children(tarasque_engine_entity *target, allocator alloc)
 {
-    tarasque_entity_range *all_children = NULL;
+    tarasque_engine_entity_range *all_children = NULL;
 
     if (!target) {
         return;
@@ -299,12 +299,12 @@ tarasque_engine_entity *tarasque_engine_entity_get_direct_child(tarasque_engine_
  *
  * @param[in] target Entity from which to extract children.
  * @param[inout] alloc Allocator used to create the returned range.
- * @return tarasque_entity_range*
+ * @return tarasque_engine_entity_range*
  */
-tarasque_entity_range *tarasque_engine_entity_get_children(tarasque_engine_entity *target, allocator alloc)
+tarasque_engine_entity_range *tarasque_engine_entity_get_children(tarasque_engine_entity *target, allocator alloc)
 {
     size_t child_pos = 0u;
-    tarasque_entity_range *entities = NULL;
+    tarasque_engine_entity_range *entities = NULL;
 
     if (!target) {
         return NULL;
