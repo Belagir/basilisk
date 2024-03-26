@@ -1,7 +1,7 @@
 /**
  * @file tarasque.c
  * @author gabriel ()
- * @brief Implementation file for the engine main header tarasque.h and support header tarasque_impl.h.
+ * @brief Implementation file for the engine main header tarasque_bare.h and support header tarasque_impl.h.
  *
  * This file's responsability is to aggregate the implementation of core operations of the engine.
  *
@@ -18,7 +18,7 @@
 
 #include <ustd/logging.h>
 
-#include <tarasque.h>
+#include <tarasque_bare.h>
 
 #include "../common.h"
 

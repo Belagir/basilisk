@@ -1,5 +1,5 @@
 /**
- * @file tarasque.h
+ * @file tarasque_bare.h
  * @author gabriel ()
  * @brief This is the main header containing the interface to the tarasque engine. This is normally
  * all the user needs to create an instance of the engine, add entities and organize interactions
@@ -11,8 +11,8 @@
  * @copyright Copyright (c) 2024
  *
  */
-#ifndef __TARASQUE_H__
-#define __TARASQUE_H__
+#ifndef __TARASQUE_BARE_H__
+#define __TARASQUE_BARE_H__
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------

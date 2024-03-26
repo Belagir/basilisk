@@ -1,5 +1,5 @@
 
-#include <tarasque.h>
+#include <tarasque_bare.h>
 
 #include "side_shooty/side_shooty.h"
 

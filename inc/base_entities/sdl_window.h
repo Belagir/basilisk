@@ -4,7 +4,7 @@
 
 #include <SDL2/SDL.h>
 
-#include <tarasque.h>
+#include <tarasque_bare.h>
 
 /**
  * @brief

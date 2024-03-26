@@ -3,7 +3,7 @@
 #define __BULLET_H__
 
 #include <SDL2/SDL.h>
-#include <tarasque.h>
+#include <tarasque_bare.h>
 
 typedef struct bullet {
     int x, y;

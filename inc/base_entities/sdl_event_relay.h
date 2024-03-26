@@ -2,7 +2,7 @@
 #ifndef __BASE_ENTITY_SDL_EVENT_RELAY_H__
 #define __BASE_ENTITY_SDL_EVENT_RELAY_H__
 
-#include <tarasque.h>
+#include <tarasque_bare.h>
 
 #include <SDL2/SDL.h>
 

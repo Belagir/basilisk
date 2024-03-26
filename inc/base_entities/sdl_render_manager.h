@@ -3,7 +3,7 @@
 #define __BASE_ENTITY_SDL_RENDER_MANAGER_H__
 
 #include <SDL2/SDL.h>
-#include <tarasque.h>
+#include <tarasque_bare.h>
 
 /**
  * @brief

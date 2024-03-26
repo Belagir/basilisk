@@ -2,7 +2,7 @@
 #ifndef __BACKGROUND_H__
 #define __BACKGROUND_H__
 
-#include <tarasque.h>
+#include <tarasque_bare.h>
 #include <SDL2/SDL.h>
 
 typedef struct backround {
