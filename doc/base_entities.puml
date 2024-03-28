@@ -76,6 +76,7 @@ package phase_1 {
 
     struct texture_2D << (E, PaleGreen) >> {
         + body_2D body
+        + u32 draw_index
         + SDL_Texture *texture
     }
     texture_2D --|> body_2D

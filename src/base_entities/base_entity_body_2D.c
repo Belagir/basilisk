@@ -1,5 +1,5 @@
 
-#include <SDL2/SDL.h>
+#include <ustd/math.h>
 
 #include <base_entities/sdl_entities.h>
 
@@ -7,31 +7,35 @@
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-static void BE_event_relay_sdl_on_frame(tarasque_entity *self_data, float elapsed_ms);
+/*  */
+static void BE_body_2D_on_frame(tarasque_entity *self_data, float elapsed_ms);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-static void BE_event_relay_sdl_on_frame(tarasque_entity *self_data, float elapsed_ms)
+/**
+ * @brief
+ *
+ * @param self_data
+ * @param elapsed_ms
+ */
+static void BE_body_2D_on_frame(tarasque_entity *self_data, float elapsed_ms)
 {
     (void) elapsed_ms;
 
-    BE_event_relay_sdl *relay = (BE_event_relay_sdl *) self_data;
-    SDL_Event event = { 0u };
-    size_t buffer_pos = 0u;
-
-    while ((buffer_pos < BE_EVENT_RELAY_SDL_BUFFER_SIZE) && SDL_PollEvent(&event)) {
-        relay->event_buffer[buffer_pos] = event;
-        buffer_pos += 1u;
+    if (!self_data) {
+        return;
     }
 
-    for ( ; buffer_pos > 0 ; buffer_pos--) {
-        if (relay->event_buffer[buffer_pos - 1].type == SDL_QUIT) {
-            tarasque_entity_stack_event(self_data, "sdl event quit", (tarasque_specific_event) { .is_detached = true });
-        } else {
-            tarasque_entity_stack_event(self_data, "sdl event", (tarasque_specific_event) { .is_detached = false, .data_size = sizeof(*relay->event_buffer), .data = relay->event_buffer + buffer_pos - 1, });
-        }
+    BE_body_2D *self_body = (BE_body_2D *) self_data;
+
+    if (self_body->previous) {
+        self_body->global.scale    = vector2_members_product(self_body->previous->global.scale, self_body->local.scale);
+        self_body->global.position = vector2_members_product(self_body->local.scale, vector2_add(self_body->previous->global.position, self_body->local.position));
+        self_body->global.angle    = fmodf(self_body->previous->global.angle + self_body->local.angle, PI_T_2);
+    } else {
+        self_body->global = self_body->local;
     }
 }
 
@@ -39,13 +43,19 @@ static void BE_event_relay_sdl_on_frame(tarasque_entity *self_data, float elapse
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-tarasque_specific_entity BE_event_relay_sdl_entity(BE_event_relay_sdl *args)
+/**
+ * @brief
+ *
+ * @param args
+ * @return
+ */
+tarasque_specific_entity BE_body_2D_entity(BE_body_2D *args)
 {
     return (tarasque_specific_entity) {
             .data_size = sizeof(*args),
             .data = args,
             .callbacks = {
-                    .on_frame = &BE_event_relay_sdl_on_frame,
-            }
+                    .on_frame = &BE_body_2D_on_frame,
+            },
     };
 }

@@ -8,18 +8,18 @@
 // -------------------------------------------------------------------------------------------------
 
 /*  */
-static void be_render_manager_sdl_init(tarasque_entity *self_data);
+static void BE_render_manager_sdl_init(tarasque_entity *self_data);
 
 /*  */
-static void be_render_manager_sdl_deinit(tarasque_entity *self_data);
+static void BE_render_manager_sdl_deinit(tarasque_entity *self_data);
 
 /*  */
-static void be_render_manager_sdl_on_frame(tarasque_entity *self_data, float elapsed_ms);
+static void BE_render_manager_sdl_on_frame(tarasque_entity *self_data, float elapsed_ms);
 
 /*  */
-static void be_render_manager_sdl_pre_draw(tarasque_entity *self_data, void *event_data);
+static void BE_render_manager_sdl_pre_draw(tarasque_entity *self_data, void *event_data);
 /*  */
-static void be_render_manager_sdl_post_draw(tarasque_entity *self_data, void *event_data);
+static void BE_render_manager_sdl_post_draw(tarasque_entity *self_data, void *event_data);
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -29,7 +29,7 @@ static void be_render_manager_sdl_post_draw(tarasque_entity *self_data, void *ev
  *
  * @param self_data
  */
-static void be_render_manager_sdl_init(tarasque_entity *self_data)
+static void BE_render_manager_sdl_init(tarasque_entity *self_data)
 {
     if (!self_data) {
         return;
@@ -42,8 +42,8 @@ static void be_render_manager_sdl_init(tarasque_entity *self_data)
     init_data->renderer = SDL_CreateRenderer(parent_window->window, -1, init_data->flags);
 
     if (init_data->renderer) {
-        tarasque_entity_queue_subscribe_to_event(self_data, "sdl renderer pre draw",  (tarasque_specific_event_subscription) { .callback = &be_render_manager_sdl_pre_draw });
-        tarasque_entity_queue_subscribe_to_event(self_data, "sdl renderer post draw", (tarasque_specific_event_subscription) { .callback = &be_render_manager_sdl_post_draw });
+        tarasque_entity_queue_subscribe_to_event(self_data, "sdl renderer pre draw",  (tarasque_specific_event_subscription) { .callback = &BE_render_manager_sdl_pre_draw });
+        tarasque_entity_queue_subscribe_to_event(self_data, "sdl renderer post draw", (tarasque_specific_event_subscription) { .callback = &BE_render_manager_sdl_post_draw });
     }
 }
 
@@ -52,7 +52,7 @@ static void be_render_manager_sdl_init(tarasque_entity *self_data)
  *
  * @param self_data
  */
-static void be_render_manager_sdl_deinit(tarasque_entity *self_data)
+static void BE_render_manager_sdl_deinit(tarasque_entity *self_data)
 {
     if (!self_data) {
         return;
@@ -70,7 +70,7 @@ static void be_render_manager_sdl_deinit(tarasque_entity *self_data)
  * @param self_data
  * @param elapsed_ms
  */
-static void be_render_manager_sdl_on_frame(tarasque_entity *self_data, float elapsed_ms)
+static void BE_render_manager_sdl_on_frame(tarasque_entity *self_data, float elapsed_ms)
 {
     if (!self_data) {
         return;
@@ -89,7 +89,7 @@ static void be_render_manager_sdl_on_frame(tarasque_entity *self_data, float ela
  * @param self_data
  * @param event_data
  */
-static void be_render_manager_sdl_pre_draw(tarasque_entity *self_data, void *event_data)
+static void BE_render_manager_sdl_pre_draw(tarasque_entity *self_data, void *event_data)
 {
     (void) event_data;
 
@@ -110,7 +110,7 @@ static void be_render_manager_sdl_pre_draw(tarasque_entity *self_data, void *eve
  * @param self_data
  * @param event_data
  */
-static void be_render_manager_sdl_post_draw(tarasque_entity *self_data, void *event_data)
+static void BE_render_manager_sdl_post_draw(tarasque_entity *self_data, void *event_data)
 {
     (void) event_data;
 
@@ -139,9 +139,9 @@ tarasque_specific_entity BE_render_manager_sdl_entity(BE_render_manager_sdl *arg
             .data = args,
 
             .callbacks = {
-                    .on_init = &be_render_manager_sdl_init,
-                    .on_frame = &be_render_manager_sdl_on_frame,
-                    .on_deinit = &be_render_manager_sdl_deinit,
+                    .on_init = &BE_render_manager_sdl_init,
+                    .on_frame = &BE_render_manager_sdl_on_frame,
+                    .on_deinit = &BE_render_manager_sdl_deinit,
             }
     };
 }

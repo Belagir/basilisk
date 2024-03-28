@@ -90,6 +90,7 @@ typedef struct BE_body_2D {
  */
 typedef struct BE_texture_2D {
     BE_body_2D body;
+    i32 draw_index;
 
     SDL_Texture *texture;
 } BE_texture_2D;

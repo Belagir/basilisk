@@ -6,11 +6,11 @@
 // -------------------------------------------------------------------------------------------------
 
 /*  */
-static void be_window_sdl_init(tarasque_entity *self_data);
+static void BE_window_sdl_init(tarasque_entity *self_data);
 /*  */
-static void be_window_sdl_deinit(tarasque_entity *self_data);
+static void BE_window_sdl_deinit(tarasque_entity *self_data);
 /*  */
-static void be_window_sdl_quit(tarasque_entity *self_data, void *event_data);
+static void BE_window_sdl_quit(tarasque_entity *self_data, void *event_data);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -22,7 +22,7 @@ static void be_window_sdl_quit(tarasque_entity *self_data, void *event_data);
  * @param self_data
  * @param scene
  */
-static void be_window_sdl_init(tarasque_entity *self_data)
+static void BE_window_sdl_init(tarasque_entity *self_data)
 {
     if (!self_data) {
         return;
@@ -38,7 +38,7 @@ static void be_window_sdl_init(tarasque_entity *self_data)
             (int) window_data->w, (int) window_data->h,
             window_data->flags);
 
-    tarasque_entity_queue_subscribe_to_event(self_data, "sdl event quit", (tarasque_specific_event_subscription) { .callback = &be_window_sdl_quit });
+    tarasque_entity_queue_subscribe_to_event(self_data, "sdl event quit", (tarasque_specific_event_subscription) { .callback = &BE_window_sdl_quit });
 }
 
 /**
@@ -47,7 +47,7 @@ static void be_window_sdl_init(tarasque_entity *self_data)
  * @param self_data
  * @param scene
  */
-static void be_window_sdl_deinit(tarasque_entity *self_data)
+static void BE_window_sdl_deinit(tarasque_entity *self_data)
 {
     if (!self_data) {
         return;
@@ -59,7 +59,13 @@ static void be_window_sdl_deinit(tarasque_entity *self_data)
     window_data->window = NULL;
 }
 
-static void be_window_sdl_quit(tarasque_entity *self_data, void *event_data)
+/**
+ * @brief
+ *
+ * @param self_data
+ * @param event_data
+ */
+static void BE_window_sdl_quit(tarasque_entity *self_data, void *event_data)
 {
     SDL_QuitSubSystem(SDL_INIT_VIDEO);
     tarasque_entity_queue_remove(self_data);
@@ -76,8 +82,8 @@ tarasque_specific_entity BE_window_sdl_entity(BE_window_sdl *args)
             .data = args,
 
             .callbacks = {
-                    .on_init = &be_window_sdl_init,
-                    .on_deinit = &be_window_sdl_deinit,
+                    .on_init = &BE_window_sdl_init,
+                    .on_deinit = &BE_window_sdl_deinit,
             }
     };
 }

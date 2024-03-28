@@ -87,14 +87,4 @@ void tarasque_engine_entity_init(tarasque_engine_entity *target);
 /* Execute the on_deinit() callback tied to an entity */
 void tarasque_engine_entity_deinit(tarasque_engine_entity *target);
 
-// -------------------------------------------------------------------------------------------------
-// -------------------------------------------------------------------------------------------------
-// -------------------------------------------------------------------------------------------------
-// DATA COPY
-
-/* Copy entity user data on the heap, and returns a pointer to it. */
-tarasque_specific_entity_copy tarasque_specific_entity_copy_create(tarasque_specific_entity user_data, allocator alloc);
-/* Destroys some entity user data copy and nullifies the passed pointer. */
-void tarasque_specific_entity_copy_destroy(tarasque_specific_entity_copy *user_data, allocator alloc);
-
 #endif
