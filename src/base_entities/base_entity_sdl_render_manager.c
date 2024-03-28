@@ -1,6 +1,7 @@
 
 #include <grafts/sdl_window.h>
-#include <base_entities/sdl_window.h>
+#include <base_entities/sdl_entities.h>
+
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -34,9 +35,9 @@ static void be_render_manager_sdl_init(tarasque_entity *self_data)
         return;
     }
 
-    be_render_manager_sdl *init_data = (be_render_manager_sdl *) self_data;
+    BE_render_manager_sdl *init_data = (BE_render_manager_sdl *) self_data;
 
-    be_window_sdl *parent_window = (be_window_sdl *) tarasque_entity_get_parent(self_data, init_data->window_entity_name);
+    BE_window_sdl *parent_window = (BE_window_sdl *) tarasque_entity_get_parent(self_data, init_data->window_entity_name);
 
     init_data->renderer = SDL_CreateRenderer(parent_window->window, -1, init_data->flags);
 
@@ -57,7 +58,7 @@ static void be_render_manager_sdl_deinit(tarasque_entity *self_data)
         return;
     }
 
-    be_render_manager_sdl *data = (be_render_manager_sdl *) self_data;
+    BE_render_manager_sdl *data = (BE_render_manager_sdl *) self_data;
 
     SDL_DestroyRenderer(data->renderer);
     data->renderer = NULL;
@@ -75,10 +76,10 @@ static void be_render_manager_sdl_on_frame(tarasque_entity *self_data, float ela
         return;
     }
 
-    be_render_manager_sdl *data = (be_render_manager_sdl *) self_data;
+    BE_render_manager_sdl *data = (BE_render_manager_sdl *) self_data;
 
     tarasque_entity_stack_event(self_data, "sdl renderer post draw", (tarasque_specific_event) { 0u });
-    tarasque_entity_stack_event(self_data, "sdl renderer draw", (tarasque_specific_event) { .data_size = sizeof(be_render_manager_sdl_event_draw), .data = &(be_render_manager_sdl_event_draw) { data->renderer } });
+    tarasque_entity_stack_event(self_data, "sdl renderer draw", (tarasque_specific_event) { .data_size = sizeof(BE_render_manager_sdl_event_draw), .data = &(BE_render_manager_sdl_event_draw) { data->renderer } });
     tarasque_entity_stack_event(self_data, "sdl renderer pre draw", (tarasque_specific_event) { 0u });
 }
 
@@ -96,7 +97,7 @@ static void be_render_manager_sdl_pre_draw(tarasque_entity *self_data, void *eve
         return;
     }
 
-    be_render_manager_sdl *data = (be_render_manager_sdl *) self_data;
+    BE_render_manager_sdl *data = (BE_render_manager_sdl *) self_data;
 
     SDL_SetRenderTarget(data->renderer, NULL);
     SDL_SetRenderDrawColor(data->renderer, data->clear_color.r, data->clear_color.g, data->clear_color.b, data->clear_color.a);
@@ -117,7 +118,7 @@ static void be_render_manager_sdl_post_draw(tarasque_entity *self_data, void *ev
         return;
     }
 
-    be_render_manager_sdl *data = (be_render_manager_sdl *) self_data;
+    BE_render_manager_sdl *data = (BE_render_manager_sdl *) self_data;
 
     SDL_RenderPresent(data->renderer);
 }
@@ -131,7 +132,7 @@ static void be_render_manager_sdl_post_draw(tarasque_entity *self_data, void *ev
  * @param args
  * @return
  */
-tarasque_specific_entity be_render_manager_sdl_entity(be_render_manager_sdl *args)
+tarasque_specific_entity BE_render_manager_sdl_entity(BE_render_manager_sdl *args)
 {
     return (tarasque_specific_entity) {
             .data_size = sizeof(*args),

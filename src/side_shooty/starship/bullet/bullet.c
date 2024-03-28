@@ -11,7 +11,7 @@
 static void on_event_draw(tarasque_entity *entity, void *event_data)
 {
     bullet *self = (bullet *) entity;
-    be_render_manager_sdl_event_draw *event_draw = (be_render_manager_sdl_event_draw *) event_data;
+    BE_render_manager_sdl_event_draw *event_draw = (BE_render_manager_sdl_event_draw *) event_data;
 
     SDL_RenderCopy(event_draw->renderer, self->sprite, NULL, &(const SDL_Rect) { self->x, self->y, 32, 32 });
 }

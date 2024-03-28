@@ -1,7 +1,7 @@
 
 #include <SDL2/SDL.h>
 
-#include <base_entities/sdl_context.h>
+#include <base_entities/sdl_entities.h>
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -48,7 +48,7 @@ static void be_context_sdl_deinit(tarasque_entity *self_data)
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-tarasque_specific_entity be_context_sdl_entity(void)
+tarasque_specific_entity BE_context_sdl_entity(void)
 {
     return (tarasque_specific_entity) {
         .callbacks = {

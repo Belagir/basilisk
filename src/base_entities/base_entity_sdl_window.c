@@ -1,5 +1,5 @@
 
-#include <base_entities/sdl_window.h>
+#include <base_entities/sdl_entities.h>
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -28,7 +28,7 @@ static void be_window_sdl_init(tarasque_entity *self_data)
         return;
     }
 
-    be_window_sdl *window_data = (be_window_sdl *) self_data;
+    BE_window_sdl *window_data = (BE_window_sdl *) self_data;
 
     SDL_InitSubSystem(SDL_INIT_VIDEO);
 
@@ -53,7 +53,7 @@ static void be_window_sdl_deinit(tarasque_entity *self_data)
         return;
     }
 
-    be_window_sdl *window_data = (be_window_sdl *) self_data;
+    BE_window_sdl *window_data = (BE_window_sdl *) self_data;
 
     SDL_DestroyWindow(window_data->window);
     window_data->window = NULL;
@@ -69,7 +69,7 @@ static void be_window_sdl_quit(tarasque_entity *self_data, void *event_data)
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-tarasque_specific_entity be_window_sdl_entity(be_window_sdl *args)
+tarasque_specific_entity BE_window_sdl_entity(BE_window_sdl *args)
 {
     return (tarasque_specific_entity) {
             .data_size = sizeof(*args),

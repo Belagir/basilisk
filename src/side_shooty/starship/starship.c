@@ -29,7 +29,7 @@ DECLARE_RES(bullet_sprite, "res_bullet_png")
 static void on_draw(tarasque_entity *entity, void *event_data)
 {
     starship *ship = (starship *) entity;
-    be_render_manager_sdl_event_draw *event_draw = (be_render_manager_sdl_event_draw *) event_data;
+    BE_render_manager_sdl_event_draw *event_draw = (BE_render_manager_sdl_event_draw *) event_data;
 
     SDL_RenderCopy(event_draw->renderer, ship->sprite, NULL, &(const SDL_Rect) { ship->x, ship->y, 64, 64 });
 }
@@ -74,7 +74,7 @@ static void init(tarasque_entity *entity)
 {
     starship *ship = (starship *) entity;
 
-    be_render_manager_sdl *render_manager = (be_render_manager_sdl *) tarasque_entity_get_parent(entity, "Render Manager");
+    BE_render_manager_sdl *render_manager = (BE_render_manager_sdl *) tarasque_entity_get_parent(entity, "Render Manager");
 
     if (!render_manager) {
         return;

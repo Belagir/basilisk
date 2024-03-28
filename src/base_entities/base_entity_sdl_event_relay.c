@@ -1,7 +1,7 @@
 
 #include <SDL2/SDL.h>
 
-#include <base_entities/sdl_event_relay.h>
+#include <base_entities/sdl_entities.h>
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -17,7 +17,7 @@ static void be_event_relay_sdl_on_frame(tarasque_entity *self_data, float elapse
 {
     (void) elapsed_ms;
 
-    be_event_relay_sdl *relay = (be_event_relay_sdl *) self_data;
+    BE_event_relay_sdl *relay = (BE_event_relay_sdl *) self_data;
     SDL_Event event = { 0u };
     size_t buffer_pos = 0u;
 
@@ -39,7 +39,7 @@ static void be_event_relay_sdl_on_frame(tarasque_entity *self_data, float elapse
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-tarasque_specific_entity be_event_relay_sdl_entity(be_event_relay_sdl *base)
+tarasque_specific_entity BE_event_relay_sdl_entity(BE_event_relay_sdl *args)
 {
     return (tarasque_specific_entity) {
             .data_size = sizeof(*base),
