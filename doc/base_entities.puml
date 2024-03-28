@@ -1,0 +1,108 @@
+@startuml 2D engine base entities
+
+' ------------------------------------------------------------------------------
+' ------------------------------------------------------------------------------
+
+package phase_1 as "phase 1"  {
+
+    struct vector2 {
+        + f32 x
+        + f32 y
+    }
+
+    struct properties2D {
+        + vector2 position
+        + vector2 scale
+        + f32 angle
+    }
+    properties2D --> vector2
+
+    struct body_2D << (E, PaleGreen) >> {
+        + body_2D *previous
+        + properties2D local
+        + properties2D global
+    }
+    body_2D --> properties2D
+
+}
+
+' ------------------------------------------------------------------------------
+' ------------------------------------------------------------------------------
+
+package phase_2 as "phase 2" {
+
+    struct shape_2D_circle {
+        + float radius
+    }
+
+    ' ------------------------------------------------------------------------------
+
+    struct shape_2D_rect {
+        + float width
+        + float height
+    }
+
+    ' ------------------------------------------------------------------------------
+
+    enum shape_id {
+        SHAPE_ID_CIRCLE
+        SHAPE_ID_RECT
+    }
+    shape_id::SHAPE_ID_CIRCLE ..> shape_2D_circle
+    shape_id::SHAPE_ID_RECT ..> shape_2D_rect
+
+    ' ------------------------------------------------------------------------------
+
+    struct shape_2D << (E, PaleGreen) >> {
+        + body_2D body
+        + shape_id kind
+        + union { shape_2D_circle, shape_2D_rect }
+    }
+
+    shape_2D --> shape_id
+    shape_2D --|> body_2D
+
+    struct shape_visual_2D << (E, PaleGreen) >> {
+        + SDL_Color color
+    }
+    shape_visual_2D --> shape_2D : needs as direct parent
+
+}
+
+' ------------------------------------------------------------------------------
+' ------------------------------------------------------------------------------
+
+package phase_1 {
+
+    struct texture_2D << (E, PaleGreen) >> {
+        + body_2D body
+        + SDL_Texture *texture
+    }
+    texture_2D --|> body_2D
+    note top of texture_2D : needs a rendering\ncontext as parent
+
+}
+
+' ------------------------------------------------------------------------------
+' ------------------------------------------------------------------------------
+
+package phase_3 as "phase 3" {
+
+struct shape_collider_2D << (E, PaleGreen) >> {
+    + uint32_t mask
+}
+shape_collider_2D --> shape_2D : needs as\ndirect parent
+
+' ------------------------------------------------------------------------------
+
+struct collision_manager_2D << (E, PaleGreen) >> {
+    == implementation to be defined ==
+}
+collision_manager_2D <..> shape_collider_2D : communicates with
+
+}
+
+' ------------------------------------------------------------------------------
+' ------------------------------------------------------------------------------
+
+@enduml
