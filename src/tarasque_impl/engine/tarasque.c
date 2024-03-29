@@ -404,8 +404,8 @@ void tarasque_entity_stack_event(tarasque_entity *entity, const char *str_event_
  * If no corresponding parent is found, the function returns NULL.
  *
  * @param[in] entity Entity from which to search for the parent.
- * @param[in] str_parent_name Name of the potential parent. Can be NULL if you just want to search by type.
- * @param[in] entity_def Entity definition used to create the potential parent.
+ * @param[in] str_parent_name Name of the potential parent. Can be NULL if you just want to search by type or get the first parent.
+ * @param[in] entity_def Entity definition used to create the potential parent. Can be NULL if you just want to search by name or get the first parent.
  * @return tarasque_entity *
  */
 tarasque_entity *tarasque_entity_get_parent(tarasque_entity *entity, const char *str_parent_name, const tarasque_entity_definition *entity_def)
@@ -415,6 +415,7 @@ tarasque_entity *tarasque_entity_get_parent(tarasque_entity *entity, const char 
     }
 
     tarasque_engine_entity *full_entity = tarasque_engine_entity_get_containing_full_entity(entity);
+    full_entity = tarasque_engine_entity_get_parent(full_entity);
 
     while ((full_entity != NULL)
             && (((entity_def == NULL) || (!tarasque_engine_entity_has_definition(full_entity, *entity_def)))
@@ -432,9 +433,10 @@ tarasque_entity *tarasque_entity_get_parent(tarasque_entity *entity, const char 
  *
  * @param[in] entity Entity from which to search for the child.
  * @param[in] path Path to the potential child entity.
+ * @param[in] entity_def Entity definition used to create the potential parent. Can be NULL if you just want to search by name..
  * @return tarasque_entity *
  */
-tarasque_entity *tarasque_entity_get_child(tarasque_entity *entity, const char *str_path)
+tarasque_entity *tarasque_entity_get_child(tarasque_entity *entity, const char *str_path, const tarasque_entity_definition *entity_def)
 {
     if (!entity || !str_path) {
         return NULL;
@@ -449,6 +451,10 @@ tarasque_entity *tarasque_entity_get_child(tarasque_entity *entity, const char *
         child_path = path_from_cstring(str_path, handle->alloc);
         found_entity = tarasque_engine_entity_get_child(full_entity, child_path);
         path_destroy(&child_path, handle->alloc);
+    }
+
+    if (entity_def && !tarasque_engine_entity_has_definition(found_entity, *entity_def)) {
+        return NULL;
     }
 
     return tarasque_engine_entity_get_specific_data(found_entity);
