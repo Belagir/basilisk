@@ -167,6 +167,10 @@ void tarasque_engine_destroy(tarasque_engine **handle)
 
     used_alloc = (*handle)->alloc;
 
+    if ((*handle)->active_entities) {
+        range_destroy_dynamic(used_alloc, &RANGE_TO_ANY((*handle)->active_entities));
+    }
+
     event_broker_destroy(&(*handle)->pub_sub, used_alloc);
     event_stack_destroy(&(*handle)->events, used_alloc);
     command_queue_destroy(&(*handle)->commands, used_alloc);
@@ -174,7 +178,6 @@ void tarasque_engine_destroy(tarasque_engine **handle)
     tarasque_engine_annihilate_entity_and_chilren((*handle), (*handle)->root_entity);
 
     logger_log((*handle)->logger, LOGGER_SEVERITY_INFO, "Engine shut down.\n");
-
 
     logger_destroy(&(*handle)->logger);
 
@@ -414,7 +417,8 @@ tarasque_entity *tarasque_entity_get_parent(tarasque_entity *entity, const char 
     tarasque_engine_entity *full_entity = tarasque_engine_entity_get_containing_full_entity(entity);
 
     while ((full_entity != NULL)
-            && (!tarasque_engine_entity_has_definition(full_entity, entity_def)))
+            && (!tarasque_engine_entity_has_definition(full_entity, entity_def)
+                    && ((str_parent_name == NULL) || identifier_compare_to_cstring(tarasque_engine_entity_get_name(full_entity), str_parent_name))))
     {
         full_entity = tarasque_engine_entity_get_parent(full_entity);
     }

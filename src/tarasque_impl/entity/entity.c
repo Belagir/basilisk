@@ -130,6 +130,9 @@ void tarasque_engine_entity_destroy(tarasque_engine_entity **target, allocator a
         return;
     }
 
+    if ((*target)->subtype_definitions) {
+        range_destroy_dynamic(alloc, &RANGE_TO_ANY((*target)->subtype_definitions));
+    }
     range_destroy_dynamic(alloc, &RANGE_TO_ANY((*target)->children));
     range_destroy_dynamic(alloc, &RANGE_TO_ANY((*target)->id));
 
