@@ -49,13 +49,10 @@ static void BE_body_2D_on_frame(tarasque_entity *self_data, float elapsed_ms)
  * @param args
  * @return
  */
-tarasque_specific_entity BE_body_2D_entity(BE_body_2D *args)
+tarasque_entity_definition BE_body_2D_entity(void)
 {
-    return (tarasque_specific_entity) {
-            .data_size = sizeof(*args),
-            .data = args,
-            .callbacks = {
-                    .on_frame = &BE_body_2D_on_frame,
-            },
+    return (tarasque_entity_definition) {
+            .data_size = sizeof(BE_body_2D),
+            .on_frame = &BE_body_2D_on_frame,
     };
 }

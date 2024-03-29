@@ -39,13 +39,10 @@ static void BE_event_relay_sdl_on_frame(tarasque_entity *self_data, float elapse
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-tarasque_specific_entity BE_event_relay_sdl_entity(BE_event_relay_sdl *args)
+tarasque_entity_definition BE_event_relay_sdl_entity(void)
 {
-    return (tarasque_specific_entity) {
-            .data_size = sizeof(*args),
-            .data = args,
-            .callbacks = {
-                    .on_frame = &BE_event_relay_sdl_on_frame,
-            }
+    return (tarasque_entity_definition) {
+            .data_size = sizeof(BE_event_relay_sdl),
+            .on_frame = &BE_event_relay_sdl_on_frame,
     };
 }

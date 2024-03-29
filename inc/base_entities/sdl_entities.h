@@ -100,24 +100,24 @@ typedef struct BE_texture_2D {
 // -------------------------------------------------------------------------------------------------
 
 /* */
-tarasque_specific_entity BE_context_sdl_entity(void);
+tarasque_entity_definition BE_context_sdl_entity(void);
 
 /* */
-tarasque_specific_entity BE_event_relay_sdl_entity(BE_event_relay_sdl *args);
+tarasque_entity_definition BE_event_relay_sdl_entity(void);
 
 /* */
-tarasque_specific_entity BE_render_manager_sdl_entity(BE_render_manager_sdl *args);
+tarasque_entity_definition BE_render_manager_sdl_entity(void);
 
 /* */
-tarasque_specific_entity BE_window_sdl_entity(BE_window_sdl *args);
+tarasque_entity_definition BE_window_sdl_entity(void);
 
 // -------------------------------------------------------------------------------------------------
 
 /* */
-tarasque_specific_entity BE_body_2D_entity(BE_body_2D *args);
+tarasque_entity_definition BE_body_2D_entity(void);
 
 /* */
-tarasque_specific_entity BE_texture_2D_entity(BE_texture_2D *args);
+tarasque_entity_definition BE_texture_2D_entity(void);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------

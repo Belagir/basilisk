@@ -77,14 +77,12 @@ static void BE_texture_2D_on_draw(tarasque_entity *self_data, void *event_data)
  * @param args
  * @return
  */
-tarasque_specific_entity BE_texture_2D_entity(BE_texture_2D *args)
+tarasque_entity_definition BE_texture_2D_entity(void)
 {
-    return (tarasque_specific_entity) {
-            .data_size = sizeof(*args),
-            .data = args,
-            .callbacks = {
-                    .on_init = &BE_texture_2D_init,
-                    .on_frame = NULL,
-            },
+    return (tarasque_entity_definition) {
+            .data_size = sizeof(BE_texture_2D),
+
+            .on_init = &BE_texture_2D_init,
+            .on_frame = NULL,
     };
 }
