@@ -408,7 +408,7 @@ void tarasque_entity_stack_event(tarasque_entity *entity, const char *str_event_
  * @param[in] entity_def Entity definition used to create the potential parent.
  * @return tarasque_entity *
  */
-tarasque_entity *tarasque_entity_get_parent(tarasque_entity *entity, const char *str_parent_name, tarasque_entity_definition entity_def)
+tarasque_entity *tarasque_entity_get_parent(tarasque_entity *entity, const char *str_parent_name, const tarasque_entity_definition *entity_def)
 {
     if (!entity) {
         return NULL;
@@ -417,8 +417,8 @@ tarasque_entity *tarasque_entity_get_parent(tarasque_entity *entity, const char 
     tarasque_engine_entity *full_entity = tarasque_engine_entity_get_containing_full_entity(entity);
 
     while ((full_entity != NULL)
-            && (!tarasque_engine_entity_has_definition(full_entity, entity_def)
-                    && ((str_parent_name == NULL) || identifier_compare_to_cstring(tarasque_engine_entity_get_name(full_entity), str_parent_name))))
+            && (((entity_def == NULL) || (!tarasque_engine_entity_has_definition(full_entity, *entity_def)))
+                    && ((str_parent_name == NULL) || (identifier_compare_to_cstring(tarasque_engine_entity_get_name(full_entity), str_parent_name) != 0))))
     {
         full_entity = tarasque_engine_entity_get_parent(full_entity);
     }

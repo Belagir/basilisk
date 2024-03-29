@@ -139,7 +139,7 @@ void tarasque_entity_graft(tarasque_entity *entity, const char *str_id, tarasque
 // ENTITY SEARCHING
 
 /* Search for a parent of a certain name the entity might be related to. If the name is NULL, the first parent is returned. */
-tarasque_entity *tarasque_entity_get_parent(tarasque_entity *entity, const char *str_parent_name, tarasque_entity_definition entity_def);
+tarasque_entity *tarasque_entity_get_parent(tarasque_entity *entity, const char *str_parent_name, const tarasque_entity_definition *entity_def);
 /* Search for a child entity located at a specific path relative to an entity. */
 tarasque_entity *tarasque_entity_get_child(tarasque_entity *entity, const char *str_path);
 /* Resolves wether or not the entity has been defined using a specific definition or was marked as subtyping it. */
