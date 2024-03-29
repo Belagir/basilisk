@@ -37,7 +37,7 @@ static void BE_render_manager_sdl_init(tarasque_entity *self_data)
 
     BE_render_manager_sdl *init_data = (BE_render_manager_sdl *) self_data;
 
-    BE_window_sdl *parent_window = (BE_window_sdl *) tarasque_entity_get_parent(self_data, init_data->window_entity_name);
+    BE_window_sdl *parent_window = (BE_window_sdl *) tarasque_entity_get_parent(self_data, NULL, BE_window_sdl_entity_def);
 
     init_data->renderer = SDL_CreateRenderer(parent_window->window, -1, init_data->flags);
 

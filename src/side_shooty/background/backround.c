@@ -19,7 +19,7 @@ static void on_draw(tarasque_entity *entity, void *event_data)
 static void init(tarasque_entity *entity)
 {
     backround *bg = (backround *) entity;
-    BE_render_manager_sdl *render_manager = (BE_render_manager_sdl *) tarasque_entity_get_parent(entity, "Render Manager");
+    BE_render_manager_sdl *render_manager = (BE_render_manager_sdl *) tarasque_entity_get_parent(entity, NULL, BE_render_manager_sdl_entity_def);
 
     bg->texture = IMG_LoadTexture_RW(render_manager->renderer, SDL_RWFromMem((void *) res__background_sprite_start, (int) ((size_t) res__background_sprite_end - (size_t) res__background_sprite_start)), 1);
 

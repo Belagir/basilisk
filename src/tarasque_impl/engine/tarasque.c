@@ -397,14 +397,15 @@ void tarasque_entity_stack_event(tarasque_entity *entity, const char *str_event_
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief Returns the first parent entity of the provided name. If the name is NULL, the first parent is returned.
+ * @brief Returns the first parent entity of the provided name and definition.
  * If no corresponding parent is found, the function returns NULL.
  *
  * @param[in] entity Entity from which to search for the parent.
- * @param[in] str_parent_name Name of the potential parent.
+ * @param[in] str_parent_name Name of the potential parent. Can be NULL if you just want to search by type.
+ * @param[in] entity_def Entity definition used to create the potential parent.
  * @return tarasque_entity *
  */
-tarasque_entity *tarasque_entity_get_parent(tarasque_entity *entity, const char *str_parent_name)
+tarasque_entity *tarasque_entity_get_parent(tarasque_entity *entity, const char *str_parent_name, tarasque_entity_definition entity_def)
 {
     if (!entity) {
         return NULL;
@@ -412,11 +413,9 @@ tarasque_entity *tarasque_entity_get_parent(tarasque_entity *entity, const char 
 
     tarasque_engine_entity *full_entity = tarasque_engine_entity_get_containing_full_entity(entity);
 
-    if (!str_parent_name) {
-        return tarasque_engine_entity_get_parent(full_entity);
-    }
-
-    while ((full_entity != NULL) && (identifier_compare_to_cstring(tarasque_engine_entity_get_name(full_entity), str_parent_name) != 0)) {
+    while ((full_entity != NULL)
+            && (!tarasque_engine_entity_has_definition(full_entity, entity_def)))
+    {
         full_entity = tarasque_engine_entity_get_parent(full_entity);
     }
 

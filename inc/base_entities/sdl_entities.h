@@ -42,7 +42,6 @@ typedef struct BE_render_manager_sdl_event_draw {
 typedef struct BE_render_manager_sdl {
     SDL_Color clear_color;
     SDL_RendererFlags flags;
-    const char *window_entity_name;
 
     SDL_Renderer *renderer;
 } BE_render_manager_sdl;

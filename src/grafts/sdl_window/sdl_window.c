@@ -49,8 +49,7 @@ static void graft_sdl_window_callback(tarasque_entity *entity, void *graft_args)
     render_manager = tarasque_entity_add_child(window, "Render Manager", (tarasque_specific_entity) { .entity_def = BE_render_manager_sdl_entity_def,
             .data = &(BE_render_manager_sdl) {
                     .clear_color = sdl_win_args.for_renderer.clear_color,
-                    .flags = sdl_win_args.for_renderer.flags,
-                    .window_entity_name = "Window" } });
+                    .flags = sdl_win_args.for_renderer.flags, } });
 
     event_relay = tarasque_entity_add_child(window, "Event Relay", (tarasque_specific_entity) { .entity_def = BE_event_relay_sdl_entity_def });
 }
