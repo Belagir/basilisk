@@ -52,9 +52,9 @@ static void frame(tarasque_entity *entity, float elapsed_ms)
 tarasque_specific_entity bullet_entity(bullet *args)
 {
     return (tarasque_specific_entity) {
-        .data_size = sizeof(*args),
         .data = args,
-        .callbacks = {
+        .entity_def = {
+                .data_size = sizeof(*args),
                 .on_init = &init,
                 .on_frame = &frame,
         },

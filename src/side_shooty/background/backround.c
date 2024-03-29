@@ -39,11 +39,11 @@ static void deinit(tarasque_entity *entity)
 tarasque_specific_entity backround_entity(backround *bg)
 {
     return (tarasque_specific_entity) {
-            .data_size = sizeof(&bg),
             .data = bg,
-            .callbacks = {
+            .entity_def = {
                     .on_init = &init,
                     .on_deinit = &deinit,
+                    .data_size = sizeof(&bg),
             },
     };
 }

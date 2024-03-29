@@ -128,12 +128,12 @@ static void frame(tarasque_entity *entity, float elapsed_ms)
 tarasque_specific_entity starship_entity(starship *args)
 {
     return (tarasque_specific_entity) {
-            .data_size = sizeof(*args),
             .data = args,
-            .callbacks = {
-                .on_init = &init,
-                .on_deinit = &deinit,
-                .on_frame = &frame,
+            .entity_def = {
+                    .data_size = sizeof(*args),
+                    .on_init = &init,
+                    .on_deinit = &deinit,
+                    .on_frame = &frame,
             },
     };
 }

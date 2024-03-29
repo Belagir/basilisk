@@ -43,12 +43,12 @@ static void init(tarasque_entity *entity)
 /**
  * @brief
  *
- * @return tarasque_specific_entity
+ * @return tarasque_entity_definition
  */
 tarasque_specific_entity side_shooty_game(void)
 {
     return (tarasque_specific_entity) {
-            .callbacks = {
+            .entity_def = {
                     .on_init = &init,
             }
     };
