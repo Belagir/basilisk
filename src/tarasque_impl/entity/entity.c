@@ -21,6 +21,18 @@
 
 typedef byte tarasque_entity_storage[];
 
+typedef struct tarasque_entity_definition_unit {
+    /** Size, in bytes, of the entity's specific data. */
+    unsigned long data_size;
+
+    /** Function ran on the entity-specific data when it is first created. */
+    void (*on_init)(tarasque_entity *self_data);
+    /** Function ran on the entity-specific data when it is destroyed. */
+    void (*on_deinit)(tarasque_entity *self_data);
+    /** Function ran on the entity-specific data each frame. */
+    void (*on_frame)(tarasque_entity *self_data, float elapsed_ms);
+} tarasque_entity_definition_unit;
+
 /**
  * @brief Entity data structure aggregating user data with engine-related data.
  */
@@ -34,7 +46,8 @@ typedef struct tarasque_engine_entity {
     /** Engine owning the entity, used to redirect user's actions back to the whole engine. */
     tarasque_engine *host_handle;
 
-    tarasque_entity_definition entity_def;
+    RANGE(tarasque_entity_definition_unit) *subtype_definitions;
+    tarasque_entity_definition_unit self_definition;
 
     /** The user's data. */
     tarasque_entity_storage data;
@@ -56,21 +69,42 @@ typedef struct tarasque_engine_entity {
 tarasque_engine_entity *tarasque_engine_entity_create(const identifier *id, tarasque_specific_entity user_data, tarasque_engine *handle, allocator alloc)
 {
     tarasque_engine_entity *new_entity = NULL;
+    const tarasque_entity_definition *subtyped_definition = NULL;
 
     new_entity = alloc.malloc(alloc, sizeof(*new_entity) + user_data.entity_def.data_size);
 
     if (new_entity) {
+        // core informations
         *new_entity = (tarasque_engine_entity) {
                 .id = range_create_dynamic_from_copy_of(alloc, RANGE_TO_ANY(id)),
                 .parent = NULL,
                 .children = range_create_dynamic(alloc, sizeof(*new_entity->children->data), TARASQUE_COLLECTIONS_START_LENGTH),
                 .host_handle = handle,
 
-                .entity_def = user_data.entity_def,
+                .self_definition = {
+                        .on_init = user_data.entity_def.on_init,
+                        .on_deinit = user_data.entity_def.on_deinit,
+                        .on_frame = user_data.entity_def.on_frame,
+
+                        .data_size = user_data.entity_def.data_size,
+                }
         };
 
+        // optional starting data
         if (user_data.data) {
             bytewise_copy(new_entity->data, user_data.data, user_data.entity_def.data_size);
+        }
+
+        // optional subtypes
+        if (user_data.entity_def.subtype) {
+            new_entity->subtype_definitions = range_create_dynamic(alloc, sizeof(*new_entity->subtype_definitions->data), TARASQUE_COLLECTIONS_START_LENGTH);
+
+            subtyped_definition = user_data.entity_def.subtype;
+            while (subtyped_definition) {
+                new_entity->subtype_definitions = range_ensure_capacity(alloc, RANGE_TO_ANY(new_entity->subtype_definitions), 1);
+                range_insert_value(RANGE_TO_ANY(new_entity->subtype_definitions), 0u, subtyped_definition);
+                subtyped_definition = subtyped_definition->subtype;
+            }
         }
     }
 
@@ -327,8 +361,17 @@ void tarasque_engine_entity_step_frame(tarasque_engine_entity *target, f32 elaps
     if (!target) {
         return;
     }
-    if (target->entity_def.on_frame) {
-        target->entity_def.on_frame(target->data, elapsed_ms);
+
+    if (target->subtype_definitions) {
+        for (size_t i = 0u ; i < target->subtype_definitions->length ; i++) {
+            if (target->subtype_definitions->data[i].on_frame) {
+                target->subtype_definitions->data[i].on_frame(target->data, elapsed_ms);
+            }
+        }
+    }
+
+    if (target->self_definition.on_frame) {
+        target->self_definition.on_frame(target->data, elapsed_ms);
     }
 }
 
@@ -359,8 +402,16 @@ void tarasque_engine_entity_init(tarasque_engine_entity *target)
         return;
     }
 
-    if (target->entity_def.on_init) {
-        target->entity_def.on_init(target->data);
+    if (target->subtype_definitions) {
+        for (size_t i = 0u ; i < target->subtype_definitions->length ; i++) {
+            if (target->subtype_definitions->data[i].on_init) {
+                target->subtype_definitions->data[i].on_init(target->data);
+            }
+        }
+    }
+
+    if (target->self_definition.on_init) {
+        target->self_definition.on_init(target->data);
     }
 }
 
@@ -375,7 +426,15 @@ void tarasque_engine_entity_deinit(tarasque_engine_entity *target)
         return;
     }
 
-    if (target->entity_def.on_deinit) {
-        target->entity_def.on_deinit(target->data);
+    if (target->self_definition.on_deinit) {
+        target->self_definition.on_deinit(target->data);
+    }
+
+    if (target->subtype_definitions) {
+        for (i64 i = (i64) target->subtype_definitions->length - 1 ; i >= 0 ; i--) {
+            if (target->subtype_definitions->data[i].on_deinit) {
+                target->subtype_definitions->data[i].on_deinit(target->data);
+            }
+        }
     }
 }

@@ -28,7 +28,7 @@ static void BE_texture_2D_init(tarasque_entity *self_data)
 
     BE_texture_2D *texture_data = (BE_texture_2D *) self_data;
 
-    tarasque_entity_queue_subscribe_to_event(self_data, "sdl render draw", (tarasque_specific_event_subscription) { .index = texture_data->draw_index, .callback = &BE_texture_2D_on_draw });
+    tarasque_entity_queue_subscribe_to_event(self_data, "sdl renderer draw", (tarasque_specific_event_subscription) { .index = texture_data->draw_index, .callback = &BE_texture_2D_on_draw });
 }
 
 /**
@@ -76,6 +76,8 @@ static void BE_texture_2D_on_draw(tarasque_entity *self_data, void *event_data)
  *
  */
 const tarasque_entity_definition BE_texture_2D_entity_def = {
+        .subtype = &BE_body_2D_entity_def,
+
         .data_size = sizeof(BE_texture_2D),
 
         .on_init = &BE_texture_2D_init,

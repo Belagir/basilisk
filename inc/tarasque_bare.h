@@ -30,6 +30,7 @@ typedef void tarasque_entity;
 // -------------------------------------------------------------------------------------------------
 // CONSTRUCTOR DATA STRUCTURES
 
+typedef struct tarasque_entity_definition tarasque_entity_definition;
 typedef struct tarasque_entity_definition {
     /** Size, in bytes, of the entity's specific data. */
     unsigned long data_size;
@@ -40,6 +41,8 @@ typedef struct tarasque_entity_definition {
     void (*on_deinit)(tarasque_entity *self_data);
     /** Function ran on the entity-specific data each frame. */
     void (*on_frame)(tarasque_entity *self_data, float elapsed_ms);
+
+    const tarasque_entity_definition *subtype;
 } tarasque_entity_definition;
 
 /**
