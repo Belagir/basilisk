@@ -6,12 +6,14 @@
 
 #include <tarasque_bare.h>
 
+#include <base_entities/sdl_entities.h>
+
 typedef struct starship {
-    int x, y;
+    BE_texture_2D sprite;
+
     int vel_x, vel_y;
     bool is_shooting;
 
-    SDL_Texture *sprite;
     SDL_Texture *bullets_sprite;
 } starship;
 

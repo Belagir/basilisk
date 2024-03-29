@@ -417,6 +417,10 @@ tarasque_entity *tarasque_entity_get_parent(tarasque_entity *entity, const char 
     tarasque_engine_entity *full_entity = tarasque_engine_entity_get_containing_full_entity(entity);
     full_entity = tarasque_engine_entity_get_parent(full_entity);
 
+    if ((entity_def == NULL) && (str_parent_name == NULL)) {
+        return tarasque_engine_entity_get_specific_data(full_entity);
+    }
+
     while ((full_entity != NULL)
             && (((entity_def == NULL) || (!tarasque_engine_entity_has_definition(full_entity, *entity_def)))
                     && ((str_parent_name == NULL) || (identifier_compare_to_cstring(tarasque_engine_entity_get_name(full_entity), str_parent_name) != 0))))

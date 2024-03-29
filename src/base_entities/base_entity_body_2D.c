@@ -8,11 +8,30 @@
 // -------------------------------------------------------------------------------------------------
 
 /*  */
+static void BE_body_2D_init(tarasque_entity *self_data);
+
+/*  */
 static void BE_body_2D_on_frame(tarasque_entity *self_data, float elapsed_ms);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
+
+/**
+ * @brief
+ *
+ * @param self_data
+ */
+static void BE_body_2D_init(tarasque_entity *self_data)
+{
+    if (!self_data) {
+        return;
+    }
+
+    BE_body_2D *self_body = (BE_body_2D *) self_data;
+
+    self_body->previous = tarasque_entity_get_parent(self_data, NULL, &BE_body_2D_entity_def);
+}
 
 /**
  * @brief
@@ -48,5 +67,6 @@ static void BE_body_2D_on_frame(tarasque_entity *self_data, float elapsed_ms)
  */
 const tarasque_entity_definition BE_body_2D_entity_def = {
         .data_size = sizeof(BE_body_2D),
+        .on_init = BE_body_2D_init,
         .on_frame = &BE_body_2D_on_frame,
 };
