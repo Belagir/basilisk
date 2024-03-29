@@ -25,16 +25,13 @@ typedef struct tarasque_engine_entity tarasque_engine_entity;
 /* Quickhand for a range of entities. */
 typedef RANGE(tarasque_engine_entity *) tarasque_engine_entity_range;
 
-/* Redefinition of the tarasque_entity_specific_data type to signal memory allocation in opposition of the user-managed tarasque_entity_specific_data variables. */
-typedef tarasque_specific_entity tarasque_specific_entity_copy;
-
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // LIFETIME
 
 /* Creates an entity and returns a pointer to it. */
-tarasque_engine_entity *tarasque_engine_entity_create(const identifier *id, tarasque_specific_entity_copy user_data, tarasque_engine *handle, allocator alloc);
+tarasque_engine_entity *tarasque_engine_entity_create(const identifier *id, tarasque_specific_entity user_data, tarasque_engine *handle, allocator alloc);
 /* Destroys an entity and nullifies the pointer passed. */
 void tarasque_engine_entity_destroy(tarasque_engine_entity **target, allocator alloc);
 

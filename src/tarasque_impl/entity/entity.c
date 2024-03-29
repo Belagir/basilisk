@@ -31,15 +31,11 @@ typedef struct tarasque_engine_entity {
     tarasque_engine_entity *parent;
     /** Array of all of the entity's children. */
     tarasque_engine_entity_range *children;
-
-    /** Entity callbacks to be used by the engine. */
-    tarasque_specific_entity_callbacks callbacks;
-
     /** Engine owning the entity, used to redirect user's actions back to the whole engine. */
     tarasque_engine *host_handle;
 
-    /** Size in bytes of the user's data. */
-    size_t data_size;
+    tarasque_entity_definition entity_def;
+
     /** The user's data. */
     tarasque_entity_storage data;
 } tarasque_engine_entity;
@@ -57,26 +53,25 @@ typedef struct tarasque_engine_entity {
  * @param[inout] alloc Allocator used for the creation of the entity.
  * @return entity *
  */
-tarasque_engine_entity *tarasque_engine_entity_create(const identifier *id, tarasque_specific_entity_copy user_data, tarasque_engine *handle, allocator alloc)
+tarasque_engine_entity *tarasque_engine_entity_create(const identifier *id, tarasque_specific_entity user_data, tarasque_engine *handle, allocator alloc)
 {
     tarasque_engine_entity *new_entity = NULL;
 
-    new_entity = alloc.malloc(alloc, sizeof(*new_entity) + user_data.data_size);
+    new_entity = alloc.malloc(alloc, sizeof(*new_entity) + user_data.entity_def.data_size);
 
     if (new_entity) {
         *new_entity = (tarasque_engine_entity) {
                 .id = range_create_dynamic_from_copy_of(alloc, RANGE_TO_ANY(id)),
                 .parent = NULL,
                 .children = range_create_dynamic(alloc, sizeof(*new_entity->children->data), TARASQUE_COLLECTIONS_START_LENGTH),
-
-                .callbacks = user_data.callbacks,
-
                 .host_handle = handle,
 
-                .data_size = user_data.data_size,
+                .entity_def = user_data.entity_def,
         };
 
-        bytewise_copy(new_entity->data, user_data.data, user_data.data_size);
+        if (user_data.data) {
+            bytewise_copy(new_entity->data, user_data.data, user_data.entity_def.data_size);
+        }
     }
 
     return new_entity;
@@ -332,8 +327,8 @@ void tarasque_engine_entity_step_frame(tarasque_engine_entity *target, f32 elaps
     if (!target) {
         return;
     }
-    if (target->callbacks.on_frame) {
-        target->callbacks.on_frame(target->data, elapsed_ms);
+    if (target->entity_def.on_frame) {
+        target->entity_def.on_frame(target->data, elapsed_ms);
     }
 }
 
@@ -364,8 +359,8 @@ void tarasque_engine_entity_init(tarasque_engine_entity *target)
         return;
     }
 
-    if (target->callbacks.on_init) {
-        target->callbacks.on_init(target->data);
+    if (target->entity_def.on_init) {
+        target->entity_def.on_init(target->data);
     }
 }
 
@@ -380,7 +375,7 @@ void tarasque_engine_entity_deinit(tarasque_engine_entity *target)
         return;
     }
 
-    if (target->callbacks.on_deinit) {
-        target->callbacks.on_deinit(target->data);
+    if (target->entity_def.on_deinit) {
+        target->entity_def.on_deinit(target->data);
     }
 }

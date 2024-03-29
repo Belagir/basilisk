@@ -30,30 +30,27 @@ typedef void tarasque_entity;
 // -------------------------------------------------------------------------------------------------
 // CONSTRUCTOR DATA STRUCTURES
 
-/**
- * @brief Collection of callbacks that make an entity function in the engine.
- */
-typedef struct tarasque_specific_entity_callbacks {
+typedef struct tarasque_entity_definition {
+    /** Size, in bytes, of the entity's specific data. */
+    unsigned long data_size;
+
     /** Function ran on the entity-specific data when it is first created. */
     void (*on_init)(tarasque_entity *self_data);
     /** Function ran on the entity-specific data when it is destroyed. */
     void (*on_deinit)(tarasque_entity *self_data);
     /** Function ran on the entity-specific data each frame. */
     void (*on_frame)(tarasque_entity *self_data, float elapsed_ms);
-} tarasque_specific_entity_callbacks;
+} tarasque_entity_definition;
 
 /**
  * @brief Data representing the key components of an entity.
  */
 typedef struct tarasque_specific_entity {
-    /** Size, in bytes, of the entity's specific data. */
-    unsigned long data_size;
+    /**  */
+    tarasque_entity_definition entity_def;
     /** Pointer (can be null) to some entity-specific data. This data is copied to the engine by
     functions that take the containing struct type. */
     tarasque_entity *data;
-
-    /** Specific callbacks. */
-    tarasque_specific_entity_callbacks callbacks;
 } tarasque_specific_entity;
 
 /**
