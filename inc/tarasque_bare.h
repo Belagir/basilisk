@@ -143,4 +143,6 @@ tarasque_entity *tarasque_entity_get_parent(tarasque_entity *entity, const char 
 /* Search for a child entity located at a specific path relative to an entity. */
 tarasque_entity *tarasque_entity_get_child(tarasque_entity *entity, const char *str_path);
 
+bool tarasque_entity_is(tarasque_entity *entity, tarasque_entity_definition entity_def);
+
 #endif

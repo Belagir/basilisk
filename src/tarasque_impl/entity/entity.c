@@ -57,6 +57,12 @@ typedef struct tarasque_engine_entity {
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
+static bool tarasque_entity_definition_unit_is_same_as(tarasque_entity_definition_unit def_unit, tarasque_entity_definition broad_def);
+
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+
 /**
  * @brief Creates a newly allocated entity and returns a pointer to it.
  *
@@ -206,6 +212,36 @@ tarasque_engine_entity *tarasque_engine_entity_get_parent(tarasque_engine_entity
     }
 
     return target->parent;
+}
+
+/**
+ * @brief
+ *
+ * @param entity
+ * @param entity_def
+ * @return
+ */
+bool tarasque_engine_entity_has_definition(tarasque_engine_entity *entity, tarasque_entity_definition entity_def)
+{
+    bool has_def = false;
+    size_t pos = 0u;
+
+    if (!entity) {
+        return false;
+    }
+
+    has_def = tarasque_entity_definition_unit_is_same_as(entity->self_definition, entity_def);
+
+    if (!entity->subtype_definitions) {
+        return has_def;
+    }
+
+    while ((!has_def) && (pos < entity->subtype_definitions->length)) {
+        has_def = tarasque_entity_definition_unit_is_same_as(entity->subtype_definitions->data[pos], entity_def);
+        pos += 1;
+    }
+
+    return has_def;
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -437,4 +473,17 @@ void tarasque_engine_entity_deinit(tarasque_engine_entity *target)
             }
         }
     }
+}
+
+
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+
+static bool tarasque_entity_definition_unit_is_same_as(tarasque_entity_definition_unit def_unit, tarasque_entity_definition broad_def)
+{
+    return   (def_unit.data_size == broad_def.data_size)
+            && (def_unit.on_init   == broad_def.on_init)
+            && (def_unit.on_frame  == broad_def.on_frame)
+            && (def_unit.on_deinit == broad_def.on_deinit);
 }

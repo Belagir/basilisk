@@ -451,6 +451,19 @@ tarasque_entity *tarasque_entity_get_child(tarasque_entity *entity, const char *
     return tarasque_engine_entity_get_specific_data(found_entity);
 }
 
+/**
+ * @brief
+ *
+ * @param entity
+ * @param entity_def
+ * @return
+ */
+bool tarasque_entity_is(tarasque_entity *entity, tarasque_entity_definition entity_def)
+{
+    tarasque_engine_entity *full_entity = tarasque_engine_entity_get_containing_full_entity(entity);
+    return tarasque_engine_entity_has_definition(full_entity, entity_def);
+}
+
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------

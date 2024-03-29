@@ -49,6 +49,8 @@ const identifier *tarasque_engine_entity_get_name(const tarasque_engine_entity *
 
 tarasque_engine_entity *tarasque_engine_entity_get_parent(tarasque_engine_entity *target);
 
+bool tarasque_engine_entity_has_definition(tarasque_engine_entity *entity, tarasque_entity_definition entity_def);
+
 // -------------------------------------------------------------------------------------------------
 // HIERACHY MODIFICATIONS
 
