@@ -129,15 +129,10 @@ static void BE_render_manager_sdl_post_draw(tarasque_entity *self_data, void *ev
 /**
  * @brief
  *
- * @param args
- * @return
  */
-tarasque_entity_definition BE_render_manager_sdl_entity(void)
-{
-    return (tarasque_entity_definition) {
-            .data_size = sizeof(BE_render_manager_sdl),
-            .on_init = &BE_render_manager_sdl_init,
-            .on_frame = &BE_render_manager_sdl_on_frame,
-            .on_deinit = &BE_render_manager_sdl_deinit,
-    };
-}
+const tarasque_entity_definition BE_render_manager_sdl_entity_def = {
+        .data_size = sizeof(BE_render_manager_sdl),
+        .on_init = &BE_render_manager_sdl_init,
+        .on_frame = &BE_render_manager_sdl_on_frame,
+        .on_deinit = &BE_render_manager_sdl_deinit,
+};

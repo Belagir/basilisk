@@ -45,14 +45,8 @@ static void BE_body_2D_on_frame(tarasque_entity *self_data, float elapsed_ms)
 
 /**
  * @brief
- *
- * @param args
- * @return
  */
-tarasque_entity_definition BE_body_2D_entity(void)
-{
-    return (tarasque_entity_definition) {
-            .data_size = sizeof(BE_body_2D),
-            .on_frame = &BE_body_2D_on_frame,
-    };
-}
+const tarasque_entity_definition BE_body_2D_entity_def = {
+        .data_size = sizeof(BE_body_2D),
+        .on_frame = &BE_body_2D_on_frame,
+};

@@ -75,12 +75,9 @@ static void BE_window_sdl_quit(tarasque_entity *self_data, void *event_data)
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-tarasque_entity_definition BE_window_sdl_entity(void)
-{
-    return (tarasque_entity_definition) {
-            .data_size = sizeof(BE_window_sdl),
+const tarasque_entity_definition BE_window_sdl_entity_def = {
+        .data_size = sizeof(BE_window_sdl),
 
-            .on_init = &BE_window_sdl_init,
-            .on_deinit = &BE_window_sdl_deinit,
-    };
-}
+        .on_init = &BE_window_sdl_init,
+        .on_deinit = &BE_window_sdl_deinit,
+};

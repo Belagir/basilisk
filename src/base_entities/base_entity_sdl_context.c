@@ -48,11 +48,8 @@ static void BE_context_sdl_deinit(tarasque_entity *self_data)
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-tarasque_entity_definition BE_context_sdl_entity(void)
-{
-    return (tarasque_entity_definition) {
-            .on_init = &BE_context_sdl_init,
-            .on_deinit = &BE_context_sdl_deinit,
-    };
-}
+const tarasque_entity_definition BE_context_sdl_entity_def = {
+        .on_init = &BE_context_sdl_init,
+        .on_deinit = &BE_context_sdl_deinit,
+};
 
