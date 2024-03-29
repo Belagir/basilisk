@@ -7,7 +7,23 @@
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
+#define BE_EVENT_RELAY_SDL_BUFFER_SIZE (64)     ///< Fixed size of the event buffer array. This is the number of events the event relay can re-send through the engine in one frame.
+
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+
 static void BE_event_relay_sdl_on_frame(tarasque_entity *self_data, float elapsed_ms);
+
+// -------------------------------------------------------------------------------------------------
+
+/**
+ * @brief Data layout of an "event relay" base entity.
+ */
+typedef struct BE_event_relay_sdl {
+    /** Internal buffer to re-order the polled events. Overriden each frame. */
+    SDL_Event event_buffer[BE_EVENT_RELAY_SDL_BUFFER_SIZE];
+} BE_event_relay_sdl;
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -39,6 +55,11 @@ static void BE_event_relay_sdl_on_frame(tarasque_entity *self_data, float elapse
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
+/**
+ * @brief
+ * This entity is made to be child of an sdl context (the BE_context_sdl_entity_def entity) and will poll sdl events and retransmits them in the engine's event stack.
+ * The events transfered are stacked in a way that reflects the order they were polled : the later the event is polled, the deeper it will be placed on the event stack.
+ */
 const tarasque_entity_definition BE_event_relay_sdl_entity_def = {
         .data_size = sizeof(BE_event_relay_sdl),
         .on_frame = &BE_event_relay_sdl_on_frame,

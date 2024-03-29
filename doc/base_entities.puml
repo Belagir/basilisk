@@ -24,6 +24,13 @@ package phase_1 as "phase 1"  {
     }
     body_2D --> properties2D
 
+    struct texture_2D << (E, PaleGreen) >> {
+        + body_2D body
+        + i32 draw_index
+        + SDL_Texture *texture
+    }
+    texture_2D --|> body_2D
+    note top of texture_2D : needs a rendering\ncontext as parent
 }
 
 ' ------------------------------------------------------------------------------
@@ -61,26 +68,14 @@ package phase_2 as "phase 2" {
 
     shape_2D --> shape_id
     shape_2D --|> body_2D
+    shape_2D --> shape_2D_circle
+    shape_2D --> shape_2D_rect
 
     struct shape_visual_2D << (E, PaleGreen) >> {
         + SDL_Color color
+        + i32 draw_index
     }
-    shape_visual_2D --> shape_2D : needs as direct parent
-
-}
-
-' ------------------------------------------------------------------------------
-' ------------------------------------------------------------------------------
-
-package phase_1 {
-
-    struct texture_2D << (E, PaleGreen) >> {
-        + body_2D body
-        + u32 draw_index
-        + SDL_Texture *texture
-    }
-    texture_2D --|> body_2D
-    note top of texture_2D : needs a rendering\ncontext as parent
+    shape_visual_2D --> shape_2D : needs as parent
 
 }
 
@@ -89,17 +84,17 @@ package phase_1 {
 
 package phase_3 as "phase 3" {
 
-struct shape_collider_2D << (E, PaleGreen) >> {
-    + uint32_t mask
-}
-shape_collider_2D --> shape_2D : needs as\ndirect parent
+    struct shape_collider_2D << (E, PaleGreen) >> {
+        == implementation\nto be defined ==
+    }
+    shape_collider_2D --> shape_2D : needs as parent
 
-' ------------------------------------------------------------------------------
+    ' ------------------------------------------------------------------------------
 
-struct collision_manager_2D << (E, PaleGreen) >> {
-    == implementation to be defined ==
-}
-collision_manager_2D <..> shape_collider_2D : communicates with
+    struct collision_manager_2D << (E, PaleGreen) >> {
+        == implementation\nto be defined ==
+    }
+    collision_manager_2D <..> shape_collider_2D : communicates with
 
 }
 
