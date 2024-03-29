@@ -5,10 +5,10 @@
 #include <SDL2/SDL.h>
 #include <tarasque_bare.h>
 
-typedef struct bullet {
-    int x, y;
+#include <base_entities/sdl_entities.h>
 
-    SDL_Texture *sprite;
+typedef struct bullet {
+    BE_texture_2D sprite;
 } bullet;
 
 tarasque_specific_entity bullet_entity(bullet *args);

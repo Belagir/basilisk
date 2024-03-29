@@ -113,8 +113,20 @@ static void frame(tarasque_entity *entity, float elapsed_ms)
     ship->y += ship->vel_y;
 
     if (ship->is_shooting) {
-        tarasque_entity_add_child(entity, "bullet", bullet_entity(&(bullet) { .x = ship->x, .y = ship->y, .sprite = ship->bullets_sprite }));
-        tarasque_entity_add_child(entity, "bullet", bullet_entity(&(bullet) { .x = ship->x, .y = ship->y + 32, .sprite = ship->bullets_sprite }));
+
+        tarasque_entity_add_child(entity, "bullet", bullet_entity(&(bullet) {
+                .sprite = {
+                        .body = { .local = { .scale = { 1, 1 }, .position = { .x = (float) ship->x, .y = (float) ship->y } } },
+                        .draw_index = 1, .texture = ship->bullets_sprite,
+                },
+        }));
+        tarasque_entity_add_child(entity, "bullet", bullet_entity(&(bullet) {
+                .sprite = {
+                        .body = { .local = { .scale = { 1, 1 }, .position = { .x = (float) ship->x, .y = (float) ship->y + 32 } } },
+                        .draw_index = 1, .texture = ship->bullets_sprite,
+                },
+        }));
+
         ship->is_shooting = false;
     }
 }
