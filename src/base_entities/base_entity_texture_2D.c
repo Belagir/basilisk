@@ -58,8 +58,8 @@ static void BE_texture_2D_on_draw(tarasque_entity *self_data, void *event_data)
             &(const SDL_Rect) {
                     .x = (int) texture_data->body.global.position.x,
                     .y = (int) texture_data->body.global.position.y,
-                    .w = (int) texture_data->body.global.scale.x * text_w,
-                    .h = (int) texture_data->body.global.scale.y * text_h,
+                    .w = (int) (texture_data->body.global.scale.x * (f32) text_w),
+                    .h = (int) (texture_data->body.global.scale.y * (f32) text_h),
             },
             texture_data->body.global.angle,
             NULL,
