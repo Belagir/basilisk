@@ -145,4 +145,10 @@ tarasque_entity *tarasque_entity_get_child(tarasque_entity *entity, const char *
 /* Resolves wether or not the entity has been defined using a specific definition or was marked as subtyping it. */
 bool tarasque_entity_is(tarasque_entity *entity, tarasque_entity_definition entity_def);
 
+
+// -------------------------------------------------------------------------------------------------
+// RESOURCE HANDLING
+
+void *tarasque_entity_fetch_resource(tarasque_entity *entity, const char *str_storage, const char *str_file_path);
+
 #endif

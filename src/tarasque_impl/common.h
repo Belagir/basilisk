@@ -80,6 +80,17 @@ i32 identifier_compare(const void *lhs, const void *rhs);
 bool character_is_num(char c);
 
 // -------------------------------------------------------------------------------------------------
+
+/* Simple hash function to hash anything. */
+u32 hash_jenkins_one_at_a_time(const byte *key, size_t length, u32 seed);
+
+/* Hashes an identifier with an abritrary hash function. */
+u32 hash_indentifier(const identifier *id, u32 (*hash_function)(const byte *key, size_t length, u32 seed));
+
+/* Hashes a path, identifier by indetifier, with an abritrary hash function. */
+u32 hash_path(const path *p, u32 (*hash_function)(const byte *key, size_t length, u32 seed));
+
+// -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 

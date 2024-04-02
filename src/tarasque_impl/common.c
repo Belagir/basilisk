@@ -250,6 +250,51 @@ bool character_is_num(char c)
 }
 
 // -------------------------------------------------------------------------------------------------
+
+u32 hash_jenkins_one_at_a_time(const byte *key, size_t length, u32 seed)
+{
+    size_t i = 0u;
+    u32 hash = seed;
+
+    while (i < length) {
+        hash += key[i++];
+        hash += hash << 10u;
+        hash ^= hash >> 6u;
+    }
+
+    hash += hash << 3u;
+    hash ^= hash >> 11u;
+    hash += hash << 15u;
+
+    return hash;
+}
+
+u32 hash_indentifier(const identifier *id, u32 (*hash_function)(const byte *key, size_t length, u32 seed))
+{
+    if (!id || !hash_function) {
+        return 0u;
+    }
+
+    return hash_function((const byte *) id->data, id->length, 0u);
+}
+
+u32 hash_path(const path *p, u32 (*hash_function)(const byte *key, size_t length, u32 seed))
+{
+    u32 full_hash = 0u;
+
+    if (!p || !hash_function) {
+        return 0u;
+    }
+
+    for (size_t i = 0u ; i < p->length ; i++) {
+        full_hash = hash_function((const byte *) p->data[i]->data, p->data[i]->length, full_hash);
+    }
+
+    return full_hash;
+}
+
+
+// -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
