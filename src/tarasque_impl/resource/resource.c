@@ -86,7 +86,8 @@ void *resource_manager_fetch(resource_manager *res_manager, const char *str_stor
         target_storage = res_manager->storages->data[found_storage_index];
     } else {
         target_storage = resource_storage_data_create(str_storage, alloc);
-        sorted_range_insert_in(RANGE_TO_ANY(res_manager->storages), &hash_compare_doubleref, target_storage);
+        res_manager->storages = range_ensure_capacity(alloc, RANGE_TO_ANY(res_manager->storages), 1);
+        sorted_range_insert_in(RANGE_TO_ANY(res_manager->storages), &hash_compare_doubleref, &target_storage);
     }
 
 #ifdef TARASQUE_UPDATE_RESOURCES

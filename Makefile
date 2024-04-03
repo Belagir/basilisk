@@ -46,7 +46,7 @@ LFLAGS += -lGL
 RESFLAGS = -r -b binary -z noexecstack
 
 # additional flags for defines
-DFLAGS += -D_POSIX_C_SOURCE=199309L
+DFLAGS += -D_POSIX_C_SOURCE=199309L -DTARASQUE_UPDATE_RESOURCES
 
 # --------------- Internal variables -------------------------------------------
 
