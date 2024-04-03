@@ -25,6 +25,7 @@
 #include "../command/command.h"
 #include "../entity/entity.h"
 #include "../event/event.h"
+#include "../resource/resource.h"
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -47,6 +48,8 @@ typedef struct tarasque_engine {
     event_stack *events;
     /** Publisher / subscriber object maintaining a collection of subscriptions of entities to events. */
     event_broker *pub_sub;
+    /** Resource manager object to load / unload files from the filesystem. */
+    resource_manager *res_manager;
 
     /** Root of the game tree as an empty entity. */
     tarasque_engine_entity *root_entity;
@@ -133,9 +136,10 @@ tarasque_engine *tarasque_engine_create(void)
 
                 .logger = logger_create(stdout, LOGGER_ON_DESTROY_DO_NOTHING),
 
-                .commands = command_queue_create(used_alloc),
-                .events = event_stack_create(used_alloc),
-                .pub_sub = event_broker_create(used_alloc),
+                .commands    = command_queue_create(used_alloc),
+                .events      = event_stack_create(used_alloc),
+                .pub_sub     = event_broker_create(used_alloc),
+                .res_manager = resource_manager_create(used_alloc),
 
                 .root_entity = tarasque_engine_entity_create(identifier_root, (tarasque_specific_entity) { 0u }, new_engine, used_alloc),
 
@@ -171,6 +175,7 @@ void tarasque_engine_destroy(tarasque_engine **handle)
         range_destroy_dynamic(used_alloc, &RANGE_TO_ANY((*handle)->active_entities));
     }
 
+    resource_manager_destroy(&(*handle)->res_manager, used_alloc);
     event_broker_destroy(&(*handle)->pub_sub, used_alloc);
     event_stack_destroy(&(*handle)->events, used_alloc);
     command_queue_destroy(&(*handle)->commands, used_alloc);
@@ -475,6 +480,25 @@ bool tarasque_entity_is(tarasque_entity *entity, tarasque_entity_definition enti
 {
     tarasque_engine_entity *full_entity = tarasque_engine_entity_get_containing_full_entity(entity);
     return tarasque_engine_entity_has_definition(full_entity, entity_def);
+}
+
+
+// -------------------------------------------------------------------------------------------------
+
+void *tarasque_entity_fetch_resource(tarasque_entity *entity, const char *str_storage, const char *str_file_path)
+{
+    if (!entity || !str_file_path) {
+        return NULL;
+    }
+
+    tarasque_engine_entity *full_entity = tarasque_engine_entity_get_containing_full_entity(entity);
+    tarasque_engine *handle = tarasque_engine_entity_get_host_engine_handle(full_entity);
+
+    if (!handle) {
+        return NULL;
+    }
+
+    return resource_manager_fetch(handle->res_manager, str_storage, str_file_path, handle->alloc);
 }
 
 // -------------------------------------------------------------------------------------------------
