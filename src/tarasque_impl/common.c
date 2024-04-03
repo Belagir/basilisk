@@ -249,6 +249,23 @@ bool character_is_num(char c)
     return (c >= '0') && (c <= '9');
 }
 
+size_t c_string_length(const char *str, bool keep_terminator)
+{
+    size_t str_length = 0u;
+
+    if (!str) {
+        return 0u;
+    }
+
+    while (str[str_length] != '\0') {
+        str_length += 1;
+    }
+
+    str_length += (size_t) keep_terminator;
+
+    return str_length;
+}
+
 // -------------------------------------------------------------------------------------------------
 
 u32 hash_jenkins_one_at_a_time(const byte *key, size_t length, u32 seed)
@@ -293,6 +310,18 @@ u32 hash_path(const path *p, u32 (*hash_function)(const byte *key, size_t length
     return full_hash;
 }
 
+i32 hash_compare(const void *lhs, const void *rhs)
+{
+    u32 val_lhs = *(u32 *) lhs;
+    u32 val_rhs = *(u32 *) rhs;
+
+    return (val_lhs > val_rhs) - (val_lhs < val_rhs);
+}
+
+i32 hash_compare_doubleref(const void *lhs, const void *rhs)
+{
+    return hash_compare(*(u32 **) lhs, *(u32 **) rhs);
+}
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -330,11 +359,7 @@ static identifier *identifier_create_base(const char *str, allocator alloc, bool
         return NULL;
     }
 
-    while (str[str_length] != '\0') {
-        str_length += 1;
-    }
-
-    str_length += (size_t) keep_terminator;
+    str_length = c_string_length(str, keep_terminator);
 
     new_identifier = range_create_dynamic_from(alloc, sizeof(*str), str_length, str_length, str);
 
