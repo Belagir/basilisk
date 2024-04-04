@@ -22,8 +22,6 @@ void resource_storage_data_destroy(resource_storage_data **storage_data, allocat
 
 // -------------------------------------------------------------------------------------------------
 
-void resource_storage_data_sync_from_path(resource_storage_data *storage_data, const char *str_path, allocator alloc);
-
 void *resource_storage_data_get(resource_storage_data *storage_data, const char *str_path);
 
 // -------------------------------------------------------------------------------------------------

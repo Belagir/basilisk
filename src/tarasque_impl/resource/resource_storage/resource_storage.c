@@ -86,49 +86,6 @@ void resource_storage_data_destroy(resource_storage_data **storage_data, allocat
  *
  * @param storage_data
  * @param str_path
- * @param alloc
- */
-void resource_storage_data_sync_from_path(resource_storage_data *storage_data, const char *str_path, allocator alloc)
-{
-    FILE *found_file = NULL;
-    resource_item *found_item = NULL;
-    u32 str_path_hash = 0u;
-    size_t item_index = 0u;
-
-    if (!storage_data || *str_path) {
-        return;
-    }
-
-    found_file = fopen(str_path, "r");
-
-    if (!found_file) {
-        return;
-    }
-
-    str_path_hash = hash_jenkins_one_at_a_time((const byte *) str_path, c_string_length(str_path, false), 0u);
-
-    if (!sorted_range_find_in(RANGE_TO_ANY(storage_data->items), &hash_compare_doubleref, &str_path_hash, &item_index)) {
-        storage_data->items = range_ensure_capacity(alloc, RANGE_TO_ANY(storage_data->items), 1);
-        item_index = sorted_range_insert_in(RANGE_TO_ANY(storage_data->items), &hash_compare_doubleref, &(resource_item) { .str_path_hash = str_path_hash });
-    }
-
-    found_item = storage_data->items->data + item_index;
-
-    if (found_item->data) {
-        alloc.free(alloc, found_item->data);
-        found_item->data_size = 0u;
-    }
-
-    // copy file in the item's data
-
-    fclose(found_file);
-}
-
-/**
- * @brief
- *
- * @param storage_data
- * @param str_path
  * @return
  */
 void *resource_storage_data_get(resource_storage_data *storage_data, const char *str_path)
