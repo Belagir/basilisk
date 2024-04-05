@@ -24,7 +24,7 @@ void resource_storage_data_destroy(resource_storage_data **storage_data, allocat
 
 bool resource_storage_check(resource_storage_data *storage_data, const char *str_path, allocator alloc);
 
-void *resource_storage_data_get(resource_storage_data *storage_data, const char *str_path);
+void *resource_storage_data_get(resource_storage_data *storage_data, const char *str_path, size_t *out_size, allocator alloc);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------

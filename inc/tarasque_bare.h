@@ -168,7 +168,7 @@ void tarasque_engine_declare_resource(tarasque_engine *handle, const char *str_s
 #define tarasque_engine_declare_resource(handle, str_storage, str_file_path) tarasque_engine_declare_resource(handle, TARASQUE_RESOURCE_STORAGES_FOLDER "/" str_storage "." TARASQUE_RESOURCE_STORAGES_EXTENSION, str_file_path)
 
 /* Loads a storage file if not already and search for a resource in it, returning its data. */
-void *tarasque_entity_fetch_resource(tarasque_entity *entity, const char *str_storage, const char *str_file_path);
-#define tarasque_entity_fetch_resource(_handle, _str_storage, _str_file_path) tarasque_entity_fetch_resource(handle, TARASQUE_RESOURCE_STORAGES_FOLDER "/" str_storage "." TARASQUE_RESOURCE_STORAGES_EXTENSION, str_file_path)
+void *tarasque_entity_fetch_resource(tarasque_entity *entity, const char *str_storage, const char *str_file_path, unsigned long *out_size);
+#define tarasque_entity_fetch_resource(handle, str_storage, str_file_path, out_size) tarasque_entity_fetch_resource(handle, TARASQUE_RESOURCE_STORAGES_FOLDER "/" str_storage "." TARASQUE_RESOURCE_STORAGES_EXTENSION, str_file_path, out_size)
 
 #endif

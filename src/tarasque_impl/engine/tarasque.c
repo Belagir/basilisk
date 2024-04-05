@@ -514,7 +514,7 @@ void tarasque_engine_declare_resource(tarasque_engine *handle, const char *str_s
  * @param str_file_path
  * @return
  */
-void *tarasque_entity_fetch_resource(tarasque_entity *entity, const char *str_storage, const char *str_file_path)
+void *tarasque_entity_fetch_resource(tarasque_entity *entity, const char *str_storage, const char *str_file_path, unsigned long *out_size)
 {
     if (!entity || !str_file_path) {
         return NULL;
@@ -527,7 +527,7 @@ void *tarasque_entity_fetch_resource(tarasque_entity *entity, const char *str_st
         return NULL;
     }
 
-    return resource_manager_fetch(handle->res_manager, str_storage, str_file_path, handle->alloc);
+    return resource_manager_fetch(handle->res_manager, str_storage, str_file_path, out_size, handle->alloc);
 }
 
 // -------------------------------------------------------------------------------------------------

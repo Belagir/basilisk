@@ -23,6 +23,7 @@ typedef struct resource_item_header {
  */
 typedef struct resource_item_deserialized {
     resource_item_header header;
+
     void *data;
 } resource_item_deserialized;
 
@@ -33,8 +34,9 @@ typedef struct resource_item_deserialized {
 typedef struct resource_storage_data {
     u32 storage_name_hash;
 
+    bool is_loaded;
+    // TODO (low prio, all code paths require static strings) : use an identifier or path or RANGE(char)
     const char *file_path;
-
     RANGE(resource_item_deserialized) *items;
 } resource_storage_data;
 
@@ -42,7 +44,9 @@ typedef struct resource_storage_data {
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-file_data_array *file_data_array_from(const char *str_path, allocator alloc);
+static file_data_array *file_data_array_from(const char *str_path, allocator alloc);
+
+static void resource_storage_data_reload(resource_storage_data *storage, allocator alloc);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -172,10 +176,12 @@ bool resource_storage_check(resource_storage_data *storage_data, const char *str
  * @param str_path
  * @return
  */
-void *resource_storage_data_get(resource_storage_data *storage_data, const char *str_path)
+void *resource_storage_data_get(resource_storage_data *storage_data, const char *str_path, size_t *out_size, allocator alloc)
 {
     u32 str_path_hash = 0u;
     size_t data_index = 0u;
+
+    *out_size = 0u;
 
     if (!storage_data || !str_path) {
         return NULL;
@@ -183,9 +189,10 @@ void *resource_storage_data_get(resource_storage_data *storage_data, const char 
 
     str_path_hash = hash_jenkins_one_at_a_time((const byte *) str_path, c_string_length(str_path, false), 0u);
 
-    // TODO : load storage if not loaded
+    resource_storage_data_reload(storage_data, alloc);
 
     if (sorted_range_find_in(RANGE_TO_ANY(storage_data->items), &hash_compare, &str_path_hash, &data_index)) {
+        *out_size = storage_data->items->data[data_index].header.data_size;
         return storage_data->items->data[data_index].data;
     }
 
@@ -196,7 +203,7 @@ void *resource_storage_data_get(resource_storage_data *storage_data, const char 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-file_data_array *file_data_array_from(const char *str_path, allocator alloc)
+static file_data_array *file_data_array_from(const char *str_path, allocator alloc)
 {
     FILE *file = NULL;
     struct stat file_info = { 0u };
@@ -220,4 +227,31 @@ file_data_array *file_data_array_from(const char *str_path, allocator alloc)
     fclose(file);
 
     return contents;
+}
+
+static void resource_storage_data_reload(resource_storage_data *storage, allocator alloc)
+{
+    FILE *storage_file = NULL;
+    resource_item_deserialized item = { 0u };
+
+    if (!storage || storage->is_loaded) {
+        return;
+    }
+
+    storage_file = fopen(storage->file_path, "r");
+    if (!storage_file) {
+        return;
+    }
+
+    while (!feof(storage_file) && !ferror(storage_file)) {
+        if (fread(&item.header, 1, sizeof(item.header), storage_file) == sizeof(item.header)) {
+            item.data = alloc.malloc(alloc, item.header.data_size);
+            fread(item.data, item.header.data_size, 1, storage_file);
+            sorted_range_insert_in(RANGE_TO_ANY(storage->items), &hash_compare, &item);
+        }
+    }
+
+    fclose(storage_file);
+
+    storage->is_loaded = true;
 }
