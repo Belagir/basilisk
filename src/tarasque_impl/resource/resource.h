@@ -20,6 +20,8 @@ void resource_manager_destroy(resource_manager **res_manager, allocator alloc);
 
 // -------------------------------------------------------------------------------------------------
 
+bool resource_manager_check(resource_manager *res_manager, const char *str_storage, const char *str_res_path, allocator alloc);
+
 void *resource_manager_fetch(resource_manager *res_manager, const char *str_storage, const char *str_res_path, allocator alloc);
 
 // -------------------------------------------------------------------------------------------------

@@ -68,12 +68,40 @@ void resource_manager_destroy(resource_manager **res_manager, allocator alloc)
  * @param res_manager
  * @param str_storage
  * @param str_res_path
+ * @param alloc
+ * @return
+ */
+bool resource_manager_check(resource_manager *res_manager, const char *str_storage, const char *str_res_path, allocator alloc)
+{
+    size_t found_storage_index = 0u;
+    u32 storage_name_hash = 0u;
+
+    if (!res_manager) {
+        return false;
+    }
+
+    storage_name_hash = hash_jenkins_one_at_a_time((const byte *) str_storage, c_string_length(str_storage, false), 0u);
+
+    if (!sorted_range_find_in(RANGE_TO_ANY(res_manager->storages), &hash_compare_doubleref, &(u32 *) { &storage_name_hash }, &found_storage_index)) {
+       found_storage_index = sorted_range_insert_in(RANGE_TO_ANY(res_manager->storages), &hash_compare_doubleref, &(resource_storage_data *) { resource_storage_data_create(str_storage, alloc) });
+    }
+
+    return resource_storage_check(res_manager->storages->data[found_storage_index], str_res_path, alloc);
+}
+
+/**
+ * @brief
+ *
+ * @param res_manager
+ * @param str_storage
+ * @param str_res_path
+ * @param alloc
  * @return
  */
 void *resource_manager_fetch(resource_manager *res_manager, const char *str_storage, const char *str_res_path, allocator alloc)
 {
-    size_t found_storage_index = 0u;
     resource_storage_data *target_storage = NULL;
+    size_t found_storage_index = 0u;
     u32 storage_name_hash = 0u;
 
     if (!res_manager || !str_res_path) {
@@ -83,13 +111,8 @@ void *resource_manager_fetch(resource_manager *res_manager, const char *str_stor
     storage_name_hash = hash_jenkins_one_at_a_time((const byte *) str_storage, c_string_length(str_storage, false), 0u);
 
     if (sorted_range_find_in(RANGE_TO_ANY(res_manager->storages), &hash_compare_doubleref, &storage_name_hash, &found_storage_index)) {
-        target_storage = res_manager->storages->data[found_storage_index];
-    } else {
-        target_storage = resource_storage_data_create(str_storage, alloc);
-
-        res_manager->storages = range_ensure_capacity(alloc, RANGE_TO_ANY(res_manager->storages), 1);
-        sorted_range_insert_in(RANGE_TO_ANY(res_manager->storages), &hash_compare_doubleref, &target_storage);
+        return resource_storage_data_get(res_manager->storages->data[found_storage_index], str_res_path);
     }
 
-    return resource_storage_data_get(target_storage, str_res_path);
+    return NULL;
 }

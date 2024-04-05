@@ -482,9 +482,32 @@ bool tarasque_entity_is(tarasque_entity *entity, tarasque_entity_definition enti
     return tarasque_engine_entity_has_definition(full_entity, entity_def);
 }
 
-
 // -------------------------------------------------------------------------------------------------
 
+/**
+ * @brief
+ *
+ * @param handle
+ * @param str_storage
+ * @param str_file_path
+ */
+void tarasque_engine_declare_resource(tarasque_engine *handle, const char *str_storage, const char *str_file_path)
+{
+    if (!handle) {
+        return;
+    }
+
+    resource_manager_check(handle->res_manager, str_storage, str_file_path, handle->alloc);
+}
+
+/**
+ * @brief
+ *
+ * @param entity
+ * @param str_storage
+ * @param str_file_path
+ * @return
+ */
 void *tarasque_entity_fetch_resource(tarasque_entity *entity, const char *str_storage, const char *str_file_path)
 {
     if (!entity || !str_file_path) {
