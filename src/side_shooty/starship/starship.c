@@ -13,13 +13,6 @@
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-DECLARE_RES(ship_sprite, "res_ship_png")
-DECLARE_RES(bullet_sprite, "res_bullet_png")
-
-// -------------------------------------------------------------------------------------------------
-// -------------------------------------------------------------------------------------------------
-// -------------------------------------------------------------------------------------------------
-
 /**
  * @brief
  *
@@ -61,6 +54,10 @@ static void init(tarasque_entity *entity)
     starship *ship = (starship *) entity;
 
     BE_render_manager_sdl *render_manager = (BE_render_manager_sdl *) tarasque_entity_get_parent(entity, NULL, &BE_render_manager_sdl_entity_def);
+    void *sprite_png_data = NULL;
+    void *bullet_png_data = NULL;
+    size_t sprite_png_size = 0u;
+    size_t bullet_png_size = 0u;
 
     if (!render_manager) {
         return;
@@ -68,8 +65,11 @@ static void init(tarasque_entity *entity)
 
     ship->sprite.body.local.scale = (vector2_t) { 1, 1 };
 
-    ship->sprite.texture = IMG_LoadTexture_RW(render_manager->renderer, SDL_RWFromConstMem(res__ship_sprite_start, (int) ((size_t) res__ship_sprite_end - (size_t) res__ship_sprite_start)), 1);
-    ship->bullets_sprite = IMG_LoadTexture_RW(render_manager->renderer, SDL_RWFromConstMem(res__bullet_sprite_start, (int) ((size_t) res__bullet_sprite_end - (size_t) res__bullet_sprite_start)), 1);
+    sprite_png_data = tarasque_entity_fetch_resource(entity, "sprites", "res/ship.png", &sprite_png_size);
+    bullet_png_data = tarasque_entity_fetch_resource(entity, "sprites", "res/bullet.png", &bullet_png_size);
+
+    ship->sprite.texture = IMG_LoadTexture_RW(render_manager->renderer, SDL_RWFromConstMem(sprite_png_data, (int) sprite_png_size), 1);
+    ship->bullets_sprite = IMG_LoadTexture_RW(render_manager->renderer, SDL_RWFromConstMem(bullet_png_data, (int) bullet_png_size), 1);
 
     tarasque_entity_queue_subscribe_to_event(entity, "sdl event", (tarasque_specific_event_subscription) { .callback = &on_sdl_event });
 }

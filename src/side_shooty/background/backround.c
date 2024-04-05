@@ -4,14 +4,16 @@
 #include <SDL2/SDL_image.h>
 #include <ustd/res.h>
 
-DECLARE_RES(background_sprite, "res_bg_png")
-
 static void init(tarasque_entity *entity)
 {
     backround *bg = (backround *) entity;
     BE_render_manager_sdl *render_manager = (BE_render_manager_sdl *) tarasque_entity_get_parent(entity, NULL, &BE_render_manager_sdl_entity_def);
+    void *sprite_png_data = NULL;
+    size_t sprite_png_size = 0u;
 
-    bg->sprite.texture = IMG_LoadTexture_RW(render_manager->renderer, SDL_RWFromMem((void *) res__background_sprite_start, (int) ((size_t) res__background_sprite_end - (size_t) res__background_sprite_start)), 1);
+    sprite_png_data = tarasque_entity_fetch_resource(entity, "background", "res/bg.png", &sprite_png_size);
+
+    bg->sprite.texture = IMG_LoadTexture_RW(render_manager->renderer, SDL_RWFromMem(sprite_png_data, (int) sprite_png_size), 1);
     bg->sprite.body.local.scale = (vector2_t) { .75, .75 };
     bg->sprite.body.local.angle = 0.f;
 }
