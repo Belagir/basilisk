@@ -484,6 +484,7 @@ bool tarasque_entity_is(tarasque_entity *entity, tarasque_entity_definition enti
 
 // -------------------------------------------------------------------------------------------------
 
+#undef tarasque_engine_declare_resource
 /**
  * @brief
  *
@@ -497,9 +498,14 @@ void tarasque_engine_declare_resource(tarasque_engine *handle, const char *str_s
         return;
     }
 
-    resource_manager_check(handle->res_manager, str_storage, str_file_path, handle->alloc);
+    if(resource_manager_check(handle->res_manager, str_storage, str_file_path, handle->alloc)) {
+        logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Detected resource \"%s\" in storage \"%s\".\n", str_file_path, str_storage);
+    } else {
+        logger_log(handle->logger, LOGGER_SEVERITY_ERRO, "Failed to detect resource \"%s\" in storage \"%s\".\n", str_file_path, str_storage);
+    }
 }
 
+#undef tarasque_entity_fetch_resource
 /**
  * @brief
  *

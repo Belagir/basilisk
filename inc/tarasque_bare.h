@@ -23,6 +23,10 @@
 #define TARASQUE_RESOURCE_STORAGES_FOLDER "program_data"
 #endif
 
+#ifndef TARASQUE_RESOURCE_STORAGES_EXTENSION
+#define TARASQUE_RESOURCE_STORAGES_EXTENSION "data"
+#endif
+
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -161,10 +165,10 @@ bool tarasque_entity_is(tarasque_entity *entity, tarasque_entity_definition enti
 /* In updating mode (TARASQUE_UPDATE_RESOURCES set), this function will update the resource file from the filesystem to the storage file. */
 /* Otherwise, this function will check that the resource is present in the given storage file and log what it finds. */
 void tarasque_engine_declare_resource(tarasque_engine *handle, const char *str_storage, const char *str_file_path);
-#define tarasque_engine_declare_resource(handle, str_storage, str_file_path) tarasque_engine_declare_resource(handle, TARASQUE_RESOURCE_STORAGES_FOLDER "/" str_storage, str_file_path);
+#define tarasque_engine_declare_resource(handle, str_storage, str_file_path) tarasque_engine_declare_resource(handle, TARASQUE_RESOURCE_STORAGES_FOLDER "/" str_storage "." TARASQUE_RESOURCE_STORAGES_EXTENSION, str_file_path)
 
 /* Loads a storage file if not already and search for a resource in it, returning its data. */
 void *tarasque_entity_fetch_resource(tarasque_entity *entity, const char *str_storage, const char *str_file_path);
-#define tarasque_entity_fetch_resource(_handle, _str_storage, _str_file_path) tarasque_entity_fetch_resource(handle, TARASQUE_RESOURCE_STORAGES_FOLDER "/" str_storage, str_file_path);
+#define tarasque_entity_fetch_resource(_handle, _str_storage, _str_file_path) tarasque_entity_fetch_resource(handle, TARASQUE_RESOURCE_STORAGES_FOLDER "/" str_storage "." TARASQUE_RESOURCE_STORAGES_EXTENSION, str_file_path)
 
 #endif

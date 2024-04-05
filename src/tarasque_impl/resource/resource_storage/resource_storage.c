@@ -12,16 +12,19 @@
 
 typedef RANGE(byte) file_data_array;
 
+typedef struct resource_item_header {
+    u32 str_path_hash;
+    size_t data_size;
+} resource_item_header;
+
 /**
  * @brief
  *
  */
-typedef struct resource_item {
-    u32 str_path_hash;
-
-    size_t data_size;
+typedef struct resource_item_deserialized {
+    resource_item_header header;
     void *data;
-} resource_item;
+} resource_item_deserialized;
 
 /**
  * @brief
@@ -32,7 +35,7 @@ typedef struct resource_storage_data {
 
     const char *file_path;
 
-    RANGE(resource_item) *items;
+    RANGE(resource_item_deserialized) *items;
 } resource_storage_data;
 
 // -------------------------------------------------------------------------------------------------
@@ -112,7 +115,9 @@ void resource_storage_data_destroy(resource_storage_data **storage_data, allocat
 bool resource_storage_check(resource_storage_data *storage_data, const char *str_path, allocator alloc)
 {
     FILE *storage_file = NULL;
+    resource_item_header item_header = { 0u };
     u32 str_path_hash = 0u;
+    bool found = false;
 
     if (!storage_data || !str_path) {
         return false;
@@ -134,8 +139,7 @@ bool resource_storage_check(resource_storage_data *storage_data, const char *str
         return false;
     }
 
-    fwrite(&str_path_hash, sizeof(str_path_hash), 1, storage_file);
-    fwrite(&(resource_file_data->length), sizeof(resource_file_data->length), 1, storage_file);
+    fwrite(&(resource_item_header) { .str_path_hash = str_path_hash, .data_size = resource_file_data->length }, sizeof(resource_item_header), 1, storage_file);
     fwrite(resource_file_data->data, resource_file_data->length, 1, storage_file);
     fflush(storage_file);
 
@@ -143,9 +147,20 @@ bool resource_storage_check(resource_storage_data *storage_data, const char *str
     range_destroy_dynamic(alloc, &RANGE_TO_ANY(resource_file_data));
 #endif
 
-    // TODO : check that a resource keyed to this str_path's hash exists in the file
+    storage_file = fopen(storage_data->file_path, "r");
+    if (!storage_file) {
+        return false;
+    }
 
-    return true;
+    while (!found && !feof(storage_file)) {
+        (void) fread(&item_header, sizeof(item_header), 1, storage_file);
+        found = (item_header.str_path_hash == str_path_hash);
+        fseek(storage_file, (long int) item_header.data_size, SEEK_CUR);
+    }
+
+    fclose(storage_file);
+
+    return found;
 }
 
 // -------------------------------------------------------------------------------------------------
