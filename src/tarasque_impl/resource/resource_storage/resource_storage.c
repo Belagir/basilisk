@@ -205,11 +205,13 @@ bool resource_storage_check(resource_storage_data *storage_data, const char *str
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief Returns the resource associated to a path in a storage object. If the storage object had not loaded its associated
- * storage file yet, it will do so before trying to find the requested data.
+ * @brief Returns the resource data and size associated to a path in a storage object. If the storage object had not loaded
+ * its associated storage file yet, it will do so before trying to find the requested data.
  *
- * @param storage_data
- * @param str_path
+ * @param[inout] storage_data Target storage data the resource was declared to.
+ * @param[in] str_path Path to the resource file, used to identify the resource.
+ * @param[out] out_size Outgoing size of the returned data, in bytes.
+ * @param[in] alloc Allocator used to create a buffer in case the storage file must be read.
  * @return
  */
 void *resource_storage_data_get(resource_storage_data *storage_data, const char *str_path, size_t *out_size, allocator alloc)
@@ -244,11 +246,13 @@ void *resource_storage_data_get(resource_storage_data *storage_data, const char 
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief
+ * @brief Reads the content of a file and copies it into a destination range. The function will return
+ * true on success, and false otehrwise.
  *
- * @param str_path
- * @param alloc
- * @return
+ * @param[in] str_path Path to the file on the filesystem.
+ * @param[out] dest Destination range of bytes, might be reallocated by the function.
+ * @param[in] alloc Allocator used to extend the range.
+ * @return bool
  */
 static bool file_data_array_from(const char *str_path, file_data_array **dest, allocator alloc)
 {
@@ -277,10 +281,10 @@ static bool file_data_array_from(const char *str_path, file_data_array **dest, a
 }
 
 /**
- * @brief
+ * @brief Adds the entries from a storage file into its storage object, if the storage object was set as not loaded.
  *
- * @param storage
- * @param alloc
+ * @param[inout] storage Target storage to populate.
+ * @param[in] alloc Allocator used to create memory to store the resources found in the file.
  */
 static void resource_storage_data_reload(resource_storage_data *storage, allocator alloc)
 {
@@ -300,6 +304,8 @@ static void resource_storage_data_reload(resource_storage_data *storage, allocat
         if (fread(&item.header, 1, sizeof(item.header), storage_file) == sizeof(item.header)) {
             item.data = alloc.malloc(alloc, item.header.data_size);
             fread(item.data, item.header.data_size, 1, storage_file);
+
+            storage->items = range_ensure_capacity(alloc, RANGE_TO_ANY(storage->items), 1);
             sorted_range_insert_in(RANGE_TO_ANY(storage->items), &hash_compare, &item);
         }
     }
@@ -310,12 +316,14 @@ static void resource_storage_data_reload(resource_storage_data *storage, allocat
 }
 
 /**
- * @brief
+ * @brief Appends the contentes of a file at the end of a storage file, after a header containing the hash of the path
+ * to the resource file and the number of appended bytes (excluding the header).
+ * The function will return true if the operation succeeded, and false otherwise.
  *
- * @param storage_file_path
- * @param res_path
- * @param alloc
- * @return
+ * @param storage_file_path Path to the target storage file.
+ * @param res_path Path to the resource file.
+ * @param alloc Allocator used to create a buffer to read the file.
+ * @return bool
  */
 static bool storage_file_append(const char *storage_file_path, const char *res_path, allocator alloc)
 {

@@ -1,4 +1,13 @@
-
+/**
+ * @file resource_storage.h
+ * @author gabriel ()
+ * @brief Header file for the module managing single-file resource serialization and deserialization.
+ * @version 0.1
+ * @date 2024-04-06
+ *
+ * @copyright Copyright (c) 2024
+ *
+ */
 #ifndef __TARASQUE_RESOURCE_STORAGE_H__
 #define __TARASQUE_RESOURCE_STORAGE_H__
 
