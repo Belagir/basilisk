@@ -8,6 +8,7 @@ static void init(tarasque_entity *entity)
 {
     backround *bg = (backround *) entity;
     BE_render_manager_sdl *render_manager = (BE_render_manager_sdl *) tarasque_entity_get_parent(entity, NULL, &BE_render_manager_sdl_entity_def);
+
     void *sprite_png_data = NULL;
     size_t sprite_png_size = 0u;
 

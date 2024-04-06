@@ -108,8 +108,6 @@ void *resource_manager_fetch(resource_manager *res_manager, const char *str_stor
     size_t found_storage_index = 0u;
     u32 storage_name_hash = 0u;
 
-    *out_size = 0u;
-
     if (!res_manager || !str_res_path) {
         return NULL;
     }

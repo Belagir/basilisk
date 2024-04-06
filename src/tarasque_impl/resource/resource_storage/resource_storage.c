@@ -106,7 +106,9 @@ void resource_storage_data_destroy(resource_storage_data **storage_data, allocat
         return;
     }
 
-    // TODO : release memory taken by items
+    for (size_t i = 0u ; i < (*storage_data)->items->length ; i++) {
+        alloc.free(alloc, (*storage_data)->items->data[i].data);
+    }
 
     range_destroy_dynamic(alloc, &RANGE_TO_ANY((*storage_data)->items));
 
@@ -181,7 +183,9 @@ void *resource_storage_data_get(resource_storage_data *storage_data, const char 
     u32 str_path_hash = 0u;
     size_t data_index = 0u;
 
-    *out_size = 0u;
+    if (out_size) {
+        *out_size = 0u;
+    }
 
     if (!storage_data || !str_path) {
         return NULL;
@@ -192,7 +196,9 @@ void *resource_storage_data_get(resource_storage_data *storage_data, const char 
     resource_storage_data_reload(storage_data, alloc);
 
     if (sorted_range_find_in(RANGE_TO_ANY(storage_data->items), &hash_compare, &str_path_hash, &data_index)) {
-        *out_size = storage_data->items->data[data_index].header.data_size;
+        if (out_size) {
+            *out_size = storage_data->items->data[data_index].header.data_size;
+        }
         return storage_data->items->data[data_index].data;
     }
 
