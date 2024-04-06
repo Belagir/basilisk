@@ -1,3 +1,14 @@
+/**
+ * @file resource_storage.c
+ * @author gabriel ()
+ * @brief Implementation file for the resource file deserialization object.
+ * This file centralizes all the filesystem interactions and conditional compilation needed by the resource management module.
+ * @version 0.1
+ * @date 2024-04-06
+ *
+ * @copyright Copyright (c) 2024
+ *
+ */
 
 #include <ustd/sorting.h>
 
@@ -12,40 +23,47 @@
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief
- *
+ * @typedef file_data_array
+ * @brief Shorthand symbol for the bytes found in a file. Used to quickly allocate buffers to read files into.
  */
 typedef RANGE(byte) file_data_array;
 
 /**
- * @brief
- *
+ * @brief Resource header presenting information about a resource in a storage file.
+ * This layout can be found directly in the storage file and is also used in the program memory.
+ * Needs to subtype the `u32` type for ordering.
  */
 typedef struct resource_item_header {
+    /** Hash of the path that led to the original resource file and used to access a resource from user code. */
     u32 str_path_hash;
+    /** Size of the resource, in bytes. */
     size_t data_size;
 } resource_item_header;
 
 /**
- * @brief
- *
+ * @brief Describes a codebase-exclusive data layout for a resource found in a file.
  */
 typedef struct resource_item_deserialized {
+    /** Resource information pulled from the storage file. */
     resource_item_header header;
 
+    /** Pointer to some allocated memory containing the resource's bytes. */
     void *data;
 } resource_item_deserialized;
 
 /**
- * @brief
- *
+ * @brief Describes a set of resources found in a single storage file.
+ * Needs to subtype the `u32` type for ordering.
  */
 typedef struct resource_storage_data {
+    /** Hash of the storage data name. Used for ordering collections of storages. */
     u32 storage_name_hash;
 
+    /** Flags that the storage has loaded the resources from its associated storage file. */
     bool is_loaded;
-    // TODO (low prio, all code paths require static strings) : use an identifier or path or RANGE(char)
-    const char *file_path;
+    /** Static string representing the path to the storage file associated to this storage object. */
+    const char *file_path; // TODO (low prio, all code paths require static strings) : use an identifier or path or RANGE(char)
+    /** Collection of resources, ordered by their hash. */
     RANGE(resource_item_deserialized) *items;
 } resource_storage_data;
 
@@ -53,10 +71,10 @@ typedef struct resource_storage_data {
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-/*  */
-static file_data_array *file_data_array_from(const char *str_path, allocator alloc);
+/* Loads the contents of a file into a buffer (a range of bytes) object. */
+static bool file_data_array_from(const char *str_path, file_data_array **dest, allocator alloc);
 
-/*  */
+/* Loads resources from a storage file into a storage object if the object was not marked as loaded. */
 static void resource_storage_data_reload(resource_storage_data *storage, allocator alloc);
 
 // -------------------------------------------------------------------------------------------------
@@ -64,11 +82,17 @@ static void resource_storage_data_reload(resource_storage_data *storage, allocat
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief
+ * @brief Creates a data storage object meant to load, store, service and release resources present in a single storage file.
+ * In nominal (development -- with no compilation switch) mode, calling this function will not only create the object, but also
+ * create or empty the given storage file. On failure, the function will abort the object creation, and will return NULL.
+ * With TARASQUE_RELEASE set, this function will just check that the given file can be opened in read mode. On failure, the
+ * object will not be created and the function will return NULL.
  *
- * @param str_storage_name
- * @param alloc
- * @return
+ * Calling this function will not load the resources present in the storage file.
+ *
+ * @param[in] str_storage_name Static string representing a path to the storage file. The object will retain a pointer to the string for following operations.
+ * @param[inout] alloc Allocator used to request memory for the object creation.
+ * @return resource_storage_data *
  */
 resource_storage_data *resource_storage_data_create(const char *str_storage_name, allocator alloc)
 {
@@ -140,6 +164,7 @@ bool resource_storage_check(resource_storage_data *storage_data, const char *str
 {
     FILE *storage_file = NULL;
     resource_item_header item_header = { 0u };
+    file_data_array *resource_file_data = NULL;
     u32 str_path_hash = 0u;
     bool found = false;
 
@@ -151,8 +176,10 @@ bool resource_storage_check(resource_storage_data *storage_data, const char *str
 
 #ifndef TARASQUE_RELEASE
     // fetch raw data from the target file
-    file_data_array *resource_file_data = file_data_array_from(str_path, alloc);
-    if (!resource_file_data) {
+    resource_file_data = range_create_dynamic(alloc, sizeof(*resource_file_data->data), 1u);
+
+    if (!file_data_array_from(str_path, &resource_file_data, alloc)) {
+        range_destroy_dynamic(alloc, &RANGE_TO_ANY(resource_file_data));
         return false;
     }
 
@@ -234,30 +261,30 @@ void *resource_storage_data_get(resource_storage_data *storage_data, const char 
  * @param alloc
  * @return
  */
-static file_data_array *file_data_array_from(const char *str_path, allocator alloc)
+static bool file_data_array_from(const char *str_path, file_data_array **dest, allocator alloc)
 {
     FILE *file = NULL;
     struct stat file_info = { 0u };
-    file_data_array *contents = { 0u };
 
-    if (!str_path) {
-        return NULL;
+    if (!str_path || !dest || !*dest) {
+        return false;
     }
 
     file = fopen(str_path, "r");
 
     if (!file) {
-        return NULL;
+        return false;
     }
 
     stat(str_path, &file_info);
 
-    contents = range_create_dynamic(alloc, sizeof(*contents->data), (size_t) file_info.st_size);
-    contents->length = fread(contents->data, 1u, (size_t) file_info.st_size, file);
+    range_clear(RANGE_TO_ANY((*dest)));
+    *dest = range_ensure_capacity(alloc, RANGE_TO_ANY((*dest)), (size_t) file_info.st_size);
+    (*dest)->length = fread((*dest)->data, 1u, (size_t) file_info.st_size, file);
 
     fclose(file);
 
-    return contents;
+    return true;
 }
 
 /**
