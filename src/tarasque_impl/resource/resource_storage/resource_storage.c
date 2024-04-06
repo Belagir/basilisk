@@ -77,6 +77,9 @@ static bool file_data_array_from(const char *str_path, file_data_array **dest, a
 /* Loads resources from a storage file into a storage object if the object was not marked as loaded. */
 static void resource_storage_data_reload(resource_storage_data *storage, allocator alloc);
 
+/* Copies the contents of a file at the end of a resource storage file. */
+static bool storage_file_append(const char *storage_file_path, const char *res_path, allocator alloc);
+
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -129,10 +132,11 @@ resource_storage_data *resource_storage_data_create(const char *str_storage_name
 }
 
 /**
- * @brief
+ * @brief Releases memory taken by a resource storage and nullifies the given pointer.
+ * All resources fetched from the supplied storage object are invalidated.
  *
- * @param storage_data
- * @param alloc
+ * @param[inout] storage_data Target storage data to destroy.
+ * @param[inout] alloc Allocator used to release all memory.
  */
 void resource_storage_data_destroy(resource_storage_data **storage_data, allocator alloc)
 {
@@ -153,18 +157,20 @@ void resource_storage_data_destroy(resource_storage_data **storage_data, allocat
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief
+ * @brief Checks that a resource (by its path) exists in a storage file.
+ * In nominal (development -- with no compilation switch) mode, this function will try to load the file present at the given path
+ * and append it to the storage file associated to the storage object. With TARASQUE_RELEASE set, this step is skipped.
+ * Then, the function will check that the resource is present in the storage file and return true if it finds it and false if not.
  *
- * @param storage_data
- * @param str_path
- * @param alloc
- * @return
+ * @param[inout] storage_data Storage object.
+ * @param[in] str_path Path to the resource used to either update or identify the checked resource.
+ * @param[inout] alloc Allocator used for the eventual file reading.
+ * @return bool
  */
 bool resource_storage_check(resource_storage_data *storage_data, const char *str_path, allocator alloc)
 {
     FILE *storage_file = NULL;
     resource_item_header item_header = { 0u };
-    file_data_array *resource_file_data = NULL;
     u32 str_path_hash = 0u;
     bool found = false;
 
@@ -172,31 +178,13 @@ bool resource_storage_check(resource_storage_data *storage_data, const char *str
         return false;
     }
 
-    str_path_hash = hash_jenkins_one_at_a_time((const byte *) str_path, c_string_length(str_path, false), 0u);
-
 #ifndef TARASQUE_RELEASE
-    // fetch raw data from the target file
-    resource_file_data = range_create_dynamic(alloc, sizeof(*resource_file_data->data), 1u);
-
-    if (!file_data_array_from(str_path, &resource_file_data, alloc)) {
-        range_destroy_dynamic(alloc, &RANGE_TO_ANY(resource_file_data));
+    if (!storage_file_append(storage_data->file_path, str_path, alloc)) {
         return false;
     }
-
-    // append resource file content at str_path in storage file
-    storage_file = fopen(storage_data->file_path, "a");
-    if (!storage_file) {
-        range_destroy_dynamic(alloc, &RANGE_TO_ANY(resource_file_data));
-        return false;
-    }
-
-    fwrite(&(resource_item_header) { .str_path_hash = str_path_hash, .data_size = resource_file_data->length }, sizeof(resource_item_header), 1, storage_file);
-    fwrite(resource_file_data->data, resource_file_data->length, 1, storage_file);
-    fflush(storage_file);
-
-    fclose(storage_file);
-    range_destroy_dynamic(alloc, &RANGE_TO_ANY(resource_file_data));
 #endif
+
+    str_path_hash = hash_jenkins_one_at_a_time((const byte *) str_path, c_string_length(str_path, false), 0u);
 
     storage_file = fopen(storage_data->file_path, "r");
     if (!storage_file) {
@@ -217,7 +205,8 @@ bool resource_storage_check(resource_storage_data *storage_data, const char *str
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief
+ * @brief Returns the resource associated to a path in a storage object. If the storage object had not loaded its associated
+ * storage file yet, it will do so before trying to find the requested data.
  *
  * @param storage_data
  * @param str_path
@@ -318,4 +307,49 @@ static void resource_storage_data_reload(resource_storage_data *storage, allocat
     fclose(storage_file);
 
     storage->is_loaded = true;
+}
+
+/**
+ * @brief
+ *
+ * @param storage_file_path
+ * @param res_path
+ * @param alloc
+ * @return
+ */
+static bool storage_file_append(const char *storage_file_path, const char *res_path, allocator alloc)
+{
+    file_data_array *resource_file_data = NULL;
+    FILE *storage_file = NULL;
+    u32 str_path_hash = 0u;
+
+    if (!storage_file_path || !res_path) {
+        return false;
+    }
+
+    str_path_hash = hash_jenkins_one_at_a_time((const byte *) res_path, c_string_length(res_path, false), 0u);
+
+    // fetch raw data from the target file
+    resource_file_data = range_create_dynamic(alloc, sizeof(*resource_file_data->data), 1u);
+
+    if (!file_data_array_from(res_path, &resource_file_data, alloc)) {
+        range_destroy_dynamic(alloc, &RANGE_TO_ANY(resource_file_data));
+        return false;
+    }
+
+    // append resource file content at str_path in storage file
+    storage_file = fopen(storage_file_path, "a");
+    if (!storage_file) {
+        range_destroy_dynamic(alloc, &RANGE_TO_ANY(resource_file_data));
+        return false;
+    }
+
+    fwrite(&(resource_item_header) { .str_path_hash = str_path_hash, .data_size = resource_file_data->length }, sizeof(resource_item_header), 1, storage_file);
+    fwrite(resource_file_data->data, resource_file_data->length, 1, storage_file);
+    fflush(storage_file);
+
+    fclose(storage_file);
+    range_destroy_dynamic(alloc, &RANGE_TO_ANY(resource_file_data));
+
+    return true;
 }
