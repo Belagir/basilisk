@@ -6,12 +6,21 @@
 
 #include "resource_storage.h"
 
+
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
+/**
+ * @brief
+ *
+ */
 typedef RANGE(byte) file_data_array;
 
+/**
+ * @brief
+ *
+ */
 typedef struct resource_item_header {
     u32 str_path_hash;
     size_t data_size;
@@ -44,8 +53,10 @@ typedef struct resource_storage_data {
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
+/*  */
 static file_data_array *file_data_array_from(const char *str_path, allocator alloc);
 
+/*  */
 static void resource_storage_data_reload(resource_storage_data *storage, allocator alloc);
 
 // -------------------------------------------------------------------------------------------------
@@ -68,8 +79,7 @@ resource_storage_data *resource_storage_data_create(const char *str_storage_name
         return NULL;
     }
 
-
-#ifdef TARASQUE_UPDATE_RESOURCES
+#ifndef TARASQUE_RELEASE
     (void) mkdir(TARASQUE_RESOURCE_STORAGES_FOLDER, S_IRWXU);
     storage_file = fopen(str_storage_name, "w");
 #else
@@ -118,6 +128,14 @@ void resource_storage_data_destroy(resource_storage_data **storage_data, allocat
 
 // -------------------------------------------------------------------------------------------------
 
+/**
+ * @brief
+ *
+ * @param storage_data
+ * @param str_path
+ * @param alloc
+ * @return
+ */
 bool resource_storage_check(resource_storage_data *storage_data, const char *str_path, allocator alloc)
 {
     FILE *storage_file = NULL;
@@ -131,7 +149,7 @@ bool resource_storage_check(resource_storage_data *storage_data, const char *str
 
     str_path_hash = hash_jenkins_one_at_a_time((const byte *) str_path, c_string_length(str_path, false), 0u);
 
-#ifdef TARASQUE_UPDATE_RESOURCES
+#ifndef TARASQUE_RELEASE
     // fetch raw data from the target file
     file_data_array *resource_file_data = file_data_array_from(str_path, alloc);
     if (!resource_file_data) {
@@ -209,6 +227,13 @@ void *resource_storage_data_get(resource_storage_data *storage_data, const char 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
+/**
+ * @brief
+ *
+ * @param str_path
+ * @param alloc
+ * @return
+ */
 static file_data_array *file_data_array_from(const char *str_path, allocator alloc)
 {
     FILE *file = NULL;
@@ -235,6 +260,12 @@ static file_data_array *file_data_array_from(const char *str_path, allocator all
     return contents;
 }
 
+/**
+ * @brief
+ *
+ * @param storage
+ * @param alloc
+ */
 static void resource_storage_data_reload(resource_storage_data *storage, allocator alloc)
 {
     FILE *storage_file = NULL;

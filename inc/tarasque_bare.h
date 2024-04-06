@@ -162,8 +162,8 @@ bool tarasque_entity_is(tarasque_entity *entity, tarasque_entity_definition enti
 // -------------------------------------------------------------------------------------------------
 // RESOURCE HANDLING
 
-/* In updating mode (TARASQUE_UPDATE_RESOURCES set), this function will update the resource file from the filesystem to the storage file. */
-/* Otherwise, this function will check that the resource is present in the given storage file and log what it finds. */
+/* In nominal development mode (TARASQUE_RELEASE is unset), this function will update the resource file from the filesystem to the storage file. */
+/* Otherwise, this function will just check that the resource is present in the given storage file and log what it finds. */
 void tarasque_engine_declare_resource(tarasque_engine *handle, const char *str_storage, const char *str_file_path);
 #define tarasque_engine_declare_resource(handle, str_storage, str_file_path) tarasque_engine_declare_resource(handle, TARASQUE_RESOURCE_STORAGES_FOLDER "/" str_storage "." TARASQUE_RESOURCE_STORAGES_EXTENSION, str_file_path)
 
