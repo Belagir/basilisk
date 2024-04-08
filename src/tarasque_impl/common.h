@@ -65,6 +65,9 @@ void print_path(const path *p);
 
 // -------------------------------------------------------------------------------------------------
 
+/* Compares two pointers (themselves passed by pointers) as two unsigned integers. */
+i32 raw_pointer_compare(const void *lhs, const void *rhs);
+
 /* Compares an identifier to a simple NULL_terminated string. Useful to circumvent memory allocation. */
 i32 identifier_compare_to_cstring(const identifier *id, const char *str);
 

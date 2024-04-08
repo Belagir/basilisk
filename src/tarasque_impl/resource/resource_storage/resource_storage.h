@@ -36,6 +36,12 @@ bool resource_storage_check(resource_storage_data *storage_data, const char *str
 void *resource_storage_data_get(resource_storage_data *storage_data, const char *str_path, size_t *out_size, allocator alloc);
 
 // -------------------------------------------------------------------------------------------------
+
+void resource_storage_add_suplicant(resource_storage_data *storage_data, tarasque_entity *entity, allocator alloc);
+
+void resource_storage_remove_suplicant(resource_storage_data *storage_data, tarasque_entity *entity, allocator alloc);
+
+// -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 

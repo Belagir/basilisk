@@ -104,11 +104,10 @@ bool resource_manager_check(resource_manager *res_manager, const char *str_stora
  */
 void *resource_manager_fetch(resource_manager *res_manager, const char *str_storage, const char *str_res_path, size_t *out_size, allocator alloc)
 {
-    resource_storage_data *target_storage = NULL;
     size_t found_storage_index = 0u;
     u32 storage_name_hash = 0u;
 
-    if (!res_manager || !str_res_path) {
+    if (!res_manager || !str_res_path || !str_storage) {
         return NULL;
     }
 
@@ -119,4 +118,46 @@ void *resource_manager_fetch(resource_manager *res_manager, const char *str_stor
     }
 
     return NULL;
+}
+
+/**
+ * @brief
+ *
+ * @param res_manager
+ * @param str_storage
+ * @param entity
+ * @param alloc
+ */
+void resource_manager_add_suplicant(resource_manager *res_manager, const char *str_storage, tarasque_entity *entity, allocator alloc)
+{
+    size_t found_storage_index = 0u;
+    u32 storage_name_hash = 0u;
+
+    if (!res_manager || !entity || !str_storage) {
+        return;
+    }
+
+    storage_name_hash = hash_jenkins_one_at_a_time((const byte *) str_storage, c_string_length(str_storage, false), 0u);
+
+    if (sorted_range_find_in(RANGE_TO_ANY(res_manager->storages), &hash_compare_doubleref, &(u32 *) { &storage_name_hash }, &found_storage_index)) {
+        resource_storage_add_suplicant(res_manager->storages->data[found_storage_index], entity, alloc);
+    }
+}
+
+/**
+ * @brief
+ *
+ * @param res_manager
+ * @param entity
+ * @param alloc
+ */
+void resource_manager_remove_suplicant(resource_manager *res_manager, tarasque_entity *entity, allocator alloc)
+{
+    if (!res_manager) {
+        return;
+    }
+
+    for (size_t i = 0u ; i < res_manager->storages->length ; i++) {
+        resource_storage_remove_suplicant(res_manager->storages->data[i], entity, alloc);
+    }
 }

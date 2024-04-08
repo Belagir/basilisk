@@ -65,6 +65,8 @@ typedef struct resource_storage_data {
     const char *file_path; // TODO (low prio, all code paths require static strings) : use an identifier or path or RANGE(char)
     /** Collection of resources, ordered by their hash. */
     RANGE(resource_item_deserialized) *items;
+
+    RANGE(tarasque_entity *) *supplicants;
 } resource_storage_data;
 
 // -------------------------------------------------------------------------------------------------
@@ -75,7 +77,9 @@ typedef struct resource_storage_data {
 static bool file_data_array_from(const char *str_path, file_data_array **dest, allocator alloc);
 
 /* Loads resources from a storage file into a storage object if the object was not marked as loaded. */
-static void resource_storage_data_reload(resource_storage_data *storage, allocator alloc);
+static void resource_storage_data_load(resource_storage_data *storage, allocator alloc);
+
+static void resource_storage_data_unload(resource_storage_data *storage, allocator alloc);
 
 /* Copies the contents of a file at the end of a resource storage file. */
 static bool storage_file_append(const char *storage_file_path, const char *res_path, allocator alloc);
@@ -125,6 +129,7 @@ resource_storage_data *resource_storage_data_create(const char *str_storage_name
                 .storage_name_hash = hash_jenkins_one_at_a_time((const byte *) str_storage_name, c_string_length(str_storage_name, false), 0u),
                 .file_path = str_storage_name,
                 .items = range_create_dynamic(alloc, sizeof(*new_storage->items->data), TARASQUE_COLLECTIONS_START_LENGTH),
+                .supplicants = range_create_dynamic(alloc, sizeof(*new_storage->supplicants->data), TARASQUE_COLLECTIONS_START_LENGTH),
         };
     }
 
@@ -148,6 +153,7 @@ void resource_storage_data_destroy(resource_storage_data **storage_data, allocat
         alloc.free(alloc, (*storage_data)->items->data[i].data);
     }
 
+    range_destroy_dynamic(alloc, &RANGE_TO_ANY((*storage_data)->supplicants));
     range_destroy_dynamic(alloc, &RANGE_TO_ANY((*storage_data)->items));
 
     alloc.free(alloc, *storage_data);
@@ -229,8 +235,6 @@ void *resource_storage_data_get(resource_storage_data *storage_data, const char 
 
     str_path_hash = hash_jenkins_one_at_a_time((const byte *) str_path, c_string_length(str_path, false), 0u);
 
-    resource_storage_data_reload(storage_data, alloc);
-
     if (sorted_range_find_in(RANGE_TO_ANY(storage_data->items), &hash_compare, &str_path_hash, &data_index)) {
         if (out_size) {
             *out_size = storage_data->items->data[data_index].header.data_size;
@@ -239,6 +243,52 @@ void *resource_storage_data_get(resource_storage_data *storage_data, const char 
     }
 
     return NULL;
+}
+
+/**
+ * @brief
+ *
+ * @param storage_data
+ * @param str_path
+ * @param entity
+ * @param alloc
+ */
+void resource_storage_add_suplicant(resource_storage_data *storage_data, tarasque_entity *entity, allocator alloc)
+{
+    if (!storage_data || !entity) {
+        return;
+    }
+
+    if (sorted_range_find_in(RANGE_TO_ANY(storage_data->supplicants), &raw_pointer_compare, &entity, NULL)) {
+        return;
+    }
+
+    if (storage_data->supplicants->length == 0) {
+        resource_storage_data_load(storage_data, alloc);
+    }
+
+    storage_data->supplicants = range_ensure_capacity(alloc, RANGE_TO_ANY(storage_data->supplicants), 1);
+    sorted_range_insert_in(RANGE_TO_ANY(storage_data->supplicants), &raw_pointer_compare, &entity);
+}
+
+/**
+ * @brief
+ *
+ * @param storage_data
+ * @param entity
+ * @param alloc
+ */
+void resource_storage_remove_suplicant(resource_storage_data *storage_data, tarasque_entity *entity, allocator alloc)
+{
+    if (!storage_data || !entity) {
+        return;
+    }
+
+    sorted_range_remove_from(RANGE_TO_ANY(storage_data->supplicants), &raw_pointer_compare, &entity);
+
+    if (storage_data->supplicants->length == 0) {
+        resource_storage_data_unload(storage_data, alloc);
+    }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -286,7 +336,7 @@ static bool file_data_array_from(const char *str_path, file_data_array **dest, a
  * @param[inout] storage Target storage to populate.
  * @param[in] alloc Allocator used to create memory to store the resources found in the file.
  */
-static void resource_storage_data_reload(resource_storage_data *storage, allocator alloc)
+static void resource_storage_data_load(resource_storage_data *storage, allocator alloc)
 {
     FILE *storage_file = NULL;
     resource_item_deserialized item = { 0u };
@@ -313,6 +363,26 @@ static void resource_storage_data_reload(resource_storage_data *storage, allocat
     fclose(storage_file);
 
     storage->is_loaded = true;
+}
+
+/**
+ * @brief
+ *
+ * @param storage
+ * @param alloc
+ */
+static void resource_storage_data_unload(resource_storage_data *storage, allocator alloc)
+{
+    if (!storage || !storage->is_loaded) {
+        return;
+    }
+
+    for (size_t i = 0u ; i < storage->items->length ; i++) {
+        alloc.free(alloc, storage->items->data[i].data);
+    }
+    range_clear(RANGE_TO_ANY(storage->items));
+
+    storage->is_loaded = false;
 }
 
 /**

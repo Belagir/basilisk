@@ -193,6 +193,21 @@ void print_path(const path *p)
 // -------------------------------------------------------------------------------------------------
 
 /**
+ * @brief Compares two pointers (themselves passed by pointers) as two unsigned integers.
+ *
+ * @param lhs
+ * @param rhs
+ * @return i32
+ */
+i32 raw_pointer_compare(const void *lhs, const void *rhs)
+{
+    uintptr_t lhs_val = (uintptr_t) *(const void **) lhs;
+    uintptr_t rhs_val = (uintptr_t) *(const void **) rhs;
+
+    return (lhs_val > rhs_val) - (lhs_val < rhs_val);
+}
+
+/**
  * @brief Compares an identifier to a NULL-terminated string.
  *
  * @param id

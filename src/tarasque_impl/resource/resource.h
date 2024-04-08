@@ -24,6 +24,11 @@ bool resource_manager_check(resource_manager *res_manager, const char *str_stora
 
 void *resource_manager_fetch(resource_manager *res_manager, const char *str_storage, const char *str_res_path, size_t *out_size, allocator alloc);
 
+void resource_manager_add_suplicant(resource_manager *res_manager, const char *str_storage, tarasque_entity *entity, allocator alloc);
+
+void resource_manager_remove_suplicant(resource_manager *res_manager, tarasque_entity *entity, allocator alloc);
+
+
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
