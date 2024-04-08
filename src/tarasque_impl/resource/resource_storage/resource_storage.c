@@ -55,7 +55,7 @@ typedef struct resource_item_deserialized {
  * @brief Describes a set of resources found in a single storage file.
  * Needs to subtype the `u32` type for ordering.
  */
-typedef struct resource_storage_data {
+typedef struct resource_storage {
     /** Hash of the storage data name. Used for ordering collections of storages. */
     u32 storage_name_hash;
 
@@ -66,8 +66,9 @@ typedef struct resource_storage_data {
     /** Collection of resources, ordered by their hash. */
     RANGE(resource_item_deserialized) *items;
 
+    /** Collection of entities that are using the resources of this storage. */
     RANGE(tarasque_entity *) *supplicants;
-} resource_storage_data;
+} resource_storage;
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -77,9 +78,10 @@ typedef struct resource_storage_data {
 static bool file_data_array_from(const char *str_path, file_data_array **dest, allocator alloc);
 
 /* Loads resources from a storage file into a storage object if the object was not marked as loaded. */
-static void resource_storage_data_load(resource_storage_data *storage, allocator alloc);
+static void resource_storage_load(resource_storage *storage, allocator alloc);
 
-static void resource_storage_data_unload(resource_storage_data *storage, allocator alloc);
+/* De-allocates memory used to store resources, removing resources data from the object. */
+static void resource_storage_unload(resource_storage *storage, allocator alloc);
 
 /* Copies the contents of a file at the end of a resource storage file. */
 static bool storage_file_append(const char *storage_file_path, const char *res_path, allocator alloc);
@@ -91,30 +93,30 @@ static bool storage_file_append(const char *storage_file_path, const char *res_p
 /**
  * @brief Creates a data storage object meant to load, store, service and release resources present in a single storage file.
  * In nominal (development -- with no compilation switch) mode, calling this function will not only create the object, but also
- * create or empty the given storage file. On failure, the function will abort the object creation, and will return NULL.
+ * create or empty the given storage file. On failure to do this, the function will abort the object creation, and will return NULL.
  * With TARASQUE_RELEASE set, this function will just check that the given file can be opened in read mode. On failure, the
  * object will not be created and the function will return NULL.
  *
  * Calling this function will not load the resources present in the storage file.
  *
- * @param[in] str_storage_name Static string representing a path to the storage file. The object will retain a pointer to the string for following operations.
+ * @param[in] str_storage_path Static string representing a path to the storage file. The object will retain a pointer to the string for following operations.
  * @param[inout] alloc Allocator used to request memory for the object creation.
- * @return resource_storage_data *
+ * @return resource_storage *
  */
-resource_storage_data *resource_storage_data_create(const char *str_storage_name, allocator alloc)
+resource_storage *resource_storage_create(const char *str_storage_path, allocator alloc)
 {
-    resource_storage_data *new_storage = NULL;
+    resource_storage *new_storage = NULL;
     FILE *storage_file = NULL;
 
-    if (!str_storage_name) {
+    if (!str_storage_path) {
         return NULL;
     }
 
 #ifndef TARASQUE_RELEASE
     (void) mkdir(TARASQUE_RESOURCE_STORAGES_FOLDER, S_IRWXU);
-    storage_file = fopen(str_storage_name, "w");
+    storage_file = fopen(str_storage_path, "w");
 #else
-    storage_file = fopen(str_storage_name, "r");
+    storage_file = fopen(str_storage_path, "r");
 #endif
 
     if (!storage_file) {
@@ -125,9 +127,9 @@ resource_storage_data *resource_storage_data_create(const char *str_storage_name
     new_storage = alloc.malloc(alloc, sizeof(*new_storage));
     if (new_storage) {
 
-        *new_storage = (resource_storage_data) {
-                .storage_name_hash = hash_jenkins_one_at_a_time((const byte *) str_storage_name, c_string_length(str_storage_name, false), 0u),
-                .file_path = str_storage_name,
+        *new_storage = (resource_storage) {
+                .storage_name_hash = hash_jenkins_one_at_a_time((const byte *) str_storage_path, c_string_length(str_storage_path, false), 0u),
+                .file_path = str_storage_path,
                 .items = range_create_dynamic(alloc, sizeof(*new_storage->items->data), TARASQUE_COLLECTIONS_START_LENGTH),
                 .supplicants = range_create_dynamic(alloc, sizeof(*new_storage->supplicants->data), TARASQUE_COLLECTIONS_START_LENGTH),
         };
@@ -143,15 +145,13 @@ resource_storage_data *resource_storage_data_create(const char *str_storage_name
  * @param[inout] storage_data Target storage data to destroy.
  * @param[inout] alloc Allocator used to release all memory.
  */
-void resource_storage_data_destroy(resource_storage_data **storage_data, allocator alloc)
+void resource_storage_destroy(resource_storage **storage_data, allocator alloc)
 {
     if (!storage_data || !*storage_data) {
         return;
     }
 
-    for (size_t i = 0u ; i < (*storage_data)->items->length ; i++) {
-        alloc.free(alloc, (*storage_data)->items->data[i].data);
-    }
+    resource_storage_unload(*storage_data, alloc);
 
     range_destroy_dynamic(alloc, &RANGE_TO_ANY((*storage_data)->supplicants));
     range_destroy_dynamic(alloc, &RANGE_TO_ANY((*storage_data)->items));
@@ -173,7 +173,7 @@ void resource_storage_data_destroy(resource_storage_data **storage_data, allocat
  * @param[inout] alloc Allocator used for the eventual file reading.
  * @return bool
  */
-bool resource_storage_check(resource_storage_data *storage_data, const char *str_path, allocator alloc)
+bool resource_storage_check(resource_storage *storage_data, const char *str_path, allocator alloc)
 {
     FILE *storage_file = NULL;
     resource_item_header item_header = { 0u };
@@ -211,16 +211,17 @@ bool resource_storage_check(resource_storage_data *storage_data, const char *str
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief Returns the resource data and size associated to a path in a storage object. If the storage object had not loaded
- * its associated storage file yet, it will do so before trying to find the requested data.
+ * @brief Returns the resource data and size associated to a path in a storage object. If the storage has no supplicant
+ * entity, the storage object had not have loaded its associated storage file yet, and will return NULL, regardless of
+ * the resource existence.
  *
  * @param[inout] storage_data Target storage data the resource was declared to.
  * @param[in] str_path Path to the resource file, used to identify the resource.
  * @param[out] out_size Outgoing size of the returned data, in bytes.
- * @param[in] alloc Allocator used to create a buffer in case the storage file must be read.
- * @return
+ * @param[inout] alloc Allocator used to create a buffer in case the storage file must be read.
+ * @return void *
  */
-void *resource_storage_data_get(resource_storage_data *storage_data, const char *str_path, size_t *out_size, allocator alloc)
+void *resource_storage_get(resource_storage *storage_data, const char *str_path, size_t *out_size, allocator alloc)
 {
     u32 str_path_hash = 0u;
     size_t data_index = 0u;
@@ -246,14 +247,17 @@ void *resource_storage_data_get(resource_storage_data *storage_data, const char 
 }
 
 /**
- * @brief
+ * @brief Adds an entity as a user of a storage. If the storage had no previous other supplicant entity, it
+ * will load the resources present in its associated file, if it exists.
  *
- * @param storage_data
- * @param str_path
- * @param entity
- * @param alloc
+ * Supplicants are used to track the usage of a storage, and detect simply when to load and unload the resources
+ * present in a storage file.
+ *
+ * @param[inout] storage_data Target storage the supplicant entity is registered to.
+ * @param[in] entity Entity marked as using the storage.
+ * @param[inout] alloc Allocator used for the eventual range allocation and resource loading.
  */
-void resource_storage_add_suplicant(resource_storage_data *storage_data, tarasque_entity *entity, allocator alloc)
+void resource_storage_add_supplicant(resource_storage *storage_data, tarasque_entity *entity, allocator alloc)
 {
     if (!storage_data || !entity) {
         return;
@@ -264,7 +268,7 @@ void resource_storage_add_suplicant(resource_storage_data *storage_data, tarasqu
     }
 
     if (storage_data->supplicants->length == 0) {
-        resource_storage_data_load(storage_data, alloc);
+        resource_storage_load(storage_data, alloc);
     }
 
     storage_data->supplicants = range_ensure_capacity(alloc, RANGE_TO_ANY(storage_data->supplicants), 1);
@@ -272,13 +276,14 @@ void resource_storage_add_suplicant(resource_storage_data *storage_data, tarasqu
 }
 
 /**
- * @brief
+ * @brief Removes an entity as a storage user. If this entity was the last one to be a supplicant to the storage,
+ * all resources loaded from the filesystem are released from memory.
  *
- * @param storage_data
- * @param entity
- * @param alloc
+ * @param[inout] storage_dataTarget storage the supplicant entity is unregistered from.
+ * @param[in] entity Entity withdrawing its usage from the storage.
+ * @param[inout] alloc Allocator used to unlaod the resources.
  */
-void resource_storage_remove_suplicant(resource_storage_data *storage_data, tarasque_entity *entity, allocator alloc)
+void resource_storage_remove_supplicant(resource_storage *storage_data, tarasque_entity *entity, allocator alloc)
 {
     if (!storage_data || !entity) {
         return;
@@ -287,7 +292,7 @@ void resource_storage_remove_suplicant(resource_storage_data *storage_data, tara
     sorted_range_remove_from(RANGE_TO_ANY(storage_data->supplicants), &raw_pointer_compare, &entity);
 
     if (storage_data->supplicants->length == 0) {
-        resource_storage_data_unload(storage_data, alloc);
+        resource_storage_unload(storage_data, alloc);
     }
 }
 
@@ -297,7 +302,7 @@ void resource_storage_remove_suplicant(resource_storage_data *storage_data, tara
 
 /**
  * @brief Reads the content of a file and copies it into a destination range. The function will return
- * true on success, and false otehrwise.
+ * true on success, and false otherwise.
  *
  * @param[in] str_path Path to the file on the filesystem.
  * @param[out] dest Destination range of bytes, might be reallocated by the function.
@@ -336,7 +341,7 @@ static bool file_data_array_from(const char *str_path, file_data_array **dest, a
  * @param[inout] storage Target storage to populate.
  * @param[in] alloc Allocator used to create memory to store the resources found in the file.
  */
-static void resource_storage_data_load(resource_storage_data *storage, allocator alloc)
+static void resource_storage_load(resource_storage *storage, allocator alloc)
 {
     FILE *storage_file = NULL;
     resource_item_deserialized item = { 0u };
@@ -366,12 +371,12 @@ static void resource_storage_data_load(resource_storage_data *storage, allocator
 }
 
 /**
- * @brief
+ * @brief removes all entries from a storage object, if the storage object was set as laoded.
  *
- * @param storage
- * @param alloc
+ * @param[inout] storage Target storage to empty.
+ * @param[in] alloc Allocator used to release the resources' memory.
  */
-static void resource_storage_data_unload(resource_storage_data *storage, allocator alloc)
+static void resource_storage_unload(resource_storage *storage, allocator alloc)
 {
     if (!storage || !storage->is_loaded) {
         return;

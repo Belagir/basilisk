@@ -527,7 +527,7 @@ void *tarasque_entity_fetch_resource(tarasque_entity *entity, const char *str_st
         return NULL;
     }
 
-    resource_manager_add_suplicant(handle->res_manager, str_storage, full_entity, handle->alloc);
+    resource_manager_add_supplicant(handle->res_manager, str_storage, full_entity, handle->alloc);
     return resource_manager_fetch(handle->res_manager, str_storage, str_file_path, out_size, handle->alloc);
 }
 
@@ -576,7 +576,7 @@ static void tarasque_engine_annihilate_entity(tarasque_engine *handle, tarasque_
     tarasque_engine_entity_deparent(target);
 
     tarasque_engine_entity_deinit(target);
-    resource_manager_remove_suplicant(handle->res_manager, target, handle->alloc);
+    resource_manager_remove_supplicant(handle->res_manager, target, handle->alloc);
     event_stack_remove_events_of(handle->events, target, handle->alloc);
     command_queue_remove_commands_of(handle->commands, target, handle->alloc);
     event_broker_unsubscribe_from_all(handle->pub_sub, target, handle->alloc);

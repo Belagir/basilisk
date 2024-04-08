@@ -10,7 +10,7 @@
 // -------------------------------------------------------------------------------------------------
 
 typedef struct resource_manager {
-    RANGE(resource_storage_data *) *storages;
+    RANGE(resource_storage *) *storages;
 } resource_manager;
 
 // -------------------------------------------------------------------------------------------------
@@ -51,7 +51,7 @@ void resource_manager_destroy(resource_manager **res_manager, allocator alloc)
     }
 
     for (size_t i = 0u ; i < (*res_manager)->storages->length ; i++) {
-        resource_storage_data_destroy((*res_manager)->storages->data + i, alloc);
+        resource_storage_destroy((*res_manager)->storages->data + i, alloc);
     }
 
     range_destroy_dynamic(alloc, &RANGE_TO_ANY((*res_manager)->storages));
@@ -75,7 +75,7 @@ bool resource_manager_check(resource_manager *res_manager, const char *str_stora
 {
     size_t found_storage_index = 0u;
     u32 storage_name_hash = 0u;
-    resource_storage_data *new_storage = NULL;
+    resource_storage *new_storage = NULL;
 
     if (!res_manager) {
         return false;
@@ -84,7 +84,7 @@ bool resource_manager_check(resource_manager *res_manager, const char *str_stora
     storage_name_hash = hash_jenkins_one_at_a_time((const byte *) str_storage, c_string_length(str_storage, false), 0u);
 
     if (!sorted_range_find_in(RANGE_TO_ANY(res_manager->storages), &hash_compare_doubleref, &(u32 *) { &storage_name_hash }, &found_storage_index)) {
-        new_storage = resource_storage_data_create(str_storage, alloc);
+        new_storage = resource_storage_create(str_storage, alloc);
         if (new_storage) {
             found_storage_index = sorted_range_insert_in(RANGE_TO_ANY(res_manager->storages), &hash_compare_doubleref, &new_storage);
         }
@@ -114,7 +114,7 @@ void *resource_manager_fetch(resource_manager *res_manager, const char *str_stor
     storage_name_hash = hash_jenkins_one_at_a_time((const byte *) str_storage, c_string_length(str_storage, false), 0u);
 
     if (sorted_range_find_in(RANGE_TO_ANY(res_manager->storages), &hash_compare_doubleref, &(u32 *) { &storage_name_hash }, &found_storage_index)) {
-        return resource_storage_data_get(res_manager->storages->data[found_storage_index], str_res_path, out_size, alloc);
+        return resource_storage_get(res_manager->storages->data[found_storage_index], str_res_path, out_size, alloc);
     }
 
     return NULL;
@@ -128,7 +128,7 @@ void *resource_manager_fetch(resource_manager *res_manager, const char *str_stor
  * @param entity
  * @param alloc
  */
-void resource_manager_add_suplicant(resource_manager *res_manager, const char *str_storage, tarasque_entity *entity, allocator alloc)
+void resource_manager_add_supplicant(resource_manager *res_manager, const char *str_storage, tarasque_entity *entity, allocator alloc)
 {
     size_t found_storage_index = 0u;
     u32 storage_name_hash = 0u;
@@ -140,7 +140,7 @@ void resource_manager_add_suplicant(resource_manager *res_manager, const char *s
     storage_name_hash = hash_jenkins_one_at_a_time((const byte *) str_storage, c_string_length(str_storage, false), 0u);
 
     if (sorted_range_find_in(RANGE_TO_ANY(res_manager->storages), &hash_compare_doubleref, &(u32 *) { &storage_name_hash }, &found_storage_index)) {
-        resource_storage_add_suplicant(res_manager->storages->data[found_storage_index], entity, alloc);
+        resource_storage_add_supplicant(res_manager->storages->data[found_storage_index], entity, alloc);
     }
 }
 
@@ -151,13 +151,13 @@ void resource_manager_add_suplicant(resource_manager *res_manager, const char *s
  * @param entity
  * @param alloc
  */
-void resource_manager_remove_suplicant(resource_manager *res_manager, tarasque_entity *entity, allocator alloc)
+void resource_manager_remove_supplicant(resource_manager *res_manager, tarasque_entity *entity, allocator alloc)
 {
     if (!res_manager) {
         return;
     }
 
     for (size_t i = 0u ; i < res_manager->storages->length ; i++) {
-        resource_storage_remove_suplicant(res_manager->storages->data[i], entity, alloc);
+        resource_storage_remove_supplicant(res_manager->storages->data[i], entity, alloc);
     }
 }

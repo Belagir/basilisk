@@ -40,7 +40,7 @@ LFLAGS += -lSDL2_image
 LFLAGS += -lGL
 
 # additional flags for defines
-DFLAGS += -D_POSIX_C_SOURCE=199309L -DTARASQUE_UPDATE_RESOURCES
+DFLAGS += -D_POSIX_C_SOURCE=199309L
 
 # --------------- Internal variables -------------------------------------------
 
