@@ -30,7 +30,7 @@ static void BE_body_2D_init(tarasque_entity *self_data)
 
     BE_body_2D *self_body = (BE_body_2D *) self_data;
 
-    self_body->previous = tarasque_entity_get_parent(self_data, NULL, &BE_body_2D_entity_def);
+    self_body->previous = tarasque_entity_get_parent(self_data, NULL, &BE_DEF_body_2D);
 }
 
 /**
@@ -65,7 +65,7 @@ static void BE_body_2D_on_frame(tarasque_entity *self_data, float elapsed_ms)
 /**
  * @brief
  */
-const tarasque_entity_definition BE_body_2D_entity_def = {
+const tarasque_entity_definition BE_DEF_body_2D = {
         .data_size = sizeof(BE_body_2D),
         .on_init = BE_body_2D_init,
         .on_frame = &BE_body_2D_on_frame,
