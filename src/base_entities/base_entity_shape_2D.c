@@ -10,4 +10,3 @@ const tarasque_entity_definition BE_DEF_shape_2D = {
 
         .data_size = sizeof(BE_shape_2D),
 };
-

@@ -127,6 +127,8 @@ typedef struct BE_shape_2D {
 } BE_shape_2D;
 
 typedef struct BE_shape_2D_visual {
+    BE_shape_2D *visualized;
+
     SDL_Color color;
     i32 draw_index;
 } BE_shape_2D_visual;
