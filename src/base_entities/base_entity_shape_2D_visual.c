@@ -28,13 +28,24 @@ static void BE_shape_2D_visual_on_draw(tarasque_entity *self_data, void *event_d
  */
 static void BE_shape_2D_visual_render_draw_circle(SDL_Renderer *renderer, vector2_t center, f32 radius)
 {
+    SDL_FPoint octants[8u] = { 0u };
+
     f32 t1 = radius / 16.f;
     f32 t2 = 0.f;
-    f32 x = radius;
-    f32 y = 0.f;
+    f32 x  = radius;
+    f32 y  = 0.f;
 
     while (x > y) {
-        SDL_RenderDrawPointF(renderer, x, y);
+        octants[0u] = (SDL_FPoint) { .x = center.x + x, center.y + y };
+        octants[1u] = (SDL_FPoint) { .x = center.x + y, center.y + x };
+        octants[2u] = (SDL_FPoint) { .x = center.x - x, center.y + y };
+        octants[3u] = (SDL_FPoint) { .x = center.x - y, center.y + x };
+        octants[4u] = (SDL_FPoint) { .x = center.x + x, center.y - y };
+        octants[5u] = (SDL_FPoint) { .x = center.x + y, center.y - x };
+        octants[6u] = (SDL_FPoint) { .x = center.x - x, center.y - y };
+        octants[7u] = (SDL_FPoint) { .x = center.x - y, center.y - x };
+
+        SDL_RenderDrawPointsF(renderer, (const SDL_FPoint *) octants, 8u);
 
         y = y + 1.f;
         t1 = t1 + y;
@@ -72,6 +83,8 @@ static void BE_shape_2D_visual_on_draw(tarasque_entity *self_data, void *event_d
 {
     BE_shape_2D_visual *visual = (BE_shape_2D_visual *) self_data;
     BE_render_manager_sdl_event_draw *event_draw = (BE_render_manager_sdl_event_draw *) event_data;
+
+    SDL_SetRenderDrawColor(event_draw->renderer, visual->color.r, visual->color.g, visual->color.b, visual->color.a);
 
     switch (visual->visualized->kind) {
         case SHAPE_2D_CIRCLE:
