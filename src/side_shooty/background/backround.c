@@ -7,7 +7,7 @@
 static void init(tarasque_entity *entity)
 {
     backround *bg = (backround *) entity;
-    BE_render_manager_sdl *render_manager = (BE_render_manager_sdl *) tarasque_entity_get_parent(entity, NULL, &BE_render_manager_sdl_entity_def);
+    BE_render_manager_sdl *render_manager = (BE_render_manager_sdl *) tarasque_entity_get_parent(entity, NULL, &BE_DEF_render_manager_sdl);
 
     void *sprite_png_data = NULL;
     size_t sprite_png_size = 0u;
@@ -32,7 +32,7 @@ tarasque_specific_entity backround_entity(backround *bg)
     return (tarasque_specific_entity) {
             .data = bg,
             .entity_def = {
-                    .subtype = &BE_texture_2D_entity_def,
+                    .subtype = &BE_DEF_texture_2D,
 
                     .on_init = &init,
                     .on_deinit = &deinit,

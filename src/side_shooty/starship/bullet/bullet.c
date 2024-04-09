@@ -30,7 +30,7 @@ tarasque_specific_entity bullet_entity(bullet *args)
     return (tarasque_specific_entity) {
         .data = args,
         .entity_def = {
-                .subtype = &BE_texture_2D_entity_def,
+                .subtype = &BE_DEF_texture_2D,
 
                 .data_size = sizeof(*args),
                 .on_frame = &frame,

@@ -53,7 +53,7 @@ static void init(tarasque_entity *entity)
 {
     starship *ship = (starship *) entity;
 
-    BE_render_manager_sdl *render_manager = (BE_render_manager_sdl *) tarasque_entity_get_parent(entity, NULL, &BE_render_manager_sdl_entity_def);
+    BE_render_manager_sdl *render_manager = (BE_render_manager_sdl *) tarasque_entity_get_parent(entity, NULL, &BE_DEF_render_manager_sdl);
     void *sprite_png_data = NULL;
     void *bullet_png_data = NULL;
     size_t sprite_png_size = 0u;
@@ -129,7 +129,7 @@ tarasque_specific_entity starship_entity(starship *args)
     return (tarasque_specific_entity) {
             .data = args,
             .entity_def = {
-                    .subtype = &BE_texture_2D_entity_def,
+                    .subtype = &BE_DEF_texture_2D,
 
                     .data_size = sizeof(*args),
                     .on_init = &init,
