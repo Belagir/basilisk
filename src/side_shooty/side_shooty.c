@@ -38,16 +38,11 @@ static void init(tarasque_entity *entity)
 
     tarasque_entity_add_child(tarasque_entity_get_child(entity, "Context/Window/Render Manager", NULL), "ship",
             starship_entity(&(starship) {
-                    .sprite = {
-                            .body = {
-                                    .local = {
-                                            .position = { 10, 10 },
-                                            .scale = { 1, 1 },
-                                    },
-                            },
-                            .draw_index = 1,
-                    },
-            }));
+                    .sprite.body.local.position = { 10, 10 },
+                    .sprite.body.local.scale = { 1, 1 },
+                    .sprite.draw_index = 1,
+            } ));
+
     tarasque_entity_add_child(tarasque_entity_get_child(entity, "Context/Window/Render Manager", NULL), "background", backround_entity(&(backround) { 0u }));
 }
 

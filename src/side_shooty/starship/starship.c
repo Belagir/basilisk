@@ -72,6 +72,18 @@ static void init(tarasque_entity *entity)
     ship->bullets_sprite = IMG_LoadTexture_RW(render_manager->renderer, SDL_RWFromConstMem(bullet_png_data, (int) bullet_png_size), 1);
 
     tarasque_entity_queue_subscribe_to_event(entity, "sdl event", (tarasque_specific_event_subscription) { .callback = &on_sdl_event });
+
+    tarasque_entity_add_child(entity, "circle", (tarasque_specific_entity) {
+            .entity_def = BE_DEF_shape_2D,
+            .data = &(BE_shape_2D) {
+                    .body = { .local.scale = { 1, 1 }, .local.position = { .x = 70, .y = 32 } }, .kind = SHAPE_2D_CIRCLE, .as_circle = { .radius = 25.f },
+            } });
+
+    tarasque_entity_add_child(tarasque_entity_get_child(entity, "circle", &BE_DEF_shape_2D), "circle visual", (tarasque_specific_entity) {
+            .entity_def = BE_DEF_shape_2D_visual,
+            .data = &(BE_shape_2D_visual) {
+                    .color = (SDL_Color) { 255, 180, 20, 255 }, .draw_index = 5
+            } });
 }
 
 /**
@@ -102,17 +114,16 @@ static void frame(tarasque_entity *entity, float elapsed_ms)
     if (ship->is_shooting) {
 
         tarasque_entity_add_child(tarasque_entity_get_parent(entity, NULL, NULL), "bullet", bullet_entity(&(bullet) {
-                .sprite = {
-                        .body = { .local = { .scale = { 1, 1 }, .position = ship->sprite.body.local.position } },
-                        .draw_index = 1, .texture = ship->bullets_sprite,
-                },
-        }));
+                .sprite.body.local = { .scale = { 1, 1 }, .position = ship->sprite.body.local.position },
+                .sprite.draw_index = 1,
+                .sprite.texture = ship->bullets_sprite,
+
+        } ));
         tarasque_entity_add_child(tarasque_entity_get_parent(entity, NULL, NULL), "bullet", bullet_entity(&(bullet) {
-                .sprite = {
-                        .body = { .local = { .scale = { 1, 1 }, .position = vector2_add(ship->sprite.body.local.position, (vector2_t) { 0, 32 }) } },
-                        .draw_index = 1, .texture = ship->bullets_sprite,
-                },
-        }));
+                .sprite.body.local = { .scale = { 1, 1 }, .position = vector2_add(ship->sprite.body.local.position, (vector2_t) { 0, 32 }) },
+                .sprite.draw_index = 1,
+                .sprite.texture = ship->bullets_sprite,
+        } ));
 
         ship->is_shooting = false;
     }
