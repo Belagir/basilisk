@@ -42,8 +42,8 @@ void resource_storage_destroy(resource_storage **storage_data, allocator alloc);
 bool resource_storage_check(resource_storage *storage_data, const char *str_path, allocator alloc);
 
 /* Returns a resource from the loaded resources in a storage. This storage needs to be loaded to return the
-   resource (have at least one supplicant entity.) */
-void *resource_storage_get(resource_storage *storage_data, const char *str_path, size_t *out_size, allocator alloc);
+   resource (i.e. have at least one supplicant entity.) */
+void *resource_storage_get(resource_storage *storage_data, const char *str_path, size_t *out_size);
 
 // -------------------------------------------------------------------------------------------------
 

@@ -485,37 +485,55 @@ bool tarasque_entity_is(tarasque_entity *entity, tarasque_entity_definition enti
 // -------------------------------------------------------------------------------------------------
 
 #undef tarasque_engine_declare_resource
+
 /**
- * @brief
+ * @brief Declares a resource into the engine to be used later. Trying to get (with `tarasque_entity_fetch_resource()`)
+ * an undeclared resource will fail regardless of its existence.
+ * In nominal, development mode (with the compilation switch TARASQUE_RELEASE reset), this function will search for the
+ * specified resource file and append it to a storage file named after the storage name provided.
+ * With TARASQUE_RELEASE set, the function will only check that the resource is present in an already existing storage file
+ * of the provided name.
+ * If all went right, the resource will be ready to be used by entity requesting it with `tarasque_entity_fetch_resource()`.
  *
- * @param handle
- * @param str_storage
- * @param str_file_path
+ * @param[inout] handle Handle to an engine instance.
+ * @param[in] str_storage_name Name of the storage retaining the resource data.
+ * @param[in] str_file_path Path to a resource file to declare.
  */
-void tarasque_engine_declare_resource(tarasque_engine *handle, const char *str_storage, const char *str_file_path)
+void tarasque_engine_declare_resource(tarasque_engine *handle, const char *str_storage_name, const char *str_file_path)
 {
+    const char *str_storage_path = str_storage_name; // for lisibility and intent
+
     if (!handle) {
         return;
     }
 
-    if(resource_manager_check(handle->res_manager, str_storage, str_file_path, handle->alloc)) {
-        logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Detected resource \"%s\" in storage \"%s\".\n", str_file_path, str_storage);
+    if(resource_manager_touch(handle->res_manager, str_storage_path, str_file_path, handle->alloc)) {
+        logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Detected resource \"%s\" in storage \"%s\".\n", str_file_path, str_storage_path);
     } else {
-        logger_log(handle->logger, LOGGER_SEVERITY_ERRO, "Failed to detect resource \"%s\" in storage \"%s\".\n", str_file_path, str_storage);
+        logger_log(handle->logger, LOGGER_SEVERITY_ERRO, "Failed to detect resource \"%s\" in storage \"%s\".\n", str_file_path, str_storage_path);
     }
 }
 
 #undef tarasque_entity_fetch_resource
+
 /**
- * @brief
+ * @brief Returns the data from a resource present in a storage. The entity will be registered as using this storage, and if it is the first
+ * one to do so, all of the storage's resources will be loaded in memory. On entity removal, the entity will be also removed from the storage's
+ * users, and if it was the last one, the storage will be unloaded. You can also pass NULL to the `str_file_path` argument to notify the engine
+ * that the provided entity needs to keep the storage loaded as long as it lives.
  *
- * @param entity
- * @param str_storage
- * @param str_file_path
- * @return
+ * The memory returned is owned by the engine and will follow its own lifetime.
+ *
+ * @param[in] entity Entity querying a resource. It will be registered as a user of the storage.
+ * @param[in] str_storage_name Name of the storage containing the resource.
+ * @param[in] str_file_path File path to the actual resource. Can be NULL.
+ * @param[out] out_size Outgoing number of bytes the function returned.
+ * @return void *
  */
-void *tarasque_entity_fetch_resource(tarasque_entity *entity, const char *str_storage, const char *str_file_path, unsigned long *out_size)
+void *tarasque_entity_fetch_resource(tarasque_entity *entity, const char *str_storage_name, const char *str_file_path, unsigned long *out_size)
 {
+    const char *str_storage_path = str_storage_name; // for lisibility and intent
+
     if (!entity) {
         return NULL;
     }
@@ -527,8 +545,8 @@ void *tarasque_entity_fetch_resource(tarasque_entity *entity, const char *str_st
         return NULL;
     }
 
-    resource_manager_add_supplicant(handle->res_manager, str_storage, full_entity, handle->alloc);
-    return resource_manager_fetch(handle->res_manager, str_storage, str_file_path, out_size, handle->alloc);
+    resource_manager_add_supplicant(handle->res_manager, str_storage_path, full_entity, handle->alloc);
+    return resource_manager_fetch(handle->res_manager, str_storage_path, str_file_path, out_size);
 }
 
 // -------------------------------------------------------------------------------------------------

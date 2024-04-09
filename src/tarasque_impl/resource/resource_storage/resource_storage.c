@@ -218,10 +218,9 @@ bool resource_storage_check(resource_storage *storage_data, const char *str_path
  * @param[inout] storage_data Target storage data the resource was declared to.
  * @param[in] str_path Path to the resource file, used to identify the resource.
  * @param[out] out_size Outgoing size of the returned data, in bytes.
- * @param[inout] alloc Allocator used to create a buffer in case the storage file must be read.
  * @return void *
  */
-void *resource_storage_get(resource_storage *storage_data, const char *str_path, size_t *out_size, allocator alloc)
+void *resource_storage_get(resource_storage *storage_data, const char *str_path, size_t *out_size)
 {
     u32 str_path_hash = 0u;
     size_t data_index = 0u;

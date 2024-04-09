@@ -162,13 +162,13 @@ bool tarasque_entity_is(tarasque_entity *entity, tarasque_entity_definition enti
 // -------------------------------------------------------------------------------------------------
 // RESOURCE HANDLING
 
-/* In nominal development mode (TARASQUE_RELEASE is unset), this function will update the resource file from the filesystem to the storage file. */
-/* Otherwise, this function will just check that the resource is present in the given storage file and log what it finds. */
-void tarasque_engine_declare_resource(tarasque_engine *handle, const char *str_storage, const char *str_file_path);
-#define tarasque_engine_declare_resource(handle, str_storage, str_file_path) tarasque_engine_declare_resource(handle, TARASQUE_RESOURCE_STORAGES_FOLDER "/" str_storage "." TARASQUE_RESOURCE_STORAGES_EXTENSION, str_file_path)
+/* Requiered before using a resource. In nominal development mode (TARASQUE_RELEASE is unset), this function will update the resource file from the filesystem to the storage file.
+   Otherwise, this function will check that the resource is present in the given storage file and log what it finds. */
+void tarasque_engine_declare_resource(tarasque_engine *handle, const char *str_storage_name, const char *str_file_path);
+#define tarasque_engine_declare_resource(handle, str_storage_name, str_file_path) tarasque_engine_declare_resource(handle, TARASQUE_RESOURCE_STORAGES_FOLDER "/" str_storage_name "." TARASQUE_RESOURCE_STORAGES_EXTENSION, str_file_path)
 
 /* Loads a storage file if not already and search for a resource in it, returning its data. */
-void *tarasque_entity_fetch_resource(tarasque_entity *entity, const char *str_storage, const char *str_file_path, unsigned long *out_size);
-#define tarasque_entity_fetch_resource(entity, str_storage, str_file_path, out_size) tarasque_entity_fetch_resource(entity, TARASQUE_RESOURCE_STORAGES_FOLDER "/" str_storage "." TARASQUE_RESOURCE_STORAGES_EXTENSION, str_file_path, out_size)
+void *tarasque_entity_fetch_resource(tarasque_entity *entity, const char *str_storage_name, const char *str_file_path, unsigned long *out_size);
+#define tarasque_entity_fetch_resource(entity, str_storage_name, str_file_path, out_size) tarasque_entity_fetch_resource(entity, TARASQUE_RESOURCE_STORAGES_FOLDER "/" str_storage_name "." TARASQUE_RESOURCE_STORAGES_EXTENSION, str_file_path, out_size)
 
 #endif
