@@ -1,7 +1,7 @@
 /**
  * @file tarasque.c
  * @author gabriel ()
- * @brief Implementation file for the engine main header @file tarasque.h and support header @file tarasque_impl.h.
+ * @brief Implementation file for the engine main header tarasque_bare.h and support header tarasque_impl.h.
  *
  * This file's responsability is to aggregate the implementation of core operations of the engine.
  *
@@ -18,13 +18,14 @@
 
 #include <ustd/logging.h>
 
-#include <tarasque.h>
+#include <tarasque_bare.h>
 
 #include "../common.h"
 
 #include "../command/command.h"
 #include "../entity/entity.h"
 #include "../event/event.h"
+#include "../resource/resource.h"
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -36,6 +37,9 @@
  * to any engine-owned memory.
  */
 typedef struct tarasque_engine {
+    /** Allocator object used for all memory operations done by the engine instance. */
+    allocator alloc;
+
     /** Logger object to communicate to the outside world. */
     logger *logger;
     /** Command queue containing pending operations that will change the state of other collections. */
@@ -44,15 +48,19 @@ typedef struct tarasque_engine {
     event_stack *events;
     /** Publisher / subscriber object maintaining a collection of subscriptions of entities to events. */
     event_broker *pub_sub;
+    /** Resource manager object to load / unload files from the filesystem. */
+    resource_manager *res_manager;
 
     /** Root of the game tree as an empty entity. */
     tarasque_engine_entity *root_entity;
 
+    /** Buffer of references to entities to use for the main loop. */
+    tarasque_engine_entity_range *active_entities;
+    /** Flags that the active entities buffer needs to be reloaded. */
+    bool update_active_entities;
+
     /** Flag signaling wether the engine should exit or not the main loop. */
     bool should_quit;
-
-    /** Allocator object used for all memory operations done by the engine instance. */
-    allocator alloc;
 } tarasque_engine;
 
 // -------------------------------------------------------------------------------------------------
@@ -82,6 +90,11 @@ static void tarasque_engine_process_event(tarasque_engine *handle, event process
 
 /* Steps all entities forward in time with their on_frame() callback. */
 static void tarasque_engine_frame_step_entities(tarasque_engine *handle, f32 elapsed_time);
+
+// -------------------------------------------------------------------------------------------------
+
+/* Updates the active entities buffer if needed. */
+static void tarasque_engine_update_active_entities(tarasque_engine *handle);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -119,17 +132,21 @@ tarasque_engine *tarasque_engine_create(void)
     new_engine = used_alloc.malloc(used_alloc, sizeof(*new_engine));
     if (new_engine) {
         *new_engine = (tarasque_engine) {
+                .alloc = used_alloc,
+
                 .logger = logger_create(stdout, LOGGER_ON_DESTROY_DO_NOTHING),
 
-                .commands = command_queue_create(used_alloc),
-                .events = event_stack_create(used_alloc),
-                .pub_sub = event_broker_create(used_alloc),
+                .commands    = command_queue_create(used_alloc),
+                .events      = event_stack_create(used_alloc),
+                .pub_sub     = event_broker_create(used_alloc),
+                .res_manager = resource_manager_create(used_alloc),
 
                 .root_entity = tarasque_engine_entity_create(identifier_root, (tarasque_specific_entity) { 0u }, new_engine, used_alloc),
 
-                .should_quit = false,
+                .active_entities = NULL,
+                .update_active_entities = false,
 
-                .alloc = used_alloc,
+                .should_quit = false,
         };
 
         logger_log(new_engine->logger, LOGGER_SEVERITY_INFO, "Engine is ready.\n");
@@ -154,6 +171,11 @@ void tarasque_engine_destroy(tarasque_engine **handle)
 
     used_alloc = (*handle)->alloc;
 
+    if ((*handle)->active_entities) {
+        range_destroy_dynamic(used_alloc, &RANGE_TO_ANY((*handle)->active_entities));
+    }
+
+    resource_manager_destroy(&(*handle)->res_manager, used_alloc);
     event_broker_destroy(&(*handle)->pub_sub, used_alloc);
     event_stack_destroy(&(*handle)->events, used_alloc);
     command_queue_destroy(&(*handle)->commands, used_alloc);
@@ -161,7 +183,6 @@ void tarasque_engine_destroy(tarasque_engine **handle)
     tarasque_engine_annihilate_entity_and_chilren((*handle), (*handle)->root_entity);
 
     logger_log((*handle)->logger, LOGGER_SEVERITY_INFO, "Engine shut down.\n");
-
 
     logger_destroy(&(*handle)->logger);
 
@@ -219,6 +240,8 @@ void tarasque_engine_run(tarasque_engine *handle, int fps) {
         while (event_stack_length(handle->events) > 0u) {
             tarasque_engine_process_event(handle, event_stack_pop(handle->events));
         }
+
+        tarasque_engine_update_active_entities(handle);
 
         tarasque_engine_frame_step_entities(handle, (f32) frame_delay);
 
@@ -284,6 +307,8 @@ tarasque_entity *tarasque_entity_add_child(tarasque_entity *entity, const char *
     logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Added entity \"%s\" under parent \"%s\".\n", tarasque_engine_entity_get_name(new_entity)->data, tarasque_engine_entity_get_name(full_entity)->data);
 
     range_destroy_dynamic(handle->alloc, &RANGE_TO_ANY(new_entity_id));
+
+    handle->update_active_entities = true;
 
     return tarasque_engine_entity_get_specific_data(new_entity);
 }
@@ -380,26 +405,31 @@ void tarasque_entity_stack_event(tarasque_entity *entity, const char *str_event_
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief Returns the first parent entity of the provided name. If the name is NULL, the first parent is returned.
+ * @brief Returns the first parent entity of the provided name and definition.
  * If no corresponding parent is found, the function returns NULL.
  *
  * @param[in] entity Entity from which to search for the parent.
- * @param[in] str_parent_name Name of the potential parent.
+ * @param[in] str_parent_name Name of the potential parent. Can be NULL if you just want to search by type or get the first parent.
+ * @param[in] entity_def Entity definition used to create the potential parent. Can be NULL if you just want to search by name or get the first parent.
  * @return tarasque_entity *
  */
-tarasque_entity *tarasque_entity_get_parent(tarasque_entity *entity, const char *str_parent_name)
+tarasque_entity *tarasque_entity_get_parent(tarasque_entity *entity, const char *str_parent_name, const tarasque_entity_definition *entity_def)
 {
     if (!entity) {
         return NULL;
     }
 
     tarasque_engine_entity *full_entity = tarasque_engine_entity_get_containing_full_entity(entity);
+    full_entity = tarasque_engine_entity_get_parent(full_entity);
 
-    if (!str_parent_name) {
-        return tarasque_engine_entity_get_parent(full_entity);
+    if ((entity_def == NULL) && (str_parent_name == NULL)) {
+        return tarasque_engine_entity_get_specific_data(full_entity);
     }
 
-    while ((full_entity != NULL) && (identifier_compare_to_cstring(tarasque_engine_entity_get_name(full_entity), str_parent_name) != 0)) {
+    while ((full_entity != NULL)
+            && (((entity_def == NULL) || (!tarasque_engine_entity_has_definition(full_entity, *entity_def)))
+                    && ((str_parent_name == NULL) || (identifier_compare_to_cstring(tarasque_engine_entity_get_name(full_entity), str_parent_name) != 0))))
+    {
         full_entity = tarasque_engine_entity_get_parent(full_entity);
     }
 
@@ -412,9 +442,10 @@ tarasque_entity *tarasque_entity_get_parent(tarasque_entity *entity, const char 
  *
  * @param[in] entity Entity from which to search for the child.
  * @param[in] path Path to the potential child entity.
+ * @param[in] entity_def Entity definition used to create the potential parent. Can be NULL if you just want to search by name..
  * @return tarasque_entity *
  */
-tarasque_entity *tarasque_entity_get_child(tarasque_entity *entity, const char *str_path)
+tarasque_entity *tarasque_entity_get_child(tarasque_entity *entity, const char *str_path, const tarasque_entity_definition *entity_def)
 {
     if (!entity || !str_path) {
         return NULL;
@@ -431,7 +462,91 @@ tarasque_entity *tarasque_entity_get_child(tarasque_entity *entity, const char *
         path_destroy(&child_path, handle->alloc);
     }
 
+    if (entity_def && !tarasque_engine_entity_has_definition(found_entity, *entity_def)) {
+        return NULL;
+    }
+
     return tarasque_engine_entity_get_specific_data(found_entity);
+}
+
+/**
+ * @brief
+ *
+ * @param entity
+ * @param entity_def
+ * @return
+ */
+bool tarasque_entity_is(tarasque_entity *entity, tarasque_entity_definition entity_def)
+{
+    tarasque_engine_entity *full_entity = tarasque_engine_entity_get_containing_full_entity(entity);
+    return tarasque_engine_entity_has_definition(full_entity, entity_def);
+}
+
+// -------------------------------------------------------------------------------------------------
+
+#undef tarasque_engine_declare_resource
+
+/**
+ * @brief Declares a resource into the engine to be used later. Trying to get (with `tarasque_entity_fetch_resource()`)
+ * an undeclared resource will fail regardless of its existence.
+ * In nominal, development mode (with the compilation switch TARASQUE_RELEASE reset), this function will search for the
+ * specified resource file and append it to a storage file named after the storage name provided.
+ * With TARASQUE_RELEASE set, the function will only check that the resource is present in an already existing storage file
+ * of the provided name.
+ * If all went right, the resource will be ready to be used by entity requesting it with `tarasque_entity_fetch_resource()`.
+ *
+ * @param[inout] handle Handle to an engine instance.
+ * @param[in] str_storage_name Name of the storage retaining the resource data.
+ * @param[in] str_file_path Path to a resource file to declare.
+ */
+void tarasque_engine_declare_resource(tarasque_engine *handle, const char *str_storage_name, const char *str_file_path)
+{
+    const char *str_storage_path = str_storage_name; // for lisibility and intent
+
+    if (!handle) {
+        return;
+    }
+
+    if(resource_manager_touch(handle->res_manager, str_storage_path, str_file_path, handle->alloc)) {
+        logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Detected resource \"%s\" in storage \"%s\".\n", str_file_path, str_storage_path);
+    } else {
+        logger_log(handle->logger, LOGGER_SEVERITY_ERRO, "Failed to detect resource \"%s\" in storage \"%s\".\n", str_file_path, str_storage_path);
+    }
+}
+
+#undef tarasque_entity_fetch_resource
+
+/**
+ * @brief Returns the data from a resource present in a storage. The entity will be registered as using this storage, and if it is the first
+ * one to do so, all of the storage's resources will be loaded in memory. On entity removal, the entity will be also removed from the storage's
+ * users, and if it was the last one, the storage will be unloaded. You can also pass NULL to the `str_file_path` argument to notify the engine
+ * that the provided entity needs to keep the storage loaded as long as it lives.
+ *
+ * The memory returned is owned by the engine and will follow its own lifetime.
+ *
+ * @param[in] entity Entity querying a resource. It will be registered as a user of the storage.
+ * @param[in] str_storage_name Name of the storage containing the resource.
+ * @param[in] str_file_path File path to the actual resource. Can be NULL.
+ * @param[out] out_size Outgoing number of bytes the function returned.
+ * @return void *
+ */
+void *tarasque_entity_fetch_resource(tarasque_entity *entity, const char *str_storage_name, const char *str_file_path, unsigned long *out_size)
+{
+    const char *str_storage_path = str_storage_name; // for lisibility and intent
+
+    if (!entity) {
+        return NULL;
+    }
+
+    tarasque_engine_entity *full_entity = tarasque_engine_entity_get_containing_full_entity(entity);
+    tarasque_engine *handle = tarasque_engine_entity_get_host_engine_handle(full_entity);
+
+    if (!handle) {
+        return NULL;
+    }
+
+    resource_manager_add_supplicant(handle->res_manager, str_storage_path, full_entity, handle->alloc);
+    return resource_manager_fetch(handle->res_manager, str_storage_path, str_file_path, out_size);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -448,7 +563,7 @@ tarasque_entity *tarasque_entity_get_child(tarasque_entity *entity, const char *
  */
 static void tarasque_engine_annihilate_entity_and_chilren(tarasque_engine *handle, tarasque_engine_entity *target)
 {
-    tarasque_entity_range *all_children = NULL;
+    tarasque_engine_entity_range *all_children = NULL;
 
     if (!handle) {
         return;
@@ -479,6 +594,7 @@ static void tarasque_engine_annihilate_entity(tarasque_engine *handle, tarasque_
     tarasque_engine_entity_deparent(target);
 
     tarasque_engine_entity_deinit(target);
+    resource_manager_remove_supplicant(handle->res_manager, target, handle->alloc);
     event_stack_remove_events_of(handle->events, target, handle->alloc);
     command_queue_remove_commands_of(handle->commands, target, handle->alloc);
     event_broker_unsubscribe_from_all(handle->pub_sub, target, handle->alloc);
@@ -541,6 +657,7 @@ static void tarasque_engine_process_command_remove_entity(tarasque_engine *handl
 
     logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Removed entity \"%s\".\n", tarasque_engine_entity_get_name(subject)->data);
     tarasque_engine_annihilate_entity_and_chilren(handle, cmd->removed);
+    handle->update_active_entities = true;
 }
 
 /**
@@ -590,22 +707,32 @@ static void tarasque_engine_process_event(tarasque_engine *handle, event process
  */
 static void tarasque_engine_frame_step_entities(tarasque_engine *handle, f32 elapsed_ms)
 {
-    tarasque_entity_range *all_entities = NULL;
+    tarasque_engine_entity_range *all_entities = NULL;
 
-    if (!handle) {
+    if (!handle ||!handle->active_entities) {
         return;
     }
 
-    // TODO (low priority because of possible big impact on implementation) : children collections should be updated on entities change, not every frame
-    all_entities = tarasque_engine_entity_get_children(handle->root_entity, handle->alloc);
+    for (size_t i = 0u ; i < handle->active_entities->length ; i++) {
+        tarasque_engine_entity_step_frame(handle->active_entities->data[i], elapsed_ms);
+    }
+}
 
-    if (!all_entities) {
+/**
+ * @brief Fills the internal entities buffer collection if it was marked as dirty.
+ * The active entities collection is filled from parent to children from the root entity.
+ *
+ * @param[in] handle Traget engine instance.
+ */
+static void tarasque_engine_update_active_entities(tarasque_engine *handle)
+{
+    if (!handle || !handle->update_active_entities) {
         return;
     }
 
-    for (size_t i = 0u ; i < all_entities->length ; i++) {
-        tarasque_engine_entity_step_frame(all_entities->data[i], elapsed_ms);
+    if (handle->active_entities) {
+        range_destroy_dynamic(handle->alloc, &RANGE_TO_ANY(handle->active_entities));
     }
 
-    range_destroy_dynamic(handle->alloc, &RANGE_TO_ANY(all_entities));
+    handle->active_entities = tarasque_engine_entity_get_children(handle->root_entity, handle->alloc);
 }

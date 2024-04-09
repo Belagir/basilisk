@@ -14,14 +14,14 @@
 #include <ustd/allocation.h>
 #include <ustd/range.h>
 
-#include <tarasque.h>
+#include <tarasque_bare.h>
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
 /// Starting number of items of all collections used by the engine.
-#define TARASQUE_COLLECTIONS_START_LENGTH (1)
+#define TARASQUE_COLLECTIONS_START_LENGTH (8)
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -65,6 +65,9 @@ void print_path(const path *p);
 
 // -------------------------------------------------------------------------------------------------
 
+/* Compares two pointers (themselves passed by pointers) as two unsigned integers. */
+i32 raw_pointer_compare(const void *lhs, const void *rhs);
+
 /* Compares an identifier to a simple NULL_terminated string. Useful to circumvent memory allocation. */
 i32 identifier_compare_to_cstring(const identifier *id, const char *str);
 
@@ -78,6 +81,26 @@ i32 identifier_compare(const void *lhs, const void *rhs);
 
 /* Returns true if the given ASCII character is in the range 0-9. */
 bool character_is_num(char c);
+
+/* Greedily computes the length of a null-terminated string. */
+size_t c_string_length(const char *str, bool keep_terminator);
+
+// -------------------------------------------------------------------------------------------------
+
+/* Simple hash function to hash anything. */
+u32 hash_jenkins_one_at_a_time(const byte *key, size_t length, u32 seed);
+
+/* Hashes an identifier with an abritrary hash function. */
+u32 hash_indentifier(const identifier *id, u32 (*hash_function)(const byte *key, size_t length, u32 seed));
+
+/* Hashes a path, identifier by indetifier, with an abritrary hash function. */
+u32 hash_path(const path *p, u32 (*hash_function)(const byte *key, size_t length, u32 seed));
+
+/* Compares two 4-bytes hashes as if they were unsigned integers. */
+i32 hash_compare(const void *lhs, const void *rhs);
+
+/* Compares two pointers to 4-bytes hashes as if they were unsigned integers. */
+i32 hash_compare_doubleref(const void *lhs, const void *rhs);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------

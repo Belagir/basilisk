@@ -21,8 +21,6 @@ OBJ_DIR = build
 OBJ_LIB_DIR = $(PROJECT_SUBMODULES)/build
 ## Executable directory. Contains the final binary file.
 EXC_DIR = bin
-## resources directory
-RES_DIR = res
 ## Doxyfile location directory
 DOC_CONFIG_DIR = doc
 ## documentation output directory, must be coherent with the doxyfile's output directory
@@ -30,8 +28,6 @@ DOC_DIR = doc-gen
 
 ## compiler
 CC = gcc-13
-## resource packer
-RESPACKER = ld
 
 ## compilation flags
 CFLAGS += -Wextra -Wconversion -Wdangling-pointer -Wparentheses -Wpedantic -g --std=c2x
@@ -42,8 +38,6 @@ LFLAGS += -lm
 LFLAGS += `sdl2-config --cflags --libs`
 LFLAGS += -lSDL2_image
 LFLAGS += -lGL
-# resource packing flags
-RESFLAGS = -r -b binary -z noexecstack
 
 # additional flags for defines
 DFLAGS += -D_POSIX_C_SOURCE=199309L
@@ -58,10 +52,6 @@ SRC := $(notdir $(shell find $(SRC_DIR) -name *.c))
 DUPL_SRC := $(strip $(shell echo $(SRC) | tr ' ' '\n' | sort | uniq -d))
 ## list of all target object files with their path
 OBJ := $(addprefix $(OBJ_DIR)/, $(patsubst %.c, %.o, $(SRC))) $(shell find $(OBJ_LIB_DIR)/ -name *.o)
-## list of all resources files without their directory
-RES := $(notdir $(shell find $(RES_DIR)/ -type f))
-## list of all target binaries resource files to include in the binary
-RES_BIN := $(addprefix $(OBJ_DIR)/, $(addsuffix .resbin, $(RES)))
 ## list of all duplicate resource files to enforce uniqueness of filenames
 DUPL_RES := $(strip $(shell echo $(RES) | tr ' ' '\n' | sort | uniq -d))
 
@@ -85,14 +75,11 @@ vpath %.c $(sort $(dir $(shell find $(SRC_DIR) -name *.c)))
 
 all: check $(PROJECT_SUBMODULES) $(BUILD_DIRS) $(TARGET) | count_lines
 
-$(TARGET): $(OBJ) $(RES_BIN)
+$(TARGET): $(OBJ)
 	$(CC) $^ -o $@ $(LFLAGS)
 
 $(OBJ_DIR)/%.o: %.c
 	$(CC) -c $? -o $@ $(ARGS_INCL) $(CFLAGS) $(DFLAGS)
-
-$(OBJ_DIR)/%.resbin: $(RES_DIR)/%
-	$(RESPACKER) $(RESFLAGS) $? -o $@
 
 $(PROJECT_SUBMODULES):
 	make -C $@

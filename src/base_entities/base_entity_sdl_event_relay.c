@@ -1,23 +1,39 @@
 
 #include <SDL2/SDL.h>
 
-#include <base_entities/sdl_event_relay.h>
+#include <base_entities/sdl_entities.h>
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-static void be_event_relay_sdl_on_frame(tarasque_entity *self_data, float elapsed_ms);
+#define BE_EVENT_RELAY_SDL_BUFFER_SIZE (64)     ///< Fixed size of the event buffer array. This is the number of events the event relay can re-send through the engine in one frame.
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-static void be_event_relay_sdl_on_frame(tarasque_entity *self_data, float elapsed_ms)
+static void BE_event_relay_sdl_on_frame(tarasque_entity *self_data, float elapsed_ms);
+
+// -------------------------------------------------------------------------------------------------
+
+/**
+ * @brief Data layout of an "event relay" base entity.
+ */
+typedef struct BE_event_relay_sdl {
+    /** Internal buffer to re-order the polled events. Overriden each frame. */
+    SDL_Event event_buffer[BE_EVENT_RELAY_SDL_BUFFER_SIZE];
+} BE_event_relay_sdl;
+
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+
+static void BE_event_relay_sdl_on_frame(tarasque_entity *self_data, float elapsed_ms)
 {
     (void) elapsed_ms;
 
-    be_event_relay_sdl *relay = (be_event_relay_sdl *) self_data;
+    BE_event_relay_sdl *relay = (BE_event_relay_sdl *) self_data;
     SDL_Event event = { 0u };
     size_t buffer_pos = 0u;
 
@@ -39,13 +55,13 @@ static void be_event_relay_sdl_on_frame(tarasque_entity *self_data, float elapse
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-tarasque_specific_entity be_event_relay_sdl_entity(be_event_relay_sdl *base)
-{
-    return (tarasque_specific_entity) {
-            .data_size = sizeof(*base),
-            .data = base,
-            .callbacks = {
-                    .on_frame = &be_event_relay_sdl_on_frame,
-            }
-    };
-}
+/**
+ * @brief
+ * This entity is made to be child of an sdl context (the BE_context_sdl_entity_def entity) and will poll sdl events and retransmits them in the engine's event stack.
+ * The events transfered are stacked in a way that reflects the order they were polled : the later the event is polled, the deeper it will be placed on the event stack.
+ */
+const tarasque_entity_definition BE_event_relay_sdl_entity_def = {
+        .data_size = sizeof(BE_event_relay_sdl),
+        .on_frame = &BE_event_relay_sdl_on_frame,
+};
+

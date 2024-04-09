@@ -23,10 +23,7 @@
 /* Opaque type to a full entity containing user data and information about how it lives in the engine. */
 typedef struct tarasque_engine_entity tarasque_engine_entity;
 /* Quickhand for a range of entities. */
-typedef RANGE(tarasque_engine_entity *) tarasque_entity_range;
-
-/* Redefinition of the tarasque_entity_specific_data type to signal memory allocation in opposition of the user-managed tarasque_entity_specific_data variables. */
-typedef tarasque_specific_entity tarasque_specific_entity_copy;
+typedef RANGE(tarasque_engine_entity *) tarasque_engine_entity_range;
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -34,7 +31,7 @@ typedef tarasque_specific_entity tarasque_specific_entity_copy;
 // LIFETIME
 
 /* Creates an entity and returns a pointer to it. */
-tarasque_engine_entity *tarasque_engine_entity_create(const identifier *id, tarasque_specific_entity_copy user_data, tarasque_engine *handle, allocator alloc);
+tarasque_engine_entity *tarasque_engine_entity_create(const identifier *id, tarasque_specific_entity user_data, tarasque_engine *handle, allocator alloc);
 /* Destroys an entity and nullifies the pointer passed. */
 void tarasque_engine_entity_destroy(tarasque_engine_entity **target, allocator alloc);
 
@@ -51,6 +48,8 @@ tarasque_engine *tarasque_engine_entity_get_host_engine_handle(tarasque_engine_e
 const identifier *tarasque_engine_entity_get_name(const tarasque_engine_entity *target);
 
 tarasque_engine_entity *tarasque_engine_entity_get_parent(tarasque_engine_entity *target);
+
+bool tarasque_engine_entity_has_definition(tarasque_engine_entity *entity, tarasque_entity_definition entity_def);
 
 // -------------------------------------------------------------------------------------------------
 // HIERACHY MODIFICATIONS
@@ -70,7 +69,7 @@ tarasque_engine_entity *tarasque_engine_entity_get_child(tarasque_engine_entity 
 /* Find a child that is directly under an entity. */
 tarasque_engine_entity *tarasque_engine_entity_get_direct_child(tarasque_engine_entity *target, const identifier *id_path);
 /* Returns an allocated range of all children of an entity, recursively. */
-tarasque_entity_range *tarasque_engine_entity_get_children(tarasque_engine_entity *target, allocator alloc);
+tarasque_engine_entity_range *tarasque_engine_entity_get_children(tarasque_engine_entity *target, allocator alloc);
 
 // -------------------------------------------------------------------------------------------------
 // CALLBACKS EXECUTION
@@ -86,15 +85,5 @@ void tarasque_engine_entity_init(tarasque_engine_entity *target);
 
 /* Execute the on_deinit() callback tied to an entity */
 void tarasque_engine_entity_deinit(tarasque_engine_entity *target);
-
-// -------------------------------------------------------------------------------------------------
-// -------------------------------------------------------------------------------------------------
-// -------------------------------------------------------------------------------------------------
-// DATA COPY
-
-/* Copy entity user data on the heap, and returns a pointer to it. */
-tarasque_specific_entity_copy tarasque_specific_entity_copy_create(tarasque_specific_entity user_data, allocator alloc);
-/* Destroys some entity user data copy and nullifies the passed pointer. */
-void tarasque_specific_entity_copy_destroy(tarasque_specific_entity_copy *user_data, allocator alloc);
 
 #endif

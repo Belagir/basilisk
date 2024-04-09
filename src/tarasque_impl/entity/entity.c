@@ -11,7 +11,7 @@
 #include <ustd/sorting.h>
 #include <stdio.h>
 
-#include <tarasque.h>
+#include <tarasque_bare.h>
 
 #include "entity.h"
 
@@ -20,6 +20,18 @@
 // -------------------------------------------------------------------------------------------------
 
 typedef byte tarasque_entity_storage[];
+
+typedef struct tarasque_entity_definition_unit {
+    /** Size, in bytes, of the entity's specific data. */
+    unsigned long data_size;
+
+    /** Function ran on the entity-specific data when it is first created. */
+    void (*on_init)(tarasque_entity *self_data);
+    /** Function ran on the entity-specific data when it is destroyed. */
+    void (*on_deinit)(tarasque_entity *self_data);
+    /** Function ran on the entity-specific data each frame. */
+    void (*on_frame)(tarasque_entity *self_data, float elapsed_ms);
+} tarasque_entity_definition_unit;
 
 /**
  * @brief Entity data structure aggregating user data with engine-related data.
@@ -30,19 +42,22 @@ typedef struct tarasque_engine_entity {
     /** Non-owned reference to an eventual parent entity. */
     tarasque_engine_entity *parent;
     /** Array of all of the entity's children. */
-    tarasque_entity_range *children;
-
-    /** Entity callbacks to be used by the engine. */
-    tarasque_specific_entity_callbacks callbacks;
-
+    tarasque_engine_entity_range *children;
     /** Engine owning the entity, used to redirect user's actions back to the whole engine. */
     tarasque_engine *host_handle;
 
-    /** Size in bytes of the user's data. */
-    size_t data_size;
+    RANGE(tarasque_entity_definition_unit) *subtype_definitions;
+    tarasque_entity_definition_unit self_definition;
+
     /** The user's data. */
     tarasque_entity_storage data;
 } tarasque_engine_entity;
+
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+
+static bool tarasque_entity_definition_unit_is_same_as(tarasque_entity_definition_unit def_unit, tarasque_entity_definition broad_def);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -57,26 +72,46 @@ typedef struct tarasque_engine_entity {
  * @param[inout] alloc Allocator used for the creation of the entity.
  * @return entity *
  */
-tarasque_engine_entity *tarasque_engine_entity_create(const identifier *id, tarasque_specific_entity_copy user_data, tarasque_engine *handle, allocator alloc)
+tarasque_engine_entity *tarasque_engine_entity_create(const identifier *id, tarasque_specific_entity user_data, tarasque_engine *handle, allocator alloc)
 {
     tarasque_engine_entity *new_entity = NULL;
+    const tarasque_entity_definition *subtyped_definition = NULL;
 
-    new_entity = alloc.malloc(alloc, sizeof(*new_entity) + user_data.data_size);
+    new_entity = alloc.malloc(alloc, sizeof(*new_entity) + user_data.entity_def.data_size);
 
     if (new_entity) {
+        // core informations
         *new_entity = (tarasque_engine_entity) {
                 .id = range_create_dynamic_from_copy_of(alloc, RANGE_TO_ANY(id)),
                 .parent = NULL,
                 .children = range_create_dynamic(alloc, sizeof(*new_entity->children->data), TARASQUE_COLLECTIONS_START_LENGTH),
-
-                .callbacks = user_data.callbacks,
-
                 .host_handle = handle,
 
-                .data_size = user_data.data_size,
+                .self_definition = {
+                        .on_init = user_data.entity_def.on_init,
+                        .on_deinit = user_data.entity_def.on_deinit,
+                        .on_frame = user_data.entity_def.on_frame,
+
+                        .data_size = user_data.entity_def.data_size,
+                }
         };
 
-        bytewise_copy(new_entity->data, user_data.data, user_data.data_size);
+        // optional starting data
+        if (user_data.data) {
+            bytewise_copy(new_entity->data, user_data.data, user_data.entity_def.data_size);
+        }
+
+        // optional subtypes
+        if (user_data.entity_def.subtype) {
+            new_entity->subtype_definitions = range_create_dynamic(alloc, sizeof(*new_entity->subtype_definitions->data), TARASQUE_COLLECTIONS_START_LENGTH);
+
+            subtyped_definition = user_data.entity_def.subtype;
+            while (subtyped_definition) {
+                new_entity->subtype_definitions = range_ensure_capacity(alloc, RANGE_TO_ANY(new_entity->subtype_definitions), 1);
+                range_insert_value(RANGE_TO_ANY(new_entity->subtype_definitions), 0u, subtyped_definition);
+                subtyped_definition = subtyped_definition->subtype;
+            }
+        }
     }
 
     return new_entity;
@@ -95,6 +130,9 @@ void tarasque_engine_entity_destroy(tarasque_engine_entity **target, allocator a
         return;
     }
 
+    if ((*target)->subtype_definitions) {
+        range_destroy_dynamic(alloc, &RANGE_TO_ANY((*target)->subtype_definitions));
+    }
     range_destroy_dynamic(alloc, &RANGE_TO_ANY((*target)->children));
     range_destroy_dynamic(alloc, &RANGE_TO_ANY((*target)->id));
 
@@ -179,6 +217,36 @@ tarasque_engine_entity *tarasque_engine_entity_get_parent(tarasque_engine_entity
     return target->parent;
 }
 
+/**
+ * @brief
+ *
+ * @param entity
+ * @param entity_def
+ * @return
+ */
+bool tarasque_engine_entity_has_definition(tarasque_engine_entity *entity, tarasque_entity_definition entity_def)
+{
+    bool has_def = false;
+    size_t pos = 0u;
+
+    if (!entity) {
+        return false;
+    }
+
+    has_def = tarasque_entity_definition_unit_is_same_as(entity->self_definition, entity_def);
+
+    if (!entity->subtype_definitions) {
+        return has_def;
+    }
+
+    while ((!has_def) && (pos < entity->subtype_definitions->length)) {
+        has_def = tarasque_entity_definition_unit_is_same_as(entity->subtype_definitions->data[pos], entity_def);
+        pos += 1;
+    }
+
+    return has_def;
+}
+
 // -------------------------------------------------------------------------------------------------
 
 /**
@@ -224,7 +292,7 @@ void tarasque_engine_entity_deparent(tarasque_engine_entity *target)
  */
 void tarasque_engine_entity_destroy_children(tarasque_engine_entity *target, allocator alloc)
 {
-    tarasque_entity_range *all_children = NULL;
+    tarasque_engine_entity_range *all_children = NULL;
 
     if (!target) {
         return;
@@ -299,12 +367,12 @@ tarasque_engine_entity *tarasque_engine_entity_get_direct_child(tarasque_engine_
  *
  * @param[in] target Entity from which to extract children.
  * @param[inout] alloc Allocator used to create the returned range.
- * @return tarasque_entity_range*
+ * @return tarasque_engine_entity_range*
  */
-tarasque_entity_range *tarasque_engine_entity_get_children(tarasque_engine_entity *target, allocator alloc)
+tarasque_engine_entity_range *tarasque_engine_entity_get_children(tarasque_engine_entity *target, allocator alloc)
 {
     size_t child_pos = 0u;
-    tarasque_entity_range *entities = NULL;
+    tarasque_engine_entity_range *entities = NULL;
 
     if (!target) {
         return NULL;
@@ -332,8 +400,17 @@ void tarasque_engine_entity_step_frame(tarasque_engine_entity *target, f32 elaps
     if (!target) {
         return;
     }
-    if (target->callbacks.on_frame) {
-        target->callbacks.on_frame(target->data, elapsed_ms);
+
+    if (target->subtype_definitions) {
+        for (size_t i = 0u ; i < target->subtype_definitions->length ; i++) {
+            if (target->subtype_definitions->data[i].on_frame) {
+                target->subtype_definitions->data[i].on_frame(target->data, elapsed_ms);
+            }
+        }
+    }
+
+    if (target->self_definition.on_frame) {
+        target->self_definition.on_frame(target->data, elapsed_ms);
     }
 }
 
@@ -364,8 +441,16 @@ void tarasque_engine_entity_init(tarasque_engine_entity *target)
         return;
     }
 
-    if (target->callbacks.on_init) {
-        target->callbacks.on_init(target->data);
+    if (target->subtype_definitions) {
+        for (size_t i = 0u ; i < target->subtype_definitions->length ; i++) {
+            if (target->subtype_definitions->data[i].on_init) {
+                target->subtype_definitions->data[i].on_init(target->data);
+            }
+        }
+    }
+
+    if (target->self_definition.on_init) {
+        target->self_definition.on_init(target->data);
     }
 }
 
@@ -380,59 +465,28 @@ void tarasque_engine_entity_deinit(tarasque_engine_entity *target)
         return;
     }
 
-    if (target->callbacks.on_deinit) {
-        target->callbacks.on_deinit(target->data);
+    if (target->self_definition.on_deinit) {
+        target->self_definition.on_deinit(target->data);
     }
-}
 
-// -------------------------------------------------------------------------------------------------
-// -------------------------------------------------------------------------------------------------
-// -------------------------------------------------------------------------------------------------
-
-/**
- * @brief Creates an allocated copy of some user data.
- *
- * @param[in] user_data Copied user data.
- * @param[inout] alloc Allocator used for the copy.
- * @return
- */
-tarasque_specific_entity_copy tarasque_specific_entity_copy_create(tarasque_specific_entity user_data, allocator alloc)
-{
-    tarasque_specific_entity_copy copy = {
-            .callbacks = {
-                    .on_init   = user_data.callbacks.on_init,
-                    .on_deinit = user_data.callbacks.on_deinit,
-                    .on_frame  = user_data.callbacks.on_frame,
+    if (target->subtype_definitions) {
+        for (i64 i = (i64) target->subtype_definitions->length - 1 ; i >= 0 ; i--) {
+            if (target->subtype_definitions->data[i].on_deinit) {
+                target->subtype_definitions->data[i].on_deinit(target->data);
             }
-    };
-
-    if (user_data.data_size > 0u) {
-        copy.data = alloc.malloc(alloc, user_data.data_size);
-        copy.data_size = user_data.data_size;
+        }
     }
-
-    if (user_data.data) {
-        bytewise_copy(copy.data, user_data.data, user_data.data_size);
-    }
-
-    return copy;
 }
 
-/**
- * @brief Destroys a copy of user data that was previously allocated and zero-out its contents.
- *
- * @param[inout] user_data copy of user data.
- * @param[inout] alloc Allocator used to release the object.
- */
-void tarasque_specific_entity_copy_destroy(tarasque_specific_entity_copy *user_data, allocator alloc)
+
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+
+static bool tarasque_entity_definition_unit_is_same_as(tarasque_entity_definition_unit def_unit, tarasque_entity_definition broad_def)
 {
-    if (!user_data) {
-        return;
-    }
-
-    if (user_data->data) {
-        alloc.free(alloc, user_data->data);
-    }
-
-    *user_data = (tarasque_specific_entity_copy) { 0u };
+    return   (def_unit.data_size == broad_def.data_size)
+            && (def_unit.on_init   == broad_def.on_init)
+            && (def_unit.on_frame  == broad_def.on_frame)
+            && (def_unit.on_deinit == broad_def.on_deinit);
 }

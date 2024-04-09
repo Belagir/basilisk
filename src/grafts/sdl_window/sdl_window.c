@@ -37,22 +37,21 @@ static void graft_sdl_window_callback(tarasque_entity *entity, void *graft_args)
 
     const graft_sdl_window_args sdl_win_args = *(const graft_sdl_window_args *) graft_args;
 
-    context = tarasque_entity_add_child(entity, "Context", be_context_sdl_entity());
+    context = tarasque_entity_add_child(entity, "Context", (tarasque_specific_entity) { .entity_def = BE_context_sdl_entity_def });
 
-    window = tarasque_entity_add_child(context, "Window",
-            be_window_sdl_entity(&(be_window_sdl) {
+    window = tarasque_entity_add_child(context, "Window", (tarasque_specific_entity) { .entity_def = BE_window_sdl_entity_def,
+            .data = &(BE_window_sdl) {
                     .title = sdl_win_args.for_window.title,
                     .x = sdl_win_args.for_window.x, .y = sdl_win_args.for_window.y,
                     .w = sdl_win_args.for_window.w, .h = sdl_win_args.for_window.h,
-                    .flags = sdl_win_args.for_window.flags }));
+                    .flags = sdl_win_args.for_window.flags } });
 
-    render_manager = tarasque_entity_add_child(window, "Render Manager",
-            be_render_manager_sdl_entity(&(be_render_manager_sdl) {
+    render_manager = tarasque_entity_add_child(window, "Render Manager", (tarasque_specific_entity) { .entity_def = BE_render_manager_sdl_entity_def,
+            .data = &(BE_render_manager_sdl) {
                     .clear_color = sdl_win_args.for_renderer.clear_color,
-                    .flags = sdl_win_args.for_renderer.flags,
-                    .window_entity_name = "Window" }));
+                    .flags = sdl_win_args.for_renderer.flags, } });
 
-    event_relay = tarasque_entity_add_child(window, "Event Relay", be_event_relay_sdl_entity(&(be_event_relay_sdl) { 0u }));
+    event_relay = tarasque_entity_add_child(window, "Event Relay", (tarasque_specific_entity) { .entity_def = BE_event_relay_sdl_entity_def });
 }
 
 // -------------------------------------------------------------------------------------------------

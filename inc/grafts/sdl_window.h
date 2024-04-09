@@ -15,14 +15,11 @@
 
 #include <SDL2/SDL.h>
 
-#include <tarasque.h>
+#include <tarasque_bare.h>
 
 // Importing base entities included in the graft.
 
-#include <base_entities/sdl_context.h>
-#include <base_entities/sdl_event_relay.h>
-#include <base_entities/sdl_render_manager.h>
-#include <base_entities/sdl_window.h>
+#include <base_entities/sdl_entities.h>
 
 /**
  * @brief Arguments passed to the SDL window graft callback.
