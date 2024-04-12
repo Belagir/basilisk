@@ -4,6 +4,7 @@
 #include "side_shooty.h"
 #include "starship/starship.h"
 #include "background/background.h"
+#include "target/target.h"
 
 /**
  * @brief
@@ -43,7 +44,12 @@ static void init(tarasque_entity *entity)
                     .sprite.draw_index = 1,
             } ));
 
-    tarasque_entity_add_child(tarasque_entity_get_child(entity, "Context/Window/Render Manager/Collision Manager", NULL), "background", backround_entity(&(backround) { 0u }));
+    tarasque_entity_add_child(tarasque_entity_get_child(entity, "Context/Window/Render Manager/Collision Manager", NULL), "target",
+            target_entity(&(target) {
+                    .shape.body.local.position = { 1000, 80 },
+            } ));
+
+    tarasque_entity_add_child(tarasque_entity_get_child(entity, "Context/Window/Render Manager", NULL), "background", backround_entity(&(backround) { 0u }));
 }
 
 /**
