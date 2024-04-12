@@ -1,7 +1,12 @@
 
+#include <ustd/sorting.h>
+#include <ustd/range.h>
+
 #include <base_entities/sdl_entities.h>
 
-#define BE_COLLISION_MANAGER_SIMPLEX_PRECISION (16)
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 typedef RANGE(vector2_t) range_simplex;
 
@@ -35,7 +40,12 @@ static bool BE_collision_manager_2D_check(BE_collision_manager_2D *collision_man
  */
 void BE_collision_manager_2D_register_shape(BE_collision_manager_2D *collision_manager, BE_shape_2D_collider *col)
 {
-    // TODO : register shape
+    if (!collision_manager || !col) {
+        return;
+    }
+
+    collision_manager->registered_collisions = range_ensure_capacity(make_system_allocator(), RANGE_TO_ANY(collision_manager->registered_collisions), 1);
+    sorted_range_insert_in(RANGE_TO_ANY(collision_manager->registered_collisions), &raw_pointer_compare, &col);
 }
 
 /**
@@ -46,7 +56,11 @@ void BE_collision_manager_2D_register_shape(BE_collision_manager_2D *collision_m
  */
 void BE_collision_manager_2D_unregister_shape(BE_collision_manager_2D *collision_manager, BE_shape_2D_collider *col)
 {
-    // TODO : unregister shape
+    if (!collision_manager || !col) {
+        return;
+    }
+
+    sorted_range_remove_from(RANGE_TO_ANY(collision_manager->registered_collisions), &raw_pointer_compare, &col);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -89,7 +103,7 @@ static void BE_collision_manager_2D_frame(tarasque_entity *self_data, float elap
 
     for (size_t i = 0u ; i < col_manager->registered_collisions->length ; i++) {
         for (size_t j = i + 1u ; j < col_manager->registered_collisions->length ; j++) {
-            if (BE_collision_manager_2D_check(col_manager, col_manager->registered_collisions->data[i], col_manager->registered_collisions->data[i])) {
+            if (BE_collision_manager_2D_check(col_manager, col_manager->registered_collisions->data[i], col_manager->registered_collisions->data[j])) {
                 // TODO : collision callback
             }
         }

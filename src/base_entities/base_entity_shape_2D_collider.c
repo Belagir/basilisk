@@ -24,9 +24,10 @@ static void BE_shape_2D_collider_init(tarasque_entity *self_data)
 {
     BE_shape_2D_collider *collider = (BE_shape_2D_collider *) self_data;
 
-    collider->manager = tarasque_entity_get_parent(collider, NULL, &BE_DEF_collision_manager_2D);
+    collider->monitored = tarasque_entity_get_parent(collider, NULL, &BE_DEF_shape_2D);
 
-    if (collider->manager) {
+    if (collider->monitored) {
+        collider->manager = tarasque_entity_get_parent(collider, NULL, &BE_DEF_collision_manager_2D);
         BE_collision_manager_2D_register_shape(collider->manager, collider);
     }
 }
@@ -40,9 +41,7 @@ static void BE_shape_2D_collider_deinit(tarasque_entity *self_data)
 {
     BE_shape_2D_collider *collider = (BE_shape_2D_collider *) self_data;
 
-    if (collider->manager) {
-        BE_collision_manager_2D_unregister_shape(collider->manager, collider);
-    }
+    BE_collision_manager_2D_unregister_shape(collider->manager, collider);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -64,8 +63,10 @@ vector2_t BE_shape_2D_collider_support(BE_shape_2D_collider *col, vector2_t dire
 
     switch (col->monitored->kind) {
         case SHAPE_2D_CIRCLE:
+            // TODO : circle support function
             break;
         case SHAPE_2D_RECT:
+            // TODO : rectangle support function
             break;
     }
 
