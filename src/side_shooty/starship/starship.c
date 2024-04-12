@@ -72,18 +72,6 @@ static void init(tarasque_entity *entity)
     ship->bullets_sprite = IMG_LoadTexture_RW(render_manager->renderer, SDL_RWFromConstMem(bullet_png_data, (int) bullet_png_size), 1);
 
     tarasque_entity_queue_subscribe_to_event(entity, "sdl event", (tarasque_specific_event_subscription) { .callback = &on_sdl_event });
-
-    tarasque_entity_add_child(entity, "circle", (tarasque_specific_entity) {
-            .entity_def = BE_DEF_shape_2D,
-            .data = &(BE_shape_2D) {
-                    .body = { .local.scale = { 1, 1 }, .local.position = { .x = 70, .y = 32 } }, .kind = SHAPE_2D_CIRCLE, .as_circle = { .radius = 25.f },
-            } });
-
-    tarasque_entity_add_child(tarasque_entity_get_child(entity, "circle", &BE_DEF_shape_2D), "circle visual", (tarasque_specific_entity) {
-            .entity_def = BE_DEF_shape_2D_visual,
-            .data = &(BE_shape_2D_visual) {
-                    .color = (SDL_Color) { 255, 180, 20, 255 }, .draw_index = 5
-            } });
 }
 
 /**
