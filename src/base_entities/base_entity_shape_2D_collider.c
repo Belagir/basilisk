@@ -63,7 +63,7 @@ vector2_t BE_shape_2D_collider_support(BE_shape_2D_collider *col, vector2_t dire
 
     switch (col->monitored->kind) {
         case SHAPE_2D_CIRCLE:
-            // TODO : circle support function
+            return vector2_add(col->monitored->body.global.position, vector2_scale(col->monitored->as_circle.radius, direction));
             break;
         case SHAPE_2D_RECT:
             // TODO : rectangle support function
