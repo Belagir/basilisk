@@ -30,6 +30,7 @@ static void graft_sdl_window_callback(tarasque_entity *entity, void *graft_args)
     tarasque_entity *window = NULL;
     tarasque_entity *render_manager = NULL;
     tarasque_entity *event_relay = NULL;
+    tarasque_entity *collision_manager = NULL;
 
     if (!graft_args) {
         return;
@@ -37,21 +38,23 @@ static void graft_sdl_window_callback(tarasque_entity *entity, void *graft_args)
 
     const graft_sdl_window_args sdl_win_args = *(const graft_sdl_window_args *) graft_args;
 
-    context = tarasque_entity_add_child(entity, "Context", (tarasque_specific_entity) { .entity_def = BE_context_sdl_entity_def });
+    context = tarasque_entity_add_child(entity, "Context", (tarasque_specific_entity) { .entity_def = BE_DEF_context_sdl, });
 
-    window = tarasque_entity_add_child(context, "Window", (tarasque_specific_entity) { .entity_def = BE_window_sdl_entity_def,
+    window = tarasque_entity_add_child(context, "Window", (tarasque_specific_entity) { .entity_def = BE_DEF_window_sdl,
             .data = &(BE_window_sdl) {
                     .title = sdl_win_args.for_window.title,
                     .x = sdl_win_args.for_window.x, .y = sdl_win_args.for_window.y,
                     .w = sdl_win_args.for_window.w, .h = sdl_win_args.for_window.h,
                     .flags = sdl_win_args.for_window.flags } });
 
-    render_manager = tarasque_entity_add_child(window, "Render Manager", (tarasque_specific_entity) { .entity_def = BE_render_manager_sdl_entity_def,
+    event_relay = tarasque_entity_add_child(window, "Event Relay", (tarasque_specific_entity) { .entity_def = BE_DEF_event_relay_sdl, });
+
+    render_manager = tarasque_entity_add_child(window, "Render Manager", (tarasque_specific_entity) { .entity_def = BE_DEF_render_manager_sdl,
             .data = &(BE_render_manager_sdl) {
                     .clear_color = sdl_win_args.for_renderer.clear_color,
                     .flags = sdl_win_args.for_renderer.flags, } });
 
-    event_relay = tarasque_entity_add_child(window, "Event Relay", (tarasque_specific_entity) { .entity_def = BE_event_relay_sdl_entity_def });
+    collision_manager = tarasque_entity_add_child(render_manager, "Collision Manager", (tarasque_specific_entity) { .entity_def = BE_DEF_collision_manager_2D, });
 }
 
 // -------------------------------------------------------------------------------------------------

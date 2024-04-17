@@ -57,10 +57,10 @@ static void BE_event_relay_sdl_on_frame(tarasque_entity *self_data, float elapse
 
 /**
  * @brief
- * This entity is made to be child of an sdl context (the BE_context_sdl_entity_def entity) and will poll sdl events and retransmits them in the engine's event stack.
+ * This entity is made to be child of an sdl context (the BE_DEF_context_sdl entity) and will poll sdl events and retransmits them in the engine's event stack.
  * The events transfered are stacked in a way that reflects the order they were polled : the later the event is polled, the deeper it will be placed on the event stack.
  */
-const tarasque_entity_definition BE_event_relay_sdl_entity_def = {
+const tarasque_entity_definition BE_DEF_event_relay_sdl = {
         .data_size = sizeof(BE_event_relay_sdl),
         .on_frame = &BE_event_relay_sdl_on_frame,
 };
