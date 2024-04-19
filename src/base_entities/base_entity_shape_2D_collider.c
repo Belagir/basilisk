@@ -61,12 +61,22 @@ vector2_t BE_shape_2D_collider_support(BE_shape_2D_collider *col, vector2_t dire
         return (vector2_t) { NAN, NAN };
     }
 
+    // TODO : test with scales changed
+
     switch (col->monitored->kind) {
         case SHAPE_2D_CIRCLE:
             return vector2_add(col->monitored->body.global.position, vector2_scale(col->monitored->as_circle.radius, direction));
             break;
         case SHAPE_2D_RECT:
-            // TODO : rectangle support function
+            if ((direction.x < 0.f) && (direction.y < 0.f)) {           // upper left corner
+                return col->monitored->body.global.position;
+            } else if ((direction.x > 0.f) && (direction.y < 0.f)) {    // upper right corner
+                return vector2_add(col->monitored->body.global.position, (vector2_t) { .x = col->monitored->as_rect.width });
+            } else if ((direction.x > 0.f) && (direction.y > 0.f)) {    // lower right corner
+                return vector2_add(col->monitored->body.global.position, (vector2_t) { .x = col->monitored->as_rect.width, .y = col->monitored->as_rect.height });
+            } else {                                                    // lower left corner
+                return vector2_add(col->monitored->body.global.position, (vector2_t) { .y = col->monitored->as_rect.height });
+            }
             break;
     }
 
