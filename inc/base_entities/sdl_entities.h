@@ -20,48 +20,6 @@
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief Data layout of a "sdl renderer draw" drawing event companion data sent by the E_render_manager_sdl_entity_def entity.
- */
-typedef struct BE_render_manager_sdl_event_draw {
-    /** Renderer that is currently accepting drawing operations. */
-    SDL_Renderer *renderer;
-} BE_render_manager_sdl_event_draw;
-
-/**
- * @brief Data layout of an "render manager" base entity. Use it to configure the clear color and flags on entity creation.
- */
-typedef struct BE_render_manager_sdl {
-    /** Color used to clear the screen each frame before each drawing operation. */
-    SDL_Color clear_color;
-    /** Flags passed to the SDL renderer creation method on initialization of the entity. */
-    SDL_RendererFlags flags;
-
-    /** Pointer to a renderer that will be created on entity initialization. Overriden on initialization. */
-    SDL_Renderer *renderer;
-} BE_render_manager_sdl;
-
-// -------------------------------------------------------------------------------------------------
-
-/**
- * @brief Data layout of a "sdl window" base entity. Use it to configure title, position, dimension and flags on entity creation.
- */
-typedef struct BE_window_sdl {
-    /** Title of the window used on window creation. */
-    const char *title;
-    /** Pixel position of the window on creation. */
-    size_t x, y;
-    /** Pixel position of the window on creation. */
-    size_t w, h;
-    /** Flags passed to the SDL window creation method on initialization of the entity. See the SDL_WindowFlags enum for values. */
-    SDL_WindowFlags flags;
-
-    /** Pointer to a window that will be created on entity initialization. Overriden on initialization. */
-    SDL_Window *window;
-} BE_window_sdl;
-
-// -------------------------------------------------------------------------------------------------
-
-/**
  * @brief Represents information about an object in a 2D space.
  * Not very useful by itself, but widely used in entities such as BE_body_2D.
  */
@@ -168,21 +126,38 @@ void BE_collision_manager_2D_unregister_shape(BE_collision_manager_2D *collision
 
 /* Entity definition of a SDL context, managing the broader SDL lifetime. */
 extern const tarasque_entity_definition BE_DEF_context_sdl;
+/* Returns statically-allocated SDL Context entity data, used to give the engine data to copy for instanciation. */
+tarasque_entity *BE_STATIC_context_sdl(void);
 
 // -------------------------------------------------------------------------------------------------
 
 /* Entity definition of a SDL event relay, sending back events polled from the SDL library on the event stack. */
 extern const tarasque_entity_definition BE_DEF_event_relay_sdl;
+/* Returns statically-allocated SDL event relay entity data, used to give the engine data to copy for instanciation. */
+tarasque_entity *BE_STATIC_event_relay_sdl(void);
 
 // -------------------------------------------------------------------------------------------------
 
+/**
+ * @brief Data layout of a "sdl renderer draw" drawing event companion data sent by the BE_render_manager_sdl_entity_def entity.
+ */
+typedef struct BE_render_manager_sdl_event_draw {
+    /** Renderer that is currently accepting drawing operations. */
+    SDL_Renderer *renderer;
+} BE_render_manager_sdl_event_draw;
+
 /* Entity definition of a SDL render manager, that sends draw events through the game tree to draw content onto a window. */
 extern const tarasque_entity_definition BE_DEF_render_manager_sdl;
+/* Returns statically-allocated SDL render manager entity data, used to give the engine data to copy for instanciation. */
+tarasque_entity *BE_STATIC_render_manager_sdl(SDL_Color clear_color, SDL_RendererFlags flags);
 
 // -------------------------------------------------------------------------------------------------
 
 /* Entity definition of a SDL window, that creates a desktop window.*/
 extern const tarasque_entity_definition BE_DEF_window_sdl;
+/* Returns statically-allocated SDL window entity data, used to give the engine data to copy for instanciation. */
+tarasque_entity *BE_STATIC_window_sdl(const char *title, size_t w, size_t h, size_t x, size_t y, SDL_WindowFlags flags);
+SDL_Window *BE_window_sdl_get_window(tarasque_entity *window);
 
 // -------------------------------------------------------------------------------------------------
 
