@@ -40,8 +40,6 @@ bool BE_collision_manager_2D_check(BE_collision_manager_2D *collision_manager, B
     simplex shape = { 0u };
     bool collision = false;
 
-    // TODO : collision GJK algorithm
-
     // 1 - create the optimal simplex
     shape = BE_shape_2D_collider_GJK_create_simplex(collision_manager, c1, c2);
 
@@ -50,7 +48,7 @@ bool BE_collision_manager_2D_check(BE_collision_manager_2D *collision_manager, B
 
     if (renderer) {
         // Draw simplex
-        SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255); // BLUE : AB
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderDrawLineF(renderer, shape.A.x + 300, shape.A.y + 150, shape.B.x + 300, shape.B.y + 150);
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); // RED : BC
         SDL_RenderDrawLineF(renderer, shape.B.x + 300, shape.B.y + 150, shape.C.x + 300, shape.C.y + 150);
@@ -122,21 +120,23 @@ static simplex BE_shape_2D_collider_GJK_create_simplex(BE_collision_manager_2D *
     returned_simplex.C = BE_shape_2D_collider_GJK_support_function(c1, c2, direction);
 
     // step the simplex to guarantee that it contains the origin
-    if (BE_shape_2D_collider_GJK_segment_Voronoi_contains_origin(returned_simplex.C, returned_simplex.A, returned_simplex.B, NULL)) {
-        returned_simplex.B = returned_simplex.C;
-        simplex_needs_optimisation = true;
-    } else if (BE_shape_2D_collider_GJK_segment_Voronoi_contains_origin(returned_simplex.C, returned_simplex.B, returned_simplex.A, NULL)) {
-        returned_simplex.A = returned_simplex.C;
-        simplex_needs_optimisation = true;
-    }
+    for (size_t i = 0u ; i < 2u ; i++){
+        if (BE_shape_2D_collider_GJK_segment_Voronoi_contains_origin(returned_simplex.C, returned_simplex.A, returned_simplex.B, NULL)) {
+            returned_simplex.B = returned_simplex.C;
+            simplex_needs_optimisation = true;
+        } else if (BE_shape_2D_collider_GJK_segment_Voronoi_contains_origin(returned_simplex.C, returned_simplex.B, returned_simplex.A, NULL)) {
+            returned_simplex.A = returned_simplex.C;
+            simplex_needs_optimisation = true;
+        }
 
-    if (simplex_needs_optimisation) {
-        // normal vector from AB to AO (O is the origin)
-        direction = vector2_normalize(vector2_triple_product(
-                vector2_substract(returned_simplex.B, returned_simplex.A),
-                vector2_substract(VECTOR2_ORIGIN,     returned_simplex.A),
-                vector2_substract(returned_simplex.B, returned_simplex.A)));
-        returned_simplex.C = BE_shape_2D_collider_GJK_support_function(c1, c2, direction);
+        if (simplex_needs_optimisation) {
+            // normal vector from AB to AO (O is the origin)
+            direction = vector2_normalize(vector2_triple_product(
+                    vector2_substract(returned_simplex.B, returned_simplex.A),
+                    vector2_substract(VECTOR2_ORIGIN,     returned_simplex.A),
+                    vector2_substract(returned_simplex.B, returned_simplex.A)));
+            returned_simplex.C = BE_shape_2D_collider_GJK_support_function(c1, c2, direction);
+        }
     }
 
     return returned_simplex;

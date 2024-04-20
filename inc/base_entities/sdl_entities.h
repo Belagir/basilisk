@@ -148,7 +148,7 @@ typedef struct BE_shape_2D_collider {
     collision_bitmask mask_detected_on;
     collision_bitmask mask_can_detect_on;
 
-    // + callback
+// + callback
 } BE_shape_2D_collider;
 
 vector2_t BE_shape_2D_collider_support(BE_shape_2D_collider *col, vector2_t direction);
