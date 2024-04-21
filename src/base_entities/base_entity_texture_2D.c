@@ -10,7 +10,7 @@
  */
 typedef struct BE_texture_2D_impl {
     /** Position information of the texture entity. */
-    tarasque_entity *body;
+    BE_body_2D *body;
     /** Draw index to register a drawing operation on initialization. */
     i32 draw_index;
 

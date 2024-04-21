@@ -10,7 +10,7 @@
  *
  */
 typedef struct BE_shape_2D_visual {
-    tarasque_entity *visualized;
+    BE_shape_2D *visualized;
 
     SDL_Color color;
     i32 draw_index;

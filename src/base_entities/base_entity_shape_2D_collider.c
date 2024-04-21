@@ -6,8 +6,8 @@
 // -------------------------------------------------------------------------------------------------
 
 typedef struct BE_shape_2D_collider {
-    tarasque_entity *monitored;
-    tarasque_entity *manager;
+    BE_shape_2D *monitored;
+    BE_collision_manager_2D *manager;
 
     collision_bitmask mask_detected_on;
     collision_bitmask mask_can_detect_on;
