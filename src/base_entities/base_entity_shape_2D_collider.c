@@ -71,26 +71,30 @@ static void BE_shape_2D_collider_deinit(tarasque_entity *self_data)
  */
 vector2_t BE_shape_2D_collider_support(BE_shape_2D_collider *col, vector2_t direction)
 {
+    properties_2D properties = { 0u };
+
     if (!col || !col->monitored) {
         return (vector2_t) { NAN, NAN };
     }
 
     // TODO : test with scales changed
 
+    properties = BE_body_2D_get(BE_shape_2D_get_body(col->monitored), BODY_2D_SPACE_GLOBAL);
+
     switch (BE_shape_2D_what(col->monitored)) {
         case SHAPE_2D_CIRCLE:
-            return vector2_add(BE_body_2D_get(BE_shape_2D_get_body(col->monitored), BODY_2D_SPACE_GLOBAL).position, vector2_scale(BE_shape_2D_as_circle(col->monitored)->radius, direction));
+            return vector2_add(properties.position, vector2_scale(BE_shape_2D_as_circle(col->monitored)->radius, direction));
             break;
         case SHAPE_2D_RECT:
-            // if ((direction.x < 0.f) && (direction.y < 0.f)) {           // upper left corner
-            //     return col->monitored->body.global.position;
-            // } else if ((direction.x > 0.f) && (direction.y < 0.f)) {    // upper right corner
-            //     return vector2_add(col->monitored->body.global.position, (vector2_t) { .x = col->monitored->as_rect.width });
-            // } else if ((direction.x > 0.f) && (direction.y > 0.f)) {    // lower right corner
-            //     return vector2_add(col->monitored->body.global.position, (vector2_t) { .x = col->monitored->as_rect.width, .y = col->monitored->as_rect.height });
-            // } else {                                                    // lower left corner
-            //     return vector2_add(col->monitored->body.global.position, (vector2_t) { .y = col->monitored->as_rect.height });
-            // }
+            if ((direction.x < 0.f) && (direction.y < 0.f)) {           // upper left corner
+                return properties.position;
+            } else if ((direction.x > 0.f) && (direction.y < 0.f)) {    // upper right corner
+                return vector2_add(properties.position, (vector2_t) { .x = BE_shape_2D_as_rect(col->monitored)->width });
+            } else if ((direction.x > 0.f) && (direction.y > 0.f)) {    // lower right corner
+                return vector2_add(properties.position, (vector2_t) { .x = BE_shape_2D_as_rect(col->monitored)->width, .y = BE_shape_2D_as_rect(col->monitored)->height });
+            } else {                                                    // lower left corner
+                return vector2_add(properties.position, (vector2_t) { .y = BE_shape_2D_as_rect(col->monitored)->height });
+            }
             break;
     }
 

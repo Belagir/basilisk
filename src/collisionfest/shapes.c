@@ -13,15 +13,24 @@ const tarasque_entity_definition shape_def = {
 static void init(tarasque_entity *self_data)
 {
     struct shape *shape = (struct shape *) self_data;
+    tarasque_entity *new_shape_details = NULL;
 
     shape->body = tarasque_entity_add_child(self_data, "position", (tarasque_specific_entity) {
             .entity_def = BE_DEF_body_2D,
             .data = BE_STATIC_body_2D(shape->properties),
     });
 
+    switch (shape->shape_kind) {
+        case SHAPE_2D_CIRCLE:
+            new_shape_details = BE_STATIC_shape_2D_circle((shape_2D_circle) { .radius = 20.f });
+            break;
+        case SHAPE_2D_RECT:
+            new_shape_details = BE_STATIC_shape_2D_rectangle((shape_2D_rect) { .height = 30.f, .width = 50.f });
+
+    }
     tarasque_entity *shape_impl = tarasque_entity_add_child(shape->body, "shape", (tarasque_specific_entity) {
             .entity_def = BE_DEF_shape_2D,
-            .data = BE_STATIC_shape_2D_circle((shape_2D_circle) { .radius = 20.f }),
+            .data = new_shape_details,
     });
 
     tarasque_entity_add_child(shape_impl, "visual", (tarasque_specific_entity) {
