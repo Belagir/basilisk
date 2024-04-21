@@ -5,7 +5,7 @@
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-typedef struct BE_shape_2D_collider_impl {
+typedef struct BE_shape_2D_collider {
     tarasque_entity *monitored;
     tarasque_entity *manager;
 
@@ -13,7 +13,7 @@ typedef struct BE_shape_2D_collider_impl {
     collision_bitmask mask_can_detect_on;
 
     // + callback
-} BE_shape_2D_collider_impl;
+} BE_shape_2D_collider;
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -36,7 +36,7 @@ static void BE_shape_2D_collider_deinit(tarasque_entity *self_data);
  */
 static void BE_shape_2D_collider_init(tarasque_entity *self_data)
 {
-    BE_shape_2D_collider_impl *collider = (BE_shape_2D_collider_impl *) self_data;
+    BE_shape_2D_collider *collider = (BE_shape_2D_collider *) self_data;
 
     collider->monitored = tarasque_entity_get_parent(collider, NULL, &BE_DEF_shape_2D);
 
@@ -53,7 +53,7 @@ static void BE_shape_2D_collider_init(tarasque_entity *self_data)
  */
 static void BE_shape_2D_collider_deinit(tarasque_entity *self_data)
 {
-    BE_shape_2D_collider_impl *collider = (BE_shape_2D_collider_impl *) self_data;
+    BE_shape_2D_collider *collider = (BE_shape_2D_collider *) self_data;
 
     BE_collision_manager_2D_unregister_shape(collider->manager, collider);
 }
@@ -69,10 +69,8 @@ static void BE_shape_2D_collider_deinit(tarasque_entity *self_data)
  * @param direction
  * @return
  */
-vector2_t BE_shape_2D_collider_support(tarasque_entity *col_data, vector2_t direction)
+vector2_t BE_shape_2D_collider_support(BE_shape_2D_collider *col, vector2_t direction)
 {
-    BE_shape_2D_collider_impl *col = (BE_shape_2D_collider_impl *) col_data;
-
     if (!col || !col->monitored) {
         return (vector2_t) { NAN, NAN };
     }
@@ -109,9 +107,9 @@ vector2_t BE_shape_2D_collider_support(tarasque_entity *col_data, vector2_t dire
 tarasque_entity *BE_STATIC_shape_2D_collider(collision_bitmask mask_detected_on, collision_bitmask mask_can_detect_on)
 {
 
-    static BE_shape_2D_collider_impl buffer = { 0u };
+    static BE_shape_2D_collider buffer = { 0u };
 
-    buffer = (BE_shape_2D_collider_impl) {
+    buffer = (BE_shape_2D_collider) {
             .mask_detected_on   = mask_detected_on,
             .mask_can_detect_on = mask_can_detect_on,
     };
@@ -128,7 +126,7 @@ tarasque_entity *BE_STATIC_shape_2D_collider(collision_bitmask mask_detected_on,
  *
  */
 const tarasque_entity_definition BE_DEF_shape_2D_collider = {
-        .data_size = sizeof(BE_shape_2D_collider_impl),
+        .data_size = sizeof(BE_shape_2D_collider),
 
         .on_init = &BE_shape_2D_collider_init, // register to a parent collision manager
         .on_deinit = &BE_shape_2D_collider_deinit, // unregister from the collision manager

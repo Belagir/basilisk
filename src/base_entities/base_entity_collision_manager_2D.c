@@ -10,9 +10,9 @@
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-typedef struct BE_collision_manager_2D_impl {
-    RANGE(BE_shape_2D_collider_impl *) *registered_collisions;
-} BE_collision_manager_2D_impl;
+typedef struct BE_collision_manager_2D {
+    RANGE(BE_shape_2D_collider *) *registered_collisions;
+} BE_collision_manager_2D;
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -40,7 +40,7 @@ static void BE_collision_manager_2D_on_draw(tarasque_entity *self_data, void *ev
  * @param collision_manager
  * @param col
  */
-void BE_collision_manager_2D_register_shape(BE_collision_manager_2D_impl *collision_manager, BE_shape_2D_collider_impl *col)
+void BE_collision_manager_2D_register_shape(BE_collision_manager_2D *collision_manager, BE_shape_2D_collider *col)
 {
     if (!collision_manager || !col) {
         return;
@@ -56,7 +56,7 @@ void BE_collision_manager_2D_register_shape(BE_collision_manager_2D_impl *collis
  * @param collision_manager
  * @param col
  */
-void BE_collision_manager_2D_unregister_shape(BE_collision_manager_2D_impl *collision_manager, BE_shape_2D_collider_impl *col)
+void BE_collision_manager_2D_unregister_shape(BE_collision_manager_2D *collision_manager, BE_shape_2D_collider *col)
 {
     if (!collision_manager || !col) {
         return;
@@ -76,7 +76,7 @@ void BE_collision_manager_2D_unregister_shape(BE_collision_manager_2D_impl *coll
  */
 static void BE_collision_manager_2D_init(tarasque_entity *self_data)
 {
-    BE_collision_manager_2D_impl *col_manager = (BE_collision_manager_2D_impl *) self_data;
+    BE_collision_manager_2D *col_manager = (BE_collision_manager_2D *) self_data;
 
     col_manager->registered_collisions = range_create_dynamic(make_system_allocator(), sizeof(*col_manager->registered_collisions->data), 8u);
 
@@ -90,7 +90,7 @@ static void BE_collision_manager_2D_init(tarasque_entity *self_data)
  */
 static void BE_collision_manager_2D_deinit(tarasque_entity *self_data)
 {
-    BE_collision_manager_2D_impl *col_manager = (BE_collision_manager_2D_impl *) self_data;
+    BE_collision_manager_2D *col_manager = (BE_collision_manager_2D *) self_data;
 
     range_destroy_dynamic(make_system_allocator(), &RANGE_TO_ANY(col_manager->registered_collisions));
 }
@@ -103,7 +103,7 @@ static void BE_collision_manager_2D_deinit(tarasque_entity *self_data)
  */
 // static void BE_collision_manager_2D_frame(tarasque_entity *self_data, float elapsed_time)
 // {
-//     BE_collision_manager_2D_impl *col_manager = (BE_collision_manager_2D_impl *) self_data;
+//     BE_collision_manager_2D *col_manager = (BE_collision_manager_2D *) self_data;
 
 //     for (size_t i = 0u ; i < col_manager->registered_collisions->length ; i++) {
 //         for (size_t j = i + 1u ; j < col_manager->registered_collisions->length ; j++) {
@@ -116,7 +116,7 @@ static void BE_collision_manager_2D_deinit(tarasque_entity *self_data)
 
 static void BE_collision_manager_2D_on_draw(tarasque_entity *self_data, void *event_data)
 {
-    BE_collision_manager_2D_impl *col_manager = (BE_collision_manager_2D_impl *) self_data;
+    BE_collision_manager_2D *col_manager = (BE_collision_manager_2D *) self_data;
     BE_render_manager_sdl_event_draw *event_draw = (BE_render_manager_sdl_event_draw *) event_data;
 
     for (size_t i = 0u ; i < col_manager->registered_collisions->length ; i++) {
@@ -135,7 +135,7 @@ static void BE_collision_manager_2D_on_draw(tarasque_entity *self_data, void *ev
  *
  */
 const tarasque_entity_definition BE_DEF_collision_manager_2D = {
-        .data_size = sizeof(BE_collision_manager_2D_impl),
+        .data_size = sizeof(BE_collision_manager_2D),
 
         .on_init = &BE_collision_manager_2D_init,
         // .on_frame = &BE_collision_manager_2D_frame,

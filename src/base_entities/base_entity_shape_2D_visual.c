@@ -9,12 +9,12 @@
  * @brief
  *
  */
-typedef struct BE_shape_2D_visual_impl {
+typedef struct BE_shape_2D_visual {
     tarasque_entity *visualized;
 
     SDL_Color color;
     i32 draw_index;
-} BE_shape_2D_visual_impl;
+} BE_shape_2D_visual;
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -80,7 +80,7 @@ static void BE_shape_2D_visual_render_draw_circle(SDL_Renderer *renderer, vector
  */
 static void BE_shape_2D_visual_on_init(tarasque_entity *self_data)
 {
-    BE_shape_2D_visual_impl *visual = (BE_shape_2D_visual_impl *) self_data;
+    BE_shape_2D_visual *visual = (BE_shape_2D_visual *) self_data;
 
     visual->visualized = tarasque_entity_get_parent(visual, NULL, &BE_DEF_shape_2D);
 
@@ -96,7 +96,7 @@ static void BE_shape_2D_visual_on_init(tarasque_entity *self_data)
  */
 static void BE_shape_2D_visual_on_draw(tarasque_entity *self_data, void *event_data)
 {
-    BE_shape_2D_visual_impl *visual = (BE_shape_2D_visual_impl *) self_data;
+    BE_shape_2D_visual *visual = (BE_shape_2D_visual *) self_data;
     BE_render_manager_sdl_event_draw *event_draw = (BE_render_manager_sdl_event_draw *) event_data;
     shape_2D_rect rectangle = { 0u };
 
@@ -129,9 +129,9 @@ static void BE_shape_2D_visual_on_draw(tarasque_entity *self_data, void *event_d
  */
 tarasque_entity *BE_STATIC_shape_2D_visual(SDL_Color color, i32 draw_index)
 {
-    static BE_shape_2D_visual_impl buffer = { 0u };
+    static BE_shape_2D_visual buffer = { 0u };
 
-    buffer = (BE_shape_2D_visual_impl) {
+    buffer = (BE_shape_2D_visual) {
             .color = color,
             .draw_index = draw_index,
     };
@@ -148,7 +148,7 @@ tarasque_entity *BE_STATIC_shape_2D_visual(SDL_Color color, i32 draw_index)
  *
  */
 const tarasque_entity_definition BE_DEF_shape_2D_visual = {
-        .data_size = sizeof(BE_shape_2D_visual_impl),
+        .data_size = sizeof(BE_shape_2D_visual),
 
         .on_init = &BE_shape_2D_visual_on_init,
 };

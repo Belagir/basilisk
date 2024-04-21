@@ -20,10 +20,10 @@ static void BE_event_relay_sdl_on_frame(tarasque_entity *self_data, float elapse
 /**
  * @brief Data layout of an "event relay" base entity.
  */
-typedef struct BE_event_relay_sdl_impl {
+typedef struct BE_event_relay_sdl {
     /** Internal buffer to re-order the polled events. Overriden each frame. */
     SDL_Event event_buffer[BE_EVENT_RELAY_SDL_BUFFER_SIZE];
-} BE_event_relay_sdl_impl;
+} BE_event_relay_sdl;
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -33,7 +33,7 @@ static void BE_event_relay_sdl_on_frame(tarasque_entity *self_data, float elapse
 {
     (void) elapsed_ms;
 
-    BE_event_relay_sdl_impl *relay = (BE_event_relay_sdl_impl *) self_data;
+    BE_event_relay_sdl *relay = (BE_event_relay_sdl *) self_data;
     SDL_Event event = { 0u };
     size_t buffer_pos = 0u;
 
@@ -74,7 +74,7 @@ tarasque_entity *BE_STATIC_event_relay_sdl(void)
  * The events transfered are stacked in a way that reflects the order they were polled : the later the event is polled, the deeper it will be placed on the event stack.
  */
 const tarasque_entity_definition BE_DEF_event_relay_sdl = {
-        .data_size = sizeof(BE_event_relay_sdl_impl),
+        .data_size = sizeof(BE_event_relay_sdl),
         .on_frame = &BE_event_relay_sdl_on_frame,
 };
 

@@ -5,7 +5,7 @@
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-typedef struct BE_window_sdl_impl {
+typedef struct BE_window_sdl {
     /** Title of the window used on window creation. */
     const char *title;
     /** Pixel position of the window on creation. */
@@ -17,7 +17,7 @@ typedef struct BE_window_sdl_impl {
 
     /** Pointer to a window that will be created on entity initialization. Overriden on initialization. */
     SDL_Window *window;
-} BE_window_sdl_impl;
+} BE_window_sdl;
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -46,7 +46,7 @@ static void BE_window_sdl_init(tarasque_entity *self_data)
         return;
     }
 
-    BE_window_sdl_impl *window_data = (BE_window_sdl_impl *) self_data;
+    BE_window_sdl *window_data = (BE_window_sdl *) self_data;
 
     SDL_InitSubSystem(SDL_INIT_VIDEO);
 
@@ -71,7 +71,7 @@ static void BE_window_sdl_deinit(tarasque_entity *self_data)
         return;
     }
 
-    BE_window_sdl_impl *window_data = (BE_window_sdl_impl *) self_data;
+    BE_window_sdl *window_data = (BE_window_sdl *) self_data;
 
     SDL_DestroyWindow(window_data->window);
     window_data->window = NULL;
@@ -106,9 +106,9 @@ static void BE_window_sdl_quit(tarasque_entity *self_data, void *event_data)
  */
 tarasque_entity *BE_STATIC_window_sdl(const char *title, size_t w, size_t h, size_t x, size_t y, SDL_WindowFlags flags)
 {
-    static BE_window_sdl_impl buffer = { 0u };
+    static BE_window_sdl buffer = { 0u };
 
-    buffer = (BE_window_sdl_impl) {
+    buffer = (BE_window_sdl) {
             .title = title,
             .x = x, .y = y,
             .w = w, .h = h,
@@ -124,15 +124,13 @@ tarasque_entity *BE_STATIC_window_sdl(const char *title, size_t w, size_t h, siz
  * @param window_data
  * @return
  */
-SDL_Window *BE_window_sdl_get_window(tarasque_entity *window_data)
+SDL_Window *BE_window_sdl_get_window(BE_window_sdl *window_entity)
 {
-    BE_window_sdl_impl *window = (BE_window_sdl_impl *) window_data;
-
-    if (!window_data) {
+    if (!window_entity) {
         return NULL;
     }
 
-    return window->window;
+    return window_entity->window;
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -142,7 +140,7 @@ SDL_Window *BE_window_sdl_get_window(tarasque_entity *window_data)
  *
  */
 const tarasque_entity_definition BE_DEF_window_sdl = {
-        .data_size = sizeof(BE_window_sdl_impl),
+        .data_size = sizeof(BE_window_sdl),
 
         .on_init = &BE_window_sdl_init,
         .on_deinit = &BE_window_sdl_deinit,

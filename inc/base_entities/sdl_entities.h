@@ -59,19 +59,6 @@ typedef struct shape_2D_rect {
 } shape_2D_rect;
 
 // -------------------------------------------------------------------------------------------------
-
-typedef struct BE_texture_2D_impl BE_texture_2D_impl;
-
-// -------------------------------------------------------------------------------------------------
-
-typedef struct BE_shape_2D_collider_impl BE_shape_2D_collider_impl;
-
-typedef struct BE_collision_manager_2D_impl BE_collision_manager_2D_impl;
-
-void BE_collision_manager_2D_register_shape(BE_collision_manager_2D_impl *collision_manager, BE_shape_2D_collider_impl *col);
-void BE_collision_manager_2D_unregister_shape(BE_collision_manager_2D_impl *collision_manager, BE_shape_2D_collider_impl *col);
-
-// -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
@@ -81,12 +68,20 @@ extern const tarasque_entity_definition BE_DEF_context_sdl;
 tarasque_entity *BE_STATIC_context_sdl(void);
 
 // -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+
+/*  */
+typedef struct BE_event_relay_sdl BE_event_relay_sdl;
 
 /* Entity definition of a SDL event relay, sending back events polled from the SDL library on the event stack. */
 extern const tarasque_entity_definition BE_DEF_event_relay_sdl;
+
 /* Returns statically-allocated SDL event relay entity data, used to give the engine data to copy for instanciation. */
 tarasque_entity *BE_STATIC_event_relay_sdl(void);
 
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
 /**
@@ -97,19 +92,32 @@ typedef struct BE_render_manager_sdl_event_draw {
     SDL_Renderer *renderer;
 } BE_render_manager_sdl_event_draw;
 
+/*  */
+typedef struct BE_render_manager_sdl BE_render_manager_sdl;
+
 /* Entity definition of a SDL render manager, that sends draw events through the game tree to draw content onto a window. */
 extern const tarasque_entity_definition BE_DEF_render_manager_sdl;
+
 /* Returns statically-allocated SDL render manager entity data, used to give the engine data to copy for instanciation. */
 tarasque_entity *BE_STATIC_render_manager_sdl(SDL_Color clear_color, SDL_RendererFlags flags);
 
 // -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+
+/*  */
+typedef struct BE_window_sdl BE_window_sdl;
 
 /* Entity definition of a SDL window, that creates a desktop window.*/
 extern const tarasque_entity_definition BE_DEF_window_sdl;
+
 /* Returns statically-allocated SDL window entity data, used to give the engine data to copy for instanciation. */
 tarasque_entity *BE_STATIC_window_sdl(const char *title, size_t w, size_t h, size_t x, size_t y, SDL_WindowFlags flags);
-SDL_Window *BE_window_sdl_get_window(tarasque_entity *window);
+/*  */
+SDL_Window *BE_window_sdl_get_window(BE_window_sdl *window_entity);
 
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
 /**
@@ -121,51 +129,97 @@ typedef enum BE_body_2D_space {
     BODY_2D_SPACE_GLOBAL,
 } BE_body_2D_space;
 
+/* */
+typedef struct BE_body_2D BE_body_2D;
+
 /* Entity definition of an object that is positioned in a 2D space. */
 extern const tarasque_entity_definition BE_DEF_body_2D;
+
 /* Returns statically-allocated body 2D data, used to give the engine data to copy for instanciation. */
 tarasque_entity *BE_STATIC_body_2D(properties_2D properties);
-properties_2D BE_body_2D_get(tarasque_entity *body, BE_body_2D_space how);
-void BE_body_2D_set(tarasque_entity *body, properties_2D new_properties);
-void BE_body_2D_translate(tarasque_entity *body, vector2_t change);
+/* */
+properties_2D BE_body_2D_get(BE_body_2D *body, BE_body_2D_space how);
+/* */
+void BE_body_2D_set(BE_body_2D *body, properties_2D new_properties);
+/* */
+void BE_body_2D_translate(BE_body_2D *body, vector2_t change);
 
 // -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
-/* Entity definition of an textured object that is positioned in a 2D space. */
+// TODO : texture constructor & opaque type
+/* Entity definition of a textured object that is positioned in a 2D space. */
 extern const tarasque_entity_definition BE_DEF_texture_2D;
 
 // -------------------------------------------------------------------------------------------------
-
-extern const tarasque_entity_definition BE_DEF_shape_2D;
-tarasque_entity *BE_STATIC_shape_2D_circle(shape_2D_circle circle);
-tarasque_entity *BE_STATIC_shape_2D_rectangle(shape_2D_rect rect);
-
-shape_2D_id BE_shape_2D_what(tarasque_entity *shape);
-shape_2D_circle *BE_shape_2D_as_circle(tarasque_entity *shape);
-shape_2D_rect *BE_shape_2D_as_rect(tarasque_entity *shape);
-
-tarasque_entity *BE_shape_2D_get_body(tarasque_entity *shape);
-
+// -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
+/* */
+typedef struct BE_shape_2D BE_shape_2D;
+
+/* */
+extern const tarasque_entity_definition BE_DEF_shape_2D;
+/* */
+tarasque_entity *BE_STATIC_shape_2D_circle(shape_2D_circle circle);
+/* */
+tarasque_entity *BE_STATIC_shape_2D_rectangle(shape_2D_rect rect);
+
+/* */
+shape_2D_id BE_shape_2D_what(BE_shape_2D *shape);
+/* */
+shape_2D_circle *BE_shape_2D_as_circle(BE_shape_2D *shape);
+/* */
+shape_2D_rect *BE_shape_2D_as_rect(BE_shape_2D *shape);
+/* */
+BE_body_2D *BE_shape_2D_get_body(BE_shape_2D *shape);
+
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+
+/* */
+typedef struct BE_shape_2D_visual BE_shape_2D_visual;
+
+/* */
 extern const tarasque_entity_definition BE_DEF_shape_2D_visual;
+
+/* */
 tarasque_entity *BE_STATIC_shape_2D_visual(SDL_Color color, i32 draw_index);
 
 // -------------------------------------------------------------------------------------------------
-
+// -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
+/* */
 typedef u32 collision_bitmask;
 
-typedef struct BE_shape_2D_collider_impl BE_shape_2D_collider_impl;
+/* */
+typedef struct BE_shape_2D_collider BE_shape_2D_collider;
 
+/* */
 extern const tarasque_entity_definition BE_DEF_shape_2D_collider;
+
+/* */
 tarasque_entity *BE_STATIC_shape_2D_collider(collision_bitmask mask_detected_on, collision_bitmask mask_can_detect_on);
-vector2_t BE_shape_2D_collider_support(tarasque_entity *col, vector2_t direction);
+/* */
+vector2_t BE_shape_2D_collider_support(BE_shape_2D_collider *col, vector2_t direction);
 
 // -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
+/* */
+typedef struct BE_collision_manager_2D BE_collision_manager_2D;
+
+/* */
 extern const tarasque_entity_definition BE_DEF_collision_manager_2D;
+
+/* */
+void BE_collision_manager_2D_register_shape(BE_collision_manager_2D *collision_manager, BE_shape_2D_collider *col);
+/* */
+void BE_collision_manager_2D_unregister_shape(BE_collision_manager_2D *collision_manager, BE_shape_2D_collider *col);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
