@@ -66,12 +66,10 @@ typedef struct BE_texture_2D_impl BE_texture_2D_impl;
 
 typedef struct BE_shape_2D_collider_impl BE_shape_2D_collider_impl;
 
-typedef struct BE_collision_manager_2D {
-    RANGE(BE_shape_2D_collider_impl *) *registered_collisions;
-} BE_collision_manager_2D;
+typedef struct BE_collision_manager_2D_impl BE_collision_manager_2D_impl;
 
-void BE_collision_manager_2D_register_shape(BE_collision_manager_2D *collision_manager, BE_shape_2D_collider_impl *col);
-void BE_collision_manager_2D_unregister_shape(BE_collision_manager_2D *collision_manager, BE_shape_2D_collider_impl *col);
+void BE_collision_manager_2D_register_shape(BE_collision_manager_2D_impl *collision_manager, BE_shape_2D_collider_impl *col);
+void BE_collision_manager_2D_unregister_shape(BE_collision_manager_2D_impl *collision_manager, BE_shape_2D_collider_impl *col);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------

@@ -15,7 +15,7 @@ typedef struct simplex { vector2_t A; vector2_t B; vector2_t C; } simplex;
 static vector2_t BE_shape_2D_collider_GJK_support_function(BE_shape_2D_collider_impl *c1, BE_shape_2D_collider_impl *c2, vector2_t direction);
 
 /*  */
-static simplex BE_shape_2D_collider_GJK_create_simplex(BE_collision_manager_2D *collision_manager, BE_shape_2D_collider_impl *c1, BE_shape_2D_collider_impl *c2);
+static simplex BE_shape_2D_collider_GJK_create_simplex(BE_collision_manager_2D_impl *collision_manager, BE_shape_2D_collider_impl *c1, BE_shape_2D_collider_impl *c2);
 
 /*  */
 static bool BE_shape_2D_collider_GJK_simplex_contains_origin(simplex tested, SDL_Renderer *renderer);
@@ -35,7 +35,7 @@ static bool BE_shape_2D_collider_GJK_segment_Voronoi_contains_origin(vector2_t s
  * @param c2
  * @return
  */
-bool BE_collision_manager_2D_check(BE_collision_manager_2D *collision_manager, BE_shape_2D_collider_impl *c1, BE_shape_2D_collider_impl *c2, SDL_Renderer *renderer)
+bool BE_collision_manager_2D_check(BE_collision_manager_2D_impl *collision_manager, BE_shape_2D_collider_impl *c1, BE_shape_2D_collider_impl *c2, SDL_Renderer *renderer)
 {
     simplex shape = { 0u };
     bool collision = false;
@@ -93,7 +93,7 @@ static vector2_t BE_shape_2D_collider_GJK_support_function(BE_shape_2D_collider_
  * @param c1
  * @param c2
  */
-static simplex BE_shape_2D_collider_GJK_create_simplex(BE_collision_manager_2D *collision_manager, BE_shape_2D_collider_impl *c1, BE_shape_2D_collider_impl *c2)
+static simplex BE_shape_2D_collider_GJK_create_simplex(BE_collision_manager_2D_impl *collision_manager, BE_shape_2D_collider_impl *c1, BE_shape_2D_collider_impl *c2)
 {
     vector2_t direction = VECTOR2_ZERO;
     vector2_t tmp = { 0u };
