@@ -8,7 +8,7 @@
 /**
  * @brief Data layout of a "2D texture" entity. Use it to configure what texture is displayed, on what index, and where.
  */
-typedef struct BE_texture_2D_impl {
+typedef struct BE_texture_2D {
     /** Position information of the texture entity. */
     BE_body_2D *body;
     /** Draw index to register a drawing operation on initialization. */
@@ -16,7 +16,7 @@ typedef struct BE_texture_2D_impl {
 
     /** Texture rendered to the screen. */
     SDL_Texture *texture;
-} BE_texture_2D_impl;
+} BE_texture_2D;
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -43,7 +43,7 @@ static void BE_texture_2D_init(tarasque_entity *self_data)
         return;
     }
 
-    BE_texture_2D_impl *texture_data = (BE_texture_2D_impl *) self_data;
+    BE_texture_2D *texture_data = (BE_texture_2D *) self_data;
 
     texture_data->body = tarasque_entity_get_parent(self_data, NULL, &BE_DEF_body_2D);
 
@@ -67,7 +67,7 @@ static void BE_texture_2D_on_draw(tarasque_entity *self_data, void *event_data)
     int text_w = 0;
     int text_h = 0;
 
-    BE_texture_2D_impl *texture_data = (BE_texture_2D_impl *) self_data;
+    BE_texture_2D *texture_data = (BE_texture_2D *) self_data;
     BE_render_manager_sdl_event_draw *draw_data = (BE_render_manager_sdl_event_draw *) event_data;
 
     SDL_QueryTexture(texture_data->texture, NULL, NULL, &text_w, &text_h);
@@ -95,12 +95,30 @@ static void BE_texture_2D_on_draw(tarasque_entity *self_data, void *event_data)
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
+tarasque_entity *BE_STATIC_texture_2D(SDL_Texture *texture, i32 draw_index)
+{
+    static BE_texture_2D buffer = { 0u };
+
+    if (!texture) {
+        return NULL;
+    }
+
+    buffer = (BE_texture_2D) { 0u };
+    buffer = (BE_texture_2D) {
+            .texture = texture,
+            .draw_index = draw_index,
+    };
+
+    return &buffer;
+}
+
+
 /**
  * @brief
  *
  */
 const tarasque_entity_definition BE_DEF_texture_2D = {
-        .data_size = sizeof(BE_texture_2D_impl),
+        .data_size = sizeof(BE_texture_2D),
 
         .on_init = &BE_texture_2D_init,
 };

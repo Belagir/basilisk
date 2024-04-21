@@ -51,6 +51,7 @@ tarasque_entity *BE_STATIC_shape_2D_circle(shape_2D_circle circle)
 {
     static BE_shape_2D buffer = { 0u };
 
+    buffer = (BE_shape_2D) { 0u };
     buffer = (BE_shape_2D) {
             .kind = SHAPE_2D_CIRCLE,
             .as_circle = circle,
@@ -69,6 +70,7 @@ tarasque_entity *BE_STATIC_shape_2D_rectangle(shape_2D_rect rect)
 {
     static BE_shape_2D buffer = { 0u };
 
+    buffer = (BE_shape_2D) { 0u };
     buffer = (BE_shape_2D) {
             .kind = SHAPE_2D_RECT,
             .as_rect = rect,

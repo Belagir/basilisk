@@ -131,6 +131,7 @@ tarasque_entity *BE_STATIC_shape_2D_visual(SDL_Color color, i32 draw_index)
 {
     static BE_shape_2D_visual buffer = { 0u };
 
+    buffer = (BE_shape_2D_visual) { 0u };
     buffer = (BE_shape_2D_visual) {
             .color = color,
             .draw_index = draw_index,

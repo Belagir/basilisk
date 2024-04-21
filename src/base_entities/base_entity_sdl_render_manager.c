@@ -154,6 +154,7 @@ tarasque_entity *BE_STATIC_render_manager_sdl(SDL_Color clear_color, SDL_Rendere
 {
     static BE_render_manager_sdl buffer = { 0u };
 
+    buffer = (BE_render_manager_sdl) { 0u };
     buffer = (BE_render_manager_sdl) {
             .clear_color = clear_color,
             .flags = flags,

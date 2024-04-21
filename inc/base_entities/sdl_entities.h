@@ -148,9 +148,13 @@ void BE_body_2D_translate(BE_body_2D *body, vector2_t change);
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-// TODO : texture constructor & opaque type
+/*  */
+typedef struct BE_texture_2D BE_texture_2D;
+
 /* Entity definition of a textured object that is positioned in a 2D space. */
 extern const tarasque_entity_definition BE_DEF_texture_2D;
+
+tarasque_entity *BE_STATIC_texture_2D(SDL_Texture *texture, i32 draw_index);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------

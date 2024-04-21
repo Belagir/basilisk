@@ -108,6 +108,7 @@ tarasque_entity *BE_STATIC_window_sdl(const char *title, size_t w, size_t h, siz
 {
     static BE_window_sdl buffer = { 0u };
 
+    buffer = (BE_window_sdl) { 0u };
     buffer = (BE_window_sdl) {
             .title = title,
             .x = x, .y = y,

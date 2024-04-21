@@ -109,6 +109,7 @@ tarasque_entity *BE_STATIC_shape_2D_collider(collision_bitmask mask_detected_on,
 
     static BE_shape_2D_collider buffer = { 0u };
 
+    buffer = (BE_shape_2D_collider) { 0u };
     buffer = (BE_shape_2D_collider) {
             .mask_detected_on   = mask_detected_on,
             .mask_can_detect_on = mask_can_detect_on,

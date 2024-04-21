@@ -83,23 +83,6 @@ static void BE_body_2D_on_frame(tarasque_entity *self_data, float elapsed_ms)
 /**
  * @brief
  *
- * @param properties
- * @return tarasque_entity*
- */
-tarasque_entity *BE_STATIC_body_2D(properties_2D properties)
-{
-    static BE_body_2D buffer = { 0u };
-
-    buffer = (BE_body_2D) {
-            .local = properties,
-    };
-
-    return &buffer;
-}
-
-/**
- * @brief
- *
  * @param body_2D
  * @param how
  * @return properties_2D
@@ -151,6 +134,26 @@ void BE_body_2D_translate(BE_body_2D *body_2D, vector2_t change)
 }
 
 // -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+
+/**
+ * @brief
+ *
+ * @param properties
+ * @return tarasque_entity*
+ */
+tarasque_entity *BE_STATIC_body_2D(properties_2D properties)
+{
+    static BE_body_2D buffer = { 0u };
+
+    buffer = (BE_body_2D) { 0u };
+    buffer = (BE_body_2D) {
+            .local = properties,
+    };
+
+    return &buffer;
+}
 
 /**
  * @brief
