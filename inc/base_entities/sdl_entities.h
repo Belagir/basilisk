@@ -60,18 +60,7 @@ typedef struct shape_2D_rect {
 
 // -------------------------------------------------------------------------------------------------
 
-/**
- * @brief Data layout of a "2D texture" entity. Use it to configure what texture is displayed, on what index, and where.
- */
-typedef struct BE_texture_2D {
-    /** Position information of the texture entity. */
-    // BE_body_2D_impl body;
-    /** Draw index to register a drawing operation on initialization. */
-    i32 draw_index;
-
-    /** Texture rendered to the screen. */
-    SDL_Texture *texture;
-} BE_texture_2D;
+typedef struct BE_texture_2D_impl BE_texture_2D_impl;
 
 // -------------------------------------------------------------------------------------------------
 
