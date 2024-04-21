@@ -9,6 +9,8 @@ struct shape {
     shape_2D_id shape_kind;
     properties_2D properties;
 
+    tarasque_entity *body;
+
     bool is_controllable;
     SDL_Color color;
 };

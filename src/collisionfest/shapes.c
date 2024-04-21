@@ -6,7 +6,6 @@ static void init(tarasque_entity *self_data);
 static void on_sdl_event(tarasque_entity *self_data, void *event_data);
 
 const tarasque_entity_definition shape_def = {
-    // .subtype = &BE_DEF_shape_2D,
     .data_size = sizeof(struct shape),
     .on_init = &init,
 };
@@ -15,12 +14,12 @@ static void init(tarasque_entity *self_data)
 {
     struct shape *shape = (struct shape *) self_data;
 
-    tarasque_entity *point = tarasque_entity_add_child(self_data, "position", (tarasque_specific_entity) {
+    shape->body = tarasque_entity_add_child(self_data, "position", (tarasque_specific_entity) {
             .entity_def = BE_DEF_body_2D,
             .data = BE_STATIC_body_2D(shape->properties),
     });
 
-    tarasque_entity *shape_impl = tarasque_entity_add_child(point, "shape", (tarasque_specific_entity) {
+    tarasque_entity *shape_impl = tarasque_entity_add_child(shape->body, "shape", (tarasque_specific_entity) {
             .entity_def = BE_DEF_shape_2D,
             .data = BE_STATIC_shape_2D_circle((shape_2D_circle) { .radius = 20.f }),
     });
@@ -49,12 +48,8 @@ static void on_sdl_event(tarasque_entity *self_data, void *event_data)
         return;
     }
 
-    // BE_body_2D_translate(BE_shape_2D_get_body(shape->))
-    // shape->shape.body.local.position.x += (f32) (event->key.keysym.scancode == SDL_SCANCODE_RIGHT) * 2.f;
-    // shape->shape.body.local.position.x -= (f32) (event->key.keysym.scancode == SDL_SCANCODE_LEFT)  * 2.f;
-    // shape->shape.body.local.position.y += (f32) (event->key.keysym.scancode == SDL_SCANCODE_DOWN)  * 2.f;
-    // shape->shape.body.local.position.y -= (f32) (event->key.keysym.scancode == SDL_SCANCODE_UP)    * 2.f;
-
-    // shape->shape.body.local.angle += (f32) (event->key.keysym.scancode == SDL_SCANCODE_E) * 0.314f;
-    // shape->shape.body.local.angle += (f32) (event->key.keysym.scancode == SDL_SCANCODE_Q) * 0.314f;
+    BE_body_2D_translate(shape->body, (vector2_t) {
+            .x = (f32) ((event->key.keysym.scancode == SDL_SCANCODE_RIGHT) - (event->key.keysym.scancode == SDL_SCANCODE_LEFT)) * 2.f,
+            .y = (f32) ((event->key.keysym.scancode == SDL_SCANCODE_DOWN)  - (event->key.keysym.scancode == SDL_SCANCODE_UP))   * 2.f,
+    });
 }
