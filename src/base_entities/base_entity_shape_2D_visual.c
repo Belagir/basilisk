@@ -5,6 +5,21 @@
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
+/**
+ * @brief
+ *
+ */
+typedef struct BE_shape_2D_visual_impl {
+    tarasque_entity *visualized;
+
+    SDL_Color color;
+    i32 draw_index;
+} BE_shape_2D_visual_impl;
+
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+
 /*  */
 static void BE_shape_2D_visual_render_draw_circle(SDL_Renderer *renderer, vector2_t center, f32 radius);
 
@@ -65,9 +80,9 @@ static void BE_shape_2D_visual_render_draw_circle(SDL_Renderer *renderer, vector
  */
 static void BE_shape_2D_visual_on_init(tarasque_entity *self_data)
 {
-    BE_shape_2D_visual *visual = (BE_shape_2D_visual *) self_data;
+    BE_shape_2D_visual_impl *visual = (BE_shape_2D_visual_impl *) self_data;
 
-    visual->visualized = (BE_shape_2D *) tarasque_entity_get_parent(visual, NULL, &BE_DEF_shape_2D);
+    visual->visualized = tarasque_entity_get_parent(visual, NULL, &BE_DEF_shape_2D);
 
     tarasque_entity_queue_subscribe_to_event(visual, "sdl renderer draw",
             (tarasque_specific_event_subscription) { .callback = &BE_shape_2D_visual_on_draw, .index = visual->draw_index, });
@@ -81,22 +96,22 @@ static void BE_shape_2D_visual_on_init(tarasque_entity *self_data)
  */
 static void BE_shape_2D_visual_on_draw(tarasque_entity *self_data, void *event_data)
 {
-    BE_shape_2D_visual *visual = (BE_shape_2D_visual *) self_data;
+    BE_shape_2D_visual_impl *visual = (BE_shape_2D_visual_impl *) self_data;
     BE_render_manager_sdl_event_draw *event_draw = (BE_render_manager_sdl_event_draw *) event_data;
+    shape_2D_rect rectangle = { 0u };
 
     SDL_SetRenderDrawColor(event_draw->renderer, visual->color.r, visual->color.g, visual->color.b, visual->color.a);
 
-    switch (visual->visualized->kind) {
+    switch (BE_shape_2D_what(visual->visualized)) {
         case SHAPE_2D_CIRCLE:
-            BE_shape_2D_visual_render_draw_circle(event_draw->renderer,
-                    visual->visualized->body.global.position, visual->visualized->as_circle.radius);
+            BE_shape_2D_visual_render_draw_circle(event_draw->renderer, BE_body_2D_get(BE_shape_2D_get_body(visual->visualized), BODY_2D_SPACE_GLOBAL).position, BE_shape_2D_as_circle(visual->visualized)->radius);
             break;
         case SHAPE_2D_RECT:
             SDL_RenderDrawRectF(event_draw->renderer, &(const SDL_FRect) {
-                    .x = visual->visualized->body.global.position.x,
-                    .y = visual->visualized->body.global.position.y,
-                    .h = visual->visualized->as_rect.height,
-                    .w = visual->visualized->as_rect.width, });
+                    .x = BE_body_2D_get(BE_shape_2D_get_body(visual->visualized), BODY_2D_SPACE_GLOBAL).position.x,
+                    .y = BE_body_2D_get(BE_shape_2D_get_body(visual->visualized), BODY_2D_SPACE_GLOBAL).position.y,
+                    .h = BE_shape_2D_as_rect(visual->visualized)->height,
+                    .w = BE_shape_2D_as_rect(visual->visualized)->width, });
             break;
     }
 }
@@ -108,9 +123,32 @@ static void BE_shape_2D_visual_on_draw(tarasque_entity *self_data, void *event_d
 /**
  * @brief
  *
+ * @param color
+ * @param draw_index
+ * @return
+ */
+tarasque_entity *BE_STATIC_shape_2D_visual(SDL_Color color, i32 draw_index)
+{
+    static BE_shape_2D_visual_impl buffer = { 0u };
+
+    buffer = (BE_shape_2D_visual_impl) {
+            .color = color,
+            .draw_index = draw_index,
+    };
+
+    return &buffer;
+}
+
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+
+/**
+ * @brief
+ *
  */
 const tarasque_entity_definition BE_DEF_shape_2D_visual = {
-        .data_size = sizeof(BE_shape_2D_visual),
+        .data_size = sizeof(BE_shape_2D_visual_impl),
 
         .on_init = &BE_shape_2D_visual_on_init,
 };

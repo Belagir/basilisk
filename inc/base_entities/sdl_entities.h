@@ -33,18 +33,30 @@ typedef struct properties_2D {
 } properties_2D;
 
 /**
- * @brief Data layout of a "2D body" entity. Use it to configure 2D information of objects interacting in the world plane, or change the position of an object through its local position.
+ * @brief
+ *
  */
-typedef struct BE_body_2D BE_body_2D;
-typedef struct BE_body_2D {
-    /** Parent 2D body this body is pulling its global position from, automatically pulled from the entity's parents. Could be NULL. Overriden on initialization. */
-    BE_body_2D *previous;
+typedef enum shape_2D_id {
+    SHAPE_2D_CIRCLE,
+    SHAPE_2D_RECT,
+} shape_2D_id;
 
-    /** Local position of the object in respect to its optional previous parent 2D body. */
-    properties_2D local;
-    /** Global position of the object on the world plane. Overriden on each frame. */
-    properties_2D global;
-} BE_body_2D;
+/**
+ * @brief
+ *
+ */
+typedef struct shape_2D_circle {
+    f32 radius;
+} shape_2D_circle;
+
+/**
+ * @brief
+ *
+ */
+typedef struct shape_2D_rect {
+    f32 width;
+    f32 height;
+} shape_2D_rect;
 
 // -------------------------------------------------------------------------------------------------
 
@@ -53,7 +65,7 @@ typedef struct BE_body_2D {
  */
 typedef struct BE_texture_2D {
     /** Position information of the texture entity. */
-    BE_body_2D body;
+    // BE_body_2D_impl body;
     /** Draw index to register a drawing operation on initialization. */
     i32 draw_index;
 
@@ -63,62 +75,14 @@ typedef struct BE_texture_2D {
 
 // -------------------------------------------------------------------------------------------------
 
-typedef enum shape_2D_id {
-    SHAPE_2D_CIRCLE,
-    SHAPE_2D_RECT,
-} shape_2D_id;
-
-typedef struct shape_2D_circle {
-    f32 radius;
-} shape_2D_circle;
-
-typedef struct shape_2D_rect {
-    f32 width;
-    f32 height;
-} shape_2D_rect;
-
-typedef struct BE_shape_2D {
-    BE_body_2D body;
-    shape_2D_id kind;
-
-    union { shape_2D_circle as_circle; shape_2D_rect as_rect; };
-} BE_shape_2D;
-
-// -------------------------------------------------------------------------------------------------
-
-typedef struct BE_shape_2D_visual {
-    BE_shape_2D *visualized;
-
-    SDL_Color color;
-    i32 draw_index;
-} BE_shape_2D_visual;
-
-// -------------------------------------------------------------------------------------------------
-
-typedef u32 collision_bitmask;
-
-typedef struct BE_collision_manager_2D BE_collision_manager_2D;
-
-typedef struct BE_shape_2D_collider {
-    BE_shape_2D *monitored;
-    BE_collision_manager_2D *manager;
-
-    collision_bitmask mask_detected_on;
-    collision_bitmask mask_can_detect_on;
-
-// + callback
-} BE_shape_2D_collider;
-
-vector2_t BE_shape_2D_collider_support(BE_shape_2D_collider *col, vector2_t direction);
-
-// -------------------------------------------------------------------------------------------------
+typedef struct BE_shape_2D_collider_impl BE_shape_2D_collider_impl;
 
 typedef struct BE_collision_manager_2D {
-    RANGE(BE_shape_2D_collider *) *registered_collisions;
+    RANGE(BE_shape_2D_collider_impl *) *registered_collisions;
 } BE_collision_manager_2D;
 
-void BE_collision_manager_2D_register_shape(BE_collision_manager_2D *collision_manager, BE_shape_2D_collider *col);
-void BE_collision_manager_2D_unregister_shape(BE_collision_manager_2D *collision_manager, BE_shape_2D_collider *col);
+void BE_collision_manager_2D_register_shape(BE_collision_manager_2D *collision_manager, BE_shape_2D_collider_impl *col);
+void BE_collision_manager_2D_unregister_shape(BE_collision_manager_2D *collision_manager, BE_shape_2D_collider_impl *col);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -161,8 +125,22 @@ SDL_Window *BE_window_sdl_get_window(tarasque_entity *window);
 
 // -------------------------------------------------------------------------------------------------
 
+/**
+ * @brief
+ *
+ */
+typedef enum BE_body_2D_space {
+    BODY_2D_SPACE_LOCAL,
+    BODY_2D_SPACE_GLOBAL,
+} BE_body_2D_space;
+
 /* Entity definition of an object that is positioned in a 2D space. */
 extern const tarasque_entity_definition BE_DEF_body_2D;
+/* Returns statically-allocated body 2D data, used to give the engine data to copy for instanciation. */
+tarasque_entity *BE_STATIC_body_2D(properties_2D properties);
+properties_2D BE_body_2D_get(tarasque_entity *body, BE_body_2D_space how);
+void BE_body_2D_set(tarasque_entity *body, properties_2D new_properties);
+void BE_body_2D_translate(tarasque_entity *body, vector2_t change);
 
 // -------------------------------------------------------------------------------------------------
 
@@ -172,14 +150,31 @@ extern const tarasque_entity_definition BE_DEF_texture_2D;
 // -------------------------------------------------------------------------------------------------
 
 extern const tarasque_entity_definition BE_DEF_shape_2D;
+tarasque_entity *BE_STATIC_shape_2D_circle(shape_2D_circle circle);
+tarasque_entity *BE_STATIC_shape_2D_rectangle(shape_2D_rect rect);
+
+shape_2D_id BE_shape_2D_what(tarasque_entity *shape);
+shape_2D_circle *BE_shape_2D_as_circle(tarasque_entity *shape);
+shape_2D_rect *BE_shape_2D_as_rect(tarasque_entity *shape);
+
+tarasque_entity *BE_shape_2D_get_body(tarasque_entity *shape);
 
 // -------------------------------------------------------------------------------------------------
 
 extern const tarasque_entity_definition BE_DEF_shape_2D_visual;
+tarasque_entity *BE_STATIC_shape_2D_visual(SDL_Color color, i32 draw_index);
 
 // -------------------------------------------------------------------------------------------------
 
+// -------------------------------------------------------------------------------------------------
+
+typedef u32 collision_bitmask;
+
+typedef struct BE_shape_2D_collider_impl BE_shape_2D_collider_impl;
+
 extern const tarasque_entity_definition BE_DEF_shape_2D_collider;
+tarasque_entity *BE_STATIC_shape_2D_collider(collision_bitmask mask_detected_on, collision_bitmask mask_can_detect_on);
+vector2_t BE_shape_2D_collider_support(tarasque_entity *col, vector2_t direction);
 
 // -------------------------------------------------------------------------------------------------
 

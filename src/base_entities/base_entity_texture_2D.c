@@ -51,20 +51,20 @@ static void BE_texture_2D_on_draw(tarasque_entity *self_data, void *event_data)
 
     SDL_QueryTexture(texture_data->texture, NULL, NULL, &text_w, &text_h);
 
-    SDL_RenderCopyEx(
-            draw_data->renderer,
-            texture_data->texture,
-            NULL,
-            &(const SDL_Rect) {
-                    .x = (int) texture_data->body.global.position.x,
-                    .y = (int) texture_data->body.global.position.y,
-                    .w = (int) (texture_data->body.global.scale.x * (f32) text_w),
-                    .h = (int) (texture_data->body.global.scale.y * (f32) text_h),
-            },
-            texture_data->body.global.angle,
-            NULL,
-            SDL_FLIP_NONE
-    );
+    // SDL_RenderCopyEx(
+    //         draw_data->renderer,
+    //         texture_data->texture,
+    //         NULL,
+    //         &(const SDL_Rect) {
+    //                 .x = (int) texture_data->body.global.position.x,
+    //                 .y = (int) texture_data->body.global.position.y,
+    //                 .w = (int) (texture_data->body.global.scale.x * (f32) text_w),
+    //                 .h = (int) (texture_data->body.global.scale.y * (f32) text_h),
+    //         },
+    //         texture_data->body.global.angle,
+    //         NULL,
+    //         SDL_FLIP_NONE
+    // );
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -76,7 +76,7 @@ static void BE_texture_2D_on_draw(tarasque_entity *self_data, void *event_data)
  *
  */
 const tarasque_entity_definition BE_DEF_texture_2D = {
-        .subtype = &BE_DEF_body_2D,
+        // .subtype = &BE_DEF_body_2D,
 
         .data_size = sizeof(BE_texture_2D),
 

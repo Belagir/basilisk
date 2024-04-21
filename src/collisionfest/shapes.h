@@ -6,7 +6,9 @@
 #include <base_entities/sdl_entities.h>
 
 struct shape {
-    BE_shape_2D shape;
+    shape_2D_id shape_kind;
+    properties_2D properties;
+
     bool is_controllable;
     SDL_Color color;
 };

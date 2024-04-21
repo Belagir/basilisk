@@ -18,25 +18,21 @@ static void init(tarasque_entity *self_data)
     }));
     tarasque_entity_queue_subscribe_to_event(self_data, "sdl event quit", (tarasque_specific_event_subscription) { .callback = &on_window_quit });
 
-    tarasque_entity_add_child(tarasque_entity_get_child(self_data, "Context/Window/Render Manager/Collision Manager", NULL), "shape 1", (tarasque_specific_entity) {
+    tarasque_entity_add_child(tarasque_entity_get_child(self_data, "Context/Window/Render Manager/Collision Manager", NULL),"shape 1", (tarasque_specific_entity) {
             .entity_def = shape_def,
             .data = &(struct shape) {
                     .is_controllable = true,
                     .color = { .r = 255, .a = 255 },
-                    .shape.body.local.scale = { 1, 1 },
-                    .shape.body.local.position = { 100, 100 },
-                    .shape.kind = SHAPE_2D_RECT,
-                    .shape.as_rect = { 60, 80, },
+                    .properties = { .scale = { 1, 1 }, .position = { 100, 100 }, },
             }
     });
-    tarasque_entity_add_child(tarasque_entity_get_child(self_data, "Context/Window/Render Manager/Collision Manager", NULL), "shape 2", (tarasque_specific_entity) {
+
+    tarasque_entity_add_child(tarasque_entity_get_child(self_data, "Context/Window/Render Manager/Collision Manager", NULL),"shape 2", (tarasque_specific_entity) {
             .entity_def = shape_def,
             .data = &(struct shape) {
+                    .is_controllable = false,
                     .color = { .g = 255, .a = 255 },
-                    .shape.body.local.scale = { 1, 1 },
-                    .shape.body.local.position = { 110, 200 },
-                    .shape.kind = SHAPE_2D_CIRCLE,
-                    .shape.as_circle = { 30 },
+                    .properties = { .scale = { 1, 1 }, .position = { 110, 200 }, },
             }
     });
 }

@@ -12,10 +12,10 @@ typedef struct simplex { vector2_t A; vector2_t B; vector2_t C; } simplex;
 // -------------------------------------------------------------------------------------------------
 
 /*  */
-static vector2_t BE_shape_2D_collider_GJK_support_function(BE_shape_2D_collider *c1, BE_shape_2D_collider *c2, vector2_t direction);
+static vector2_t BE_shape_2D_collider_GJK_support_function(BE_shape_2D_collider_impl *c1, BE_shape_2D_collider_impl *c2, vector2_t direction);
 
 /*  */
-static simplex BE_shape_2D_collider_GJK_create_simplex(BE_collision_manager_2D *collision_manager, BE_shape_2D_collider *c1, BE_shape_2D_collider *c2);
+static simplex BE_shape_2D_collider_GJK_create_simplex(BE_collision_manager_2D *collision_manager, BE_shape_2D_collider_impl *c1, BE_shape_2D_collider_impl *c2);
 
 /*  */
 static bool BE_shape_2D_collider_GJK_simplex_contains_origin(simplex tested, SDL_Renderer *renderer);
@@ -35,7 +35,7 @@ static bool BE_shape_2D_collider_GJK_segment_Voronoi_contains_origin(vector2_t s
  * @param c2
  * @return
  */
-bool BE_collision_manager_2D_check(BE_collision_manager_2D *collision_manager, BE_shape_2D_collider *c1, BE_shape_2D_collider *c2, SDL_Renderer *renderer)
+bool BE_collision_manager_2D_check(BE_collision_manager_2D *collision_manager, BE_shape_2D_collider_impl *c1, BE_shape_2D_collider_impl *c2, SDL_Renderer *renderer)
 {
     simplex shape = { 0u };
     bool collision = false;
@@ -80,7 +80,7 @@ bool BE_collision_manager_2D_check(BE_collision_manager_2D *collision_manager, B
  * @param direction
  * @return
  */
-static vector2_t BE_shape_2D_collider_GJK_support_function(BE_shape_2D_collider *c1, BE_shape_2D_collider *c2, vector2_t direction)
+static vector2_t BE_shape_2D_collider_GJK_support_function(BE_shape_2D_collider_impl *c1, BE_shape_2D_collider_impl *c2, vector2_t direction)
 {
     return vector2_substract(BE_shape_2D_collider_support(c1, direction), BE_shape_2D_collider_support(c2, vector2_negate(direction)));
 }
@@ -93,19 +93,20 @@ static vector2_t BE_shape_2D_collider_GJK_support_function(BE_shape_2D_collider 
  * @param c1
  * @param c2
  */
-static simplex BE_shape_2D_collider_GJK_create_simplex(BE_collision_manager_2D *collision_manager, BE_shape_2D_collider *c1, BE_shape_2D_collider *c2)
+static simplex BE_shape_2D_collider_GJK_create_simplex(BE_collision_manager_2D *collision_manager, BE_shape_2D_collider_impl *c1, BE_shape_2D_collider_impl *c2)
 {
     vector2_t direction = VECTOR2_ZERO;
     vector2_t tmp = { 0u };
     simplex returned_simplex = { 0u };
     bool simplex_needs_optimisation = false;
 
-    if (!collision_manager || !c1 || !c1->monitored || !c2 || !c2->monitored) {
+    if (!collision_manager || !c1 || !c2) {
         return (simplex) { 0u };
     }
 
-    // arbitrary direction that has a good chance to only need one iteration
-    direction = vector2_normal_of(vector2_substract(c2->monitored->body.global.position, c1->monitored->body.global.position));
+    // TODO : choose vector perpendicular to the shape's direction to each other : an arbitrary direction that has a good chance to only need one iteration
+    // direction = vector2_normal_of(vector2_substract(c2->monitored->body.global.position, c1->monitored->body.global.position));
+    direction = VECTOR2_X_POSITIVE;
     returned_simplex.A = BE_shape_2D_collider_GJK_support_function(c1, c2, direction);
 
     // opposite direction

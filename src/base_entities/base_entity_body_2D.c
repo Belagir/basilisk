@@ -7,6 +7,24 @@
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
+/**
+ * @brief Data layout of a "2D body" entity. Use it to configure 2D information of objects interacting in the world plane, or change the position of an object through its local position.
+ */
+typedef struct BE_body_2D_impl BE_body_2D_impl;
+typedef struct BE_body_2D_impl {
+    /** Parent 2D body this body is pulling its global position from, automatically pulled from the entity's parents. Could be NULL. Overriden on initialization. */
+    BE_body_2D_impl *previous;
+
+    /** Local position of the object in respect to its optional previous parent 2D body. */
+    properties_2D local;
+    /** Global position of the object on the world plane. Overriden on each frame. */
+    properties_2D global;
+} BE_body_2D_impl;
+
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+
 /*  */
 static void BE_body_2D_init(tarasque_entity *self_data);
 
@@ -28,7 +46,7 @@ static void BE_body_2D_init(tarasque_entity *self_data)
         return;
     }
 
-    BE_body_2D *self_body = (BE_body_2D *) self_data;
+    BE_body_2D_impl *self_body = (BE_body_2D_impl *) self_data;
 
     self_body->previous = tarasque_entity_get_parent(self_data, NULL, &BE_DEF_body_2D);
 }
@@ -47,7 +65,7 @@ static void BE_body_2D_on_frame(tarasque_entity *self_data, float elapsed_ms)
         return;
     }
 
-    BE_body_2D *self_body = (BE_body_2D *) self_data;
+    BE_body_2D_impl *self_body = (BE_body_2D_impl *) self_data;
 
     if (self_body->previous) {
         self_body->global.scale    = vector2_members_product(self_body->previous->global.scale, self_body->local.scale);
@@ -62,11 +80,64 @@ static void BE_body_2D_on_frame(tarasque_entity *self_data, float elapsed_ms)
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
+tarasque_entity *BE_STATIC_body_2D(properties_2D properties)
+{
+    static BE_body_2D_impl buffer = { 0u };
+
+    buffer = (BE_body_2D_impl) {
+            .local = properties,
+    };
+
+    return &buffer;
+}
+
+properties_2D BE_body_2D_get(tarasque_entity *body_data, BE_body_2D_space how)
+{
+    BE_body_2D_impl *body = (BE_body_2D_impl *) body_data;
+
+    if (!body) {
+        return (properties_2D) { 0u };
+    }
+
+    switch (how) {
+        case BODY_2D_SPACE_GLOBAL:
+            return body->global;
+        case BODY_2D_SPACE_LOCAL:
+            return body->local;
+        default:
+            return (properties_2D) { 0u };
+    }
+}
+
+void BE_body_2D_set(tarasque_entity *body_data, properties_2D new_properties)
+{
+    BE_body_2D_impl *body = (BE_body_2D_impl *) body_data;
+
+    if (!body) {
+        return;
+    }
+
+    body->local = new_properties;
+}
+
+void BE_body_2D_translate(tarasque_entity *body_data, vector2_t change)
+{
+    BE_body_2D_impl *body = (BE_body_2D_impl *) body_data;
+
+    if (!body) {
+        return;
+    }
+
+    body->local.position = vector2_add(body->local.position, change);
+}
+
+// -------------------------------------------------------------------------------------------------
+
 /**
  * @brief
  */
 const tarasque_entity_definition BE_DEF_body_2D = {
-        .data_size = sizeof(BE_body_2D),
+        .data_size = sizeof(BE_body_2D_impl),
         .on_init = BE_body_2D_init,
         .on_frame = &BE_body_2D_on_frame,
 };

@@ -32,7 +32,7 @@ static void BE_collision_manager_2D_on_draw(tarasque_entity *self_data, void *ev
  * @param collision_manager
  * @param col
  */
-void BE_collision_manager_2D_register_shape(BE_collision_manager_2D *collision_manager, BE_shape_2D_collider *col)
+void BE_collision_manager_2D_register_shape(BE_collision_manager_2D *collision_manager, BE_shape_2D_collider_impl *col)
 {
     if (!collision_manager || !col) {
         return;
@@ -48,7 +48,7 @@ void BE_collision_manager_2D_register_shape(BE_collision_manager_2D *collision_m
  * @param collision_manager
  * @param col
  */
-void BE_collision_manager_2D_unregister_shape(BE_collision_manager_2D *collision_manager, BE_shape_2D_collider *col)
+void BE_collision_manager_2D_unregister_shape(BE_collision_manager_2D *collision_manager, BE_shape_2D_collider_impl *col)
 {
     if (!collision_manager || !col) {
         return;

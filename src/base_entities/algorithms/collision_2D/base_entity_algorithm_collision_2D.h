@@ -5,7 +5,7 @@
 #include <base_entities/sdl_entities.h>
 
 /*  */
-bool BE_collision_manager_2D_check(BE_collision_manager_2D *collision_manager, BE_shape_2D_collider *c1, BE_shape_2D_collider *c2, SDL_Renderer *renderer);
+bool BE_collision_manager_2D_check(BE_collision_manager_2D *collision_manager, BE_shape_2D_collider_impl *c1, BE_shape_2D_collider_impl *c2, SDL_Renderer *renderer);
 
 
 #endif
