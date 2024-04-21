@@ -46,7 +46,6 @@ typedef struct tarasque_engine_entity {
     /** Engine owning the entity, used to redirect user's actions back to the whole engine. */
     tarasque_engine *host_handle;
 
-    RANGE(tarasque_entity_definition_unit) *subtype_definitions;
     tarasque_entity_definition_unit self_definition;
 
     /** The user's data. */
@@ -100,18 +99,6 @@ tarasque_engine_entity *tarasque_engine_entity_create(const identifier *id, tara
         if (user_data.data) {
             bytewise_copy(new_entity->data, user_data.data, user_data.entity_def.data_size);
         }
-
-        // optional subtypes
-        if (user_data.entity_def.subtype) {
-            new_entity->subtype_definitions = range_create_dynamic(alloc, sizeof(*new_entity->subtype_definitions->data), TARASQUE_COLLECTIONS_START_LENGTH);
-
-            subtyped_definition = user_data.entity_def.subtype;
-            while (subtyped_definition) {
-                new_entity->subtype_definitions = range_ensure_capacity(alloc, RANGE_TO_ANY(new_entity->subtype_definitions), 1);
-                range_insert_value(RANGE_TO_ANY(new_entity->subtype_definitions), 0u, subtyped_definition);
-                subtyped_definition = subtyped_definition->subtype;
-            }
-        }
     }
 
     return new_entity;
@@ -130,9 +117,6 @@ void tarasque_engine_entity_destroy(tarasque_engine_entity **target, allocator a
         return;
     }
 
-    if ((*target)->subtype_definitions) {
-        range_destroy_dynamic(alloc, &RANGE_TO_ANY((*target)->subtype_definitions));
-    }
     range_destroy_dynamic(alloc, &RANGE_TO_ANY((*target)->children));
     range_destroy_dynamic(alloc, &RANGE_TO_ANY((*target)->id));
 
@@ -234,15 +218,6 @@ bool tarasque_engine_entity_has_definition(tarasque_engine_entity *entity, taras
     }
 
     has_def = tarasque_entity_definition_unit_is_same_as(entity->self_definition, entity_def);
-
-    if (!entity->subtype_definitions) {
-        return has_def;
-    }
-
-    while ((!has_def) && (pos < entity->subtype_definitions->length)) {
-        has_def = tarasque_entity_definition_unit_is_same_as(entity->subtype_definitions->data[pos], entity_def);
-        pos += 1;
-    }
 
     return has_def;
 }
@@ -401,14 +376,6 @@ void tarasque_engine_entity_step_frame(tarasque_engine_entity *target, f32 elaps
         return;
     }
 
-    if (target->subtype_definitions) {
-        for (size_t i = 0u ; i < target->subtype_definitions->length ; i++) {
-            if (target->subtype_definitions->data[i].on_frame) {
-                target->subtype_definitions->data[i].on_frame(target->data, elapsed_ms);
-            }
-        }
-    }
-
     if (target->self_definition.on_frame) {
         target->self_definition.on_frame(target->data, elapsed_ms);
     }
@@ -441,14 +408,6 @@ void tarasque_engine_entity_init(tarasque_engine_entity *target)
         return;
     }
 
-    if (target->subtype_definitions) {
-        for (size_t i = 0u ; i < target->subtype_definitions->length ; i++) {
-            if (target->subtype_definitions->data[i].on_init) {
-                target->subtype_definitions->data[i].on_init(target->data);
-            }
-        }
-    }
-
     if (target->self_definition.on_init) {
         target->self_definition.on_init(target->data);
     }
@@ -468,16 +427,7 @@ void tarasque_engine_entity_deinit(tarasque_engine_entity *target)
     if (target->self_definition.on_deinit) {
         target->self_definition.on_deinit(target->data);
     }
-
-    if (target->subtype_definitions) {
-        for (i64 i = (i64) target->subtype_definitions->length - 1 ; i >= 0 ; i--) {
-            if (target->subtype_definitions->data[i].on_deinit) {
-                target->subtype_definitions->data[i].on_deinit(target->data);
-            }
-        }
-    }
 }
-
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
