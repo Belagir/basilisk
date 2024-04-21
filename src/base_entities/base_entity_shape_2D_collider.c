@@ -100,6 +100,21 @@ vector2_t BE_shape_2D_collider_support(BE_shape_2D_collider *col, vector2_t dire
 /**
  * @brief
  *
+ * @param col
+ * @return BE_body_2D*
+ */
+BE_body_2D *BE_shape_2D_collider_get_body(const BE_shape_2D_collider *col)
+{
+    if (!col) {
+        return NULL;
+    }
+
+    return BE_shape_2D_get_body(col->monitored);
+}
+
+/**
+ * @brief
+ *
  * @param mask_detected_on
  * @param mask_can_detect_on
  * @return

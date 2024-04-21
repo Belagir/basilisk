@@ -209,6 +209,9 @@ extern const tarasque_entity_definition BE_DEF_shape_2D_collider;
 tarasque_entity *BE_STATIC_shape_2D_collider(collision_bitmask mask_detected_on, collision_bitmask mask_can_detect_on);
 /* */
 vector2_t BE_shape_2D_collider_support(BE_shape_2D_collider *col, vector2_t direction);
+/* */
+BE_body_2D *BE_shape_2D_collider_get_body(const BE_shape_2D_collider *col);
+
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
