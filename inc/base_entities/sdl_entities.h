@@ -199,8 +199,30 @@ tarasque_entity *BE_STATIC_shape_2D_visual(SDL_Color color, i32 draw_index);
 /* */
 typedef u32 collision_bitmask;
 
+/**
+ * @brief
+ *
+ */
+typedef enum BE_shape_2D_collider_situation {
+    SHAPE_2D_COLLIDER_SITUATION_ON_ENTER,
+    SHAPE_2D_COLLIDER_SITUATION_ON_LEAVE,
+    SHAPE_2D_COLLIDER_SITUATION_IS_INSIDE,
+
+    SHAPE_2D_COLLIDER_SITUATIONS_NUMBER,
+} BE_shape_2D_collider_situation;
+
 /* */
 typedef struct BE_shape_2D_collider BE_shape_2D_collider;
+
+/**
+ * @brief
+ *
+ */
+typedef struct BE_shape_2D_collider_callback_info {
+    tarasque_entity *subject;
+    void (*callback)(tarasque_entity *entity, BE_shape_2D_collider *hit, BE_shape_2D_collider *other);
+} BE_shape_2D_collider_callback_info;
+
 
 /* */
 extern const tarasque_entity_definition BE_DEF_shape_2D_collider;
@@ -211,7 +233,10 @@ tarasque_entity *BE_STATIC_shape_2D_collider(collision_bitmask mask_detected_on,
 vector2_t BE_shape_2D_collider_support(BE_shape_2D_collider *col, vector2_t direction);
 /* */
 BE_body_2D *BE_shape_2D_collider_get_body(const BE_shape_2D_collider *col);
+/* */
+void BE_shape_2D_collider_set_callback(BE_shape_2D_collider *col, BE_shape_2D_collider_situation situation, BE_shape_2D_collider_callback_info callback);
 
+void BE_shape_2D_collider_exec_callback(BE_shape_2D_collider *col, BE_shape_2D_collider_situation situation, tarasque_entity *entity, BE_shape_2D_collider *hit, BE_shape_2D_collider *other);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------

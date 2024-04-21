@@ -5,6 +5,10 @@
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
+/**
+ * @brief
+ *
+ */
 typedef struct BE_shape_2D_collider {
     BE_shape_2D *monitored;
     BE_collision_manager_2D *manager;
@@ -12,7 +16,7 @@ typedef struct BE_shape_2D_collider {
     collision_bitmask mask_detected_on;
     collision_bitmask mask_can_detect_on;
 
-    // + callback
+    BE_shape_2D_collider_callback_info callbacks[SHAPE_2D_COLLIDER_SITUATIONS_NUMBER];
 } BE_shape_2D_collider;
 
 // -------------------------------------------------------------------------------------------------
@@ -61,6 +65,8 @@ static void BE_shape_2D_collider_deinit(tarasque_entity *self_data)
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
+
+
 
 /**
  * @brief
@@ -114,6 +120,31 @@ BE_body_2D *BE_shape_2D_collider_get_body(const BE_shape_2D_collider *col)
     }
 
     return BE_shape_2D_get_body(col->monitored);
+}
+
+/**
+ * @brief
+ *
+ * @param col
+ * @param situation
+ * @param callback
+ */
+void BE_shape_2D_collider_set_callback(BE_shape_2D_collider *col, BE_shape_2D_collider_situation situation, BE_shape_2D_collider_callback_info callback)
+{
+    if (!col) {
+        return;
+    }
+
+    col->callbacks[situation] = callback;
+}
+
+void BE_shape_2D_collider_exec_callback(BE_shape_2D_collider *col, BE_shape_2D_collider_situation situation, tarasque_entity *entity, BE_shape_2D_collider *hit, BE_shape_2D_collider *other)
+{
+    if (!col || !col->callbacks[situation].callback) {
+        return;
+    }
+
+    col->callbacks[situation].callback(entity, hit, other);
 }
 
 /**
