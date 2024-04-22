@@ -91,7 +91,7 @@ static void on_collision(tarasque_entity *entity, BE_shape_2D_collider *hit, BE_
     struct shape *shape = (struct shape *) entity;
 
     BE_body_2D_translate(shape->body, vector2_scale(0.0005f, vector2_substract(
-            BE_body_2D_get(shape->body, BODY_2D_SPACE_GLOBAL).position,
-            BE_body_2D_get(BE_shape_2D_collider_get_body(other), BODY_2D_SPACE_GLOBAL).position
+            BE_body_2D_global(BE_shape_2D_collider_get_body(other)).position,
+            BE_body_2D_global(shape->body).position
     )));
 }
