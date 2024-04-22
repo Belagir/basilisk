@@ -106,7 +106,7 @@ static void BE_collision_manager_2D_frame(tarasque_entity *self_data, float elap
 
     for (size_t i = 0u ; i < col_manager->registered_collisions->length ; i++) {
         for (size_t j = i + 1u ; j < col_manager->registered_collisions->length ; j++) {
-            if (BE_collision_manager_2D_check(col_manager, col_manager->registered_collisions->data[i], col_manager->registered_collisions->data[j])) {
+            if (BE_collision_manager_2D_GJK_check(col_manager->registered_collisions->data[i], col_manager->registered_collisions->data[j])) {
                 BE_shape_2D_collider_exec_callback(col_manager->registered_collisions->data[i],
                         col_manager->registered_collisions->data[i], col_manager->registered_collisions->data[j]);
                 BE_shape_2D_collider_exec_callback(col_manager->registered_collisions->data[j],
