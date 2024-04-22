@@ -85,7 +85,7 @@ vector2_t BE_shape_2D_collider_support(BE_shape_2D_collider *col, vector2_t dire
 
     // TODO : test with scales changed
 
-    properties = BE_body_2D_get(BE_shape_2D_get_body(col->monitored), BODY_2D_SPACE_GLOBAL);
+    properties = BE_body_2D_global(BE_shape_2D_get_body(col->monitored));
 
     switch (BE_shape_2D_what(col->monitored)) {
         case SHAPE_2D_CIRCLE:

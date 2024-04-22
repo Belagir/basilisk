@@ -104,12 +104,12 @@ static void BE_shape_2D_visual_on_draw(tarasque_entity *self_data, void *event_d
 
     switch (BE_shape_2D_what(visual->visualized)) {
         case SHAPE_2D_CIRCLE:
-            BE_shape_2D_visual_render_draw_circle(event_draw->renderer, BE_body_2D_get(BE_shape_2D_get_body(visual->visualized), BODY_2D_SPACE_GLOBAL).position, BE_shape_2D_as_circle(visual->visualized)->radius);
+            BE_shape_2D_visual_render_draw_circle(event_draw->renderer, BE_body_2D_global(BE_shape_2D_get_body(visual->visualized)).position, BE_shape_2D_as_circle(visual->visualized)->radius);
             break;
         case SHAPE_2D_RECT:
             SDL_RenderDrawRectF(event_draw->renderer, &(const SDL_FRect) {
-                    .x = BE_body_2D_get(BE_shape_2D_get_body(visual->visualized), BODY_2D_SPACE_GLOBAL).position.x,
-                    .y = BE_body_2D_get(BE_shape_2D_get_body(visual->visualized), BODY_2D_SPACE_GLOBAL).position.y,
+                    .x = BE_body_2D_global(BE_shape_2D_get_body(visual->visualized)).position.x,
+                    .y = BE_body_2D_global(BE_shape_2D_get_body(visual->visualized)).position.y,
                     .h = BE_shape_2D_as_rect(visual->visualized)->height,
                     .w = BE_shape_2D_as_rect(visual->visualized)->width, });
             break;

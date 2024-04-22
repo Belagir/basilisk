@@ -74,10 +74,10 @@ static void BE_texture_2D_on_draw(tarasque_entity *self_data, void *event_data)
 
     dest = (SDL_Rect) { .x = 0, .y = 0, .w = text_w, .h = text_h, };
     if (texture_data->body) {
-        dest.x = (int) BE_body_2D_get(texture_data->body, BODY_2D_SPACE_GLOBAL).position.x;
-        dest.y = (int) BE_body_2D_get(texture_data->body, BODY_2D_SPACE_GLOBAL).position.y;
-        dest.w = (int) (BE_body_2D_get(texture_data->body, BODY_2D_SPACE_GLOBAL).scale.x * (f32) text_w);
-        dest.h = (int) (BE_body_2D_get(texture_data->body, BODY_2D_SPACE_GLOBAL).scale.y * (f32) text_h);
+        dest.x = (int) BE_body_2D_global(texture_data->body).position.x;
+        dest.y = (int) BE_body_2D_global(texture_data->body).position.y;
+        dest.w = (int) (BE_body_2D_global(texture_data->body).scale.x * (f32) text_w);
+        dest.h = (int) (BE_body_2D_global(texture_data->body).scale.y * (f32) text_h);
     }
 
     SDL_RenderCopyEx(

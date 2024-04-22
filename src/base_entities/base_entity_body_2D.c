@@ -80,27 +80,35 @@ static void BE_body_2D_on_frame(tarasque_entity *self_data, float elapsed_ms)
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
+
 /**
  * @brief
  *
- * @param body_2D
- * @param how
- * @return properties_2D
+ * @param body
+ * @return
  */
-properties_2D BE_body_2D_get(BE_body_2D *body_2D, BE_body_2D_space how)
+properties_2D BE_body_2D_local(BE_body_2D *body)
 {
-    if (!body_2D) {
+    if (!body) {
         return (properties_2D) { 0u };
     }
 
-    switch (how) {
-        case BODY_2D_SPACE_GLOBAL:
-            return body_2D->global;
-        case BODY_2D_SPACE_LOCAL:
-            return body_2D->local;
-        default:
-            return (properties_2D) { 0u };
+    return body->local;
+}
+
+/**
+ * @brief
+ *
+ * @param body
+ * @return
+ */
+properties_2D BE_body_2D_global(BE_body_2D *body)
+{
+    if (!body) {
+        return (properties_2D) { 0u };
     }
+
+    return body->global;
 }
 
 /**
@@ -109,7 +117,7 @@ properties_2D BE_body_2D_get(BE_body_2D *body_2D, BE_body_2D_space how)
  * @param body_2D
  * @param new_properties
  */
-void BE_body_2D_set(BE_body_2D *body_2D, properties_2D new_properties)
+void BE_body_2D_local_set(BE_body_2D *body_2D, properties_2D new_properties)
 {
     if (!body_2D) {
         return;

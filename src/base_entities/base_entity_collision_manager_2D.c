@@ -121,6 +121,11 @@ static void BE_collision_manager_2D_frame(tarasque_entity *self_data, float elap
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
+tarasque_entity *BE_STATIC_collision_manager_2D(void)
+{
+    return NULL;
+}
+
 /**
  * @brief
  *

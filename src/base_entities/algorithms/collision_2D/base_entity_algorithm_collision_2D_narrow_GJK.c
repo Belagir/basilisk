@@ -88,8 +88,8 @@ static simplex BE_shape_2D_collider_GJK_create_simplex(BE_collision_manager_2D *
 
     // choosing a vector perpendicular to the shapes' direction to each other has a good chance to only need one iteration
     direction = vector2_normal_of(vector2_substract(
-            BE_body_2D_get(BE_shape_2D_collider_get_body(c2), BODY_2D_SPACE_GLOBAL).position,
-            BE_body_2D_get(BE_shape_2D_collider_get_body(c1), BODY_2D_SPACE_GLOBAL).position));
+            BE_body_2D_global(BE_shape_2D_collider_get_body(c2)).position,
+            BE_body_2D_global(BE_shape_2D_collider_get_body(c1)).position));
     returned_simplex.A = BE_shape_2D_collider_GJK_support_function(c1, c2, direction);
 
     // opposite direction
