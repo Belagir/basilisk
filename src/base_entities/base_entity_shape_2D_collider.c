@@ -138,13 +138,13 @@ void BE_shape_2D_collider_set_callback(BE_shape_2D_collider *col, BE_shape_2D_co
     col->callbacks[situation] = callback;
 }
 
-void BE_shape_2D_collider_exec_callback(BE_shape_2D_collider *col, BE_shape_2D_collider_situation situation, tarasque_entity *entity, BE_shape_2D_collider *hit, BE_shape_2D_collider *other)
+void BE_shape_2D_collider_exec_callback(BE_shape_2D_collider *col, BE_shape_2D_collider_situation situation, BE_shape_2D_collider *hit, BE_shape_2D_collider *other)
 {
     if (!col || !col->callbacks[situation].callback) {
         return;
     }
 
-    col->callbacks[situation].callback(entity, hit, other);
+    col->callbacks[situation].callback(col->callbacks[situation].subject, hit, other);
 }
 
 /**

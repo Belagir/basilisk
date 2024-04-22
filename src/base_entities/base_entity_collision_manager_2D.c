@@ -31,9 +31,6 @@ static void BE_collision_manager_2D_deinit(tarasque_entity *self_data);
 /*  */
 static void BE_collision_manager_2D_frame(tarasque_entity *self_data, float elapsed_time);
 
-/* temp */
-static void BE_collision_manager_2D_on_draw(tarasque_entity *self_data, void *event_data);
-
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -83,8 +80,6 @@ static void BE_collision_manager_2D_init(tarasque_entity *self_data)
     BE_collision_manager_2D *col_manager = (BE_collision_manager_2D *) self_data;
 
     col_manager->registered_collisions = range_create_dynamic(make_system_allocator(), sizeof(*col_manager->registered_collisions->data), 8u);
-
-    tarasque_entity_queue_subscribe_to_event(self_data, "sdl renderer draw", (tarasque_specific_event_subscription) { .callback = &BE_collision_manager_2D_on_draw , .index = 10 });
 }
 
 /**
@@ -105,27 +100,19 @@ static void BE_collision_manager_2D_deinit(tarasque_entity *self_data)
  * @param self_data
  * @param elapsed_time
  */
-// static void BE_collision_manager_2D_frame(tarasque_entity *self_data, float elapsed_time)
-// {
-//     BE_collision_manager_2D *col_manager = (BE_collision_manager_2D *) self_data;
-
-//     for (size_t i = 0u ; i < col_manager->registered_collisions->length ; i++) {
-//         for (size_t j = i + 1u ; j < col_manager->registered_collisions->length ; j++) {
-//             if (BE_collision_manager_2D_check(col_manager, col_manager->registered_collisions->data[i], col_manager->registered_collisions->data[j])) {
-//                 printf("collision of [%#010x] vs [%#010x]\n", col_manager->registered_collisions->data[i], col_manager->registered_collisions->data[j]);
-//             }
-//         }
-//     }
-// }
-
-static void BE_collision_manager_2D_on_draw(tarasque_entity *self_data, void *event_data)
+static void BE_collision_manager_2D_frame(tarasque_entity *self_data, float elapsed_time)
 {
     BE_collision_manager_2D *col_manager = (BE_collision_manager_2D *) self_data;
-    BE_render_manager_sdl_event_draw *event_draw = (BE_render_manager_sdl_event_draw *) event_data;
 
     for (size_t i = 0u ; i < col_manager->registered_collisions->length ; i++) {
         for (size_t j = i + 1u ; j < col_manager->registered_collisions->length ; j++) {
-            BE_collision_manager_2D_check(col_manager, col_manager->registered_collisions->data[i], col_manager->registered_collisions->data[j], event_draw->renderer);
+            if (BE_collision_manager_2D_check(col_manager, col_manager->registered_collisions->data[i], col_manager->registered_collisions->data[j])) {
+                BE_shape_2D_collider_exec_callback(col_manager->registered_collisions->data[i], SHAPE_2D_COLLIDER_SITUATION_IS_INSIDE,
+                        col_manager->registered_collisions->data[i], col_manager->registered_collisions->data[j]);
+                BE_shape_2D_collider_exec_callback(col_manager->registered_collisions->data[i], SHAPE_2D_COLLIDER_SITUATION_IS_INSIDE,
+                        col_manager->registered_collisions->data[j], col_manager->registered_collisions->data[i]);
+
+            }
         }
     }
 }
@@ -142,6 +129,6 @@ const tarasque_entity_definition BE_DEF_collision_manager_2D = {
         .data_size = sizeof(BE_collision_manager_2D),
 
         .on_init = &BE_collision_manager_2D_init,
-        // .on_frame = &BE_collision_manager_2D_frame,
+        .on_frame = &BE_collision_manager_2D_frame,
         .on_deinit = &BE_collision_manager_2D_deinit,
 };
