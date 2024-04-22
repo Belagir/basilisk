@@ -54,10 +54,10 @@ static void init(tarasque_entity *self_data)
 
     BE_shape_2D_collider *hitbox = tarasque_entity_add_child(shape_impl, "hitbox", (tarasque_specific_entity) {
             .entity_def = BE_DEF_shape_2D_collider,
-            .data = BE_STATIC_shape_2D_collider(0x0, 0x0),
+            .data = BE_STATIC_shape_2D_collider(),
     });
 
-    BE_shape_2D_collider_set_callback(hitbox, SHAPE_2D_COLLIDER_SITUATION_IS_INSIDE, (BE_shape_2D_collider_callback_info) {
+    BE_shape_2D_collider_set_callback(hitbox, (BE_shape_2D_collider_callback_info) {
             .subject = self_data,
             .callback = &on_collision,
     });

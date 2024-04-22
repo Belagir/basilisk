@@ -13,10 +13,7 @@ typedef struct BE_shape_2D_collider {
     BE_shape_2D *monitored;
     BE_collision_manager_2D *manager;
 
-    collision_bitmask mask_detected_on;
-    collision_bitmask mask_can_detect_on;
-
-    BE_shape_2D_collider_callback_info callbacks[SHAPE_2D_COLLIDER_SITUATIONS_NUMBER];
+    BE_shape_2D_collider_callback_info callback_info;
 } BE_shape_2D_collider;
 
 // -------------------------------------------------------------------------------------------------
@@ -129,22 +126,22 @@ BE_body_2D *BE_shape_2D_collider_get_body(const BE_shape_2D_collider *col)
  * @param situation
  * @param callback
  */
-void BE_shape_2D_collider_set_callback(BE_shape_2D_collider *col, BE_shape_2D_collider_situation situation, BE_shape_2D_collider_callback_info callback)
+void BE_shape_2D_collider_set_callback(BE_shape_2D_collider *col, BE_shape_2D_collider_callback_info callback)
 {
     if (!col) {
         return;
     }
 
-    col->callbacks[situation] = callback;
+    col->callback_info = callback;
 }
 
-void BE_shape_2D_collider_exec_callback(BE_shape_2D_collider *col, BE_shape_2D_collider_situation situation, BE_shape_2D_collider *hit, BE_shape_2D_collider *other)
+void BE_shape_2D_collider_exec_callback(BE_shape_2D_collider *col, BE_shape_2D_collider *hit, BE_shape_2D_collider *other)
 {
-    if (!col || !col->callbacks[situation].callback) {
+    if (!col || !col->callback_info.callback) {
         return;
     }
 
-    col->callbacks[situation].callback(col->callbacks[situation].subject, hit, other);
+    col->callback_info.callback(col->callback_info.subject, hit, other);
 }
 
 /**
@@ -154,18 +151,9 @@ void BE_shape_2D_collider_exec_callback(BE_shape_2D_collider *col, BE_shape_2D_c
  * @param mask_can_detect_on
  * @return
  */
-tarasque_entity *BE_STATIC_shape_2D_collider(collision_bitmask mask_detected_on, collision_bitmask mask_can_detect_on)
+tarasque_entity *BE_STATIC_shape_2D_collider(void)
 {
-
-    static BE_shape_2D_collider buffer = { 0u };
-
-    buffer = (BE_shape_2D_collider) { 0u };
-    buffer = (BE_shape_2D_collider) {
-            .mask_detected_on   = mask_detected_on,
-            .mask_can_detect_on = mask_can_detect_on,
-    };
-
-    return &buffer;
+    return NULL;
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -64,6 +64,7 @@ typedef struct shape_2D_rect {
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // ---- SDL CONTEXT ENTITY ----
+// Manage the SDL library initialisation and exit. This is not a necessary parent for other SDL-related entities, but provides a clean lifetime to SDL modules.
 
 /* Entity definition of a SDL context, managing the broader SDL lifetime. */
 extern const tarasque_entity_definition BE_DEF_context_sdl;
@@ -75,6 +76,7 @@ tarasque_entity *BE_STATIC_context_sdl(void);
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // ---- SDL EVENT RELAY ENTITY ----
+// Sends back SDL events (polled `SDL_Event` objects) through the engine.
 
 /* Opaque type to an event relay entity instance. */
 typedef struct BE_event_relay_sdl BE_event_relay_sdl;
@@ -90,7 +92,30 @@ tarasque_entity *BE_STATIC_event_relay_sdl(void);
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
+// ---- SDL WINDOW ENTITY ----
+// Wraps around a SDL window.
+
+/* Opaque type to a sdl window entity instance. */
+typedef struct BE_window_sdl BE_window_sdl;
+
+// -------------------------------------------------------------------------------------------------
+
+/* Entity definition of a SDL window, that creates a desktop window.*/
+extern const tarasque_entity_definition BE_DEF_window_sdl;
+
+/* Returns statically-allocated SDL window entity data, used to give the engine data to copy for instanciation. */
+tarasque_entity *BE_STATIC_window_sdl(const char *title, size_t w, size_t h, size_t x, size_t y, SDL_WindowFlags flags);
+
+// -------------------------------------------------------------------------------------------------
+
+/* Returns the SDL handle to the window managed by this entity. */
+SDL_Window *BE_window_sdl_get_window(BE_window_sdl *window_entity);
+
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // ---- SDL RENDER MANAGER ENTITY ----
+// Orchestrate draw operations on a parent window, providing a "sdl renderer draw" event to other entities.
 
 /**
  * @brief Data layout of a "sdl renderer draw" drawing event companion data sent by the BE_render_manager_sdl_entity_def entity.
@@ -114,28 +139,8 @@ tarasque_entity *BE_STATIC_render_manager_sdl(SDL_Color clear_color, SDL_Rendere
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
-// ---- SDL WINDOW ENTITY ----
-
-/* Opaque type to a sdl window entity instance. */
-typedef struct BE_window_sdl BE_window_sdl;
-
-// -------------------------------------------------------------------------------------------------
-
-/* Entity definition of a SDL window, that creates a desktop window.*/
-extern const tarasque_entity_definition BE_DEF_window_sdl;
-
-/* Returns statically-allocated SDL window entity data, used to give the engine data to copy for instanciation. */
-tarasque_entity *BE_STATIC_window_sdl(const char *title, size_t w, size_t h, size_t x, size_t y, SDL_WindowFlags flags);
-
-// -------------------------------------------------------------------------------------------------
-
-/* Returns the SDL handle to the window managed by this entity. */
-SDL_Window *BE_window_sdl_get_window(BE_window_sdl *window_entity);
-
-// -------------------------------------------------------------------------------------------------
-// -------------------------------------------------------------------------------------------------
-// -------------------------------------------------------------------------------------------------
 // ---- 2D BODY ENTITY ----
+// Automates positioning of 2D objects, and creates a hierarchy of 2D objects that have a position relative to each other.
 
 /* Opaque type to a body 2D instance. */
 typedef struct BE_body_2D BE_body_2D;
@@ -163,6 +168,7 @@ void BE_body_2D_translate(BE_body_2D *body, vector2_t change);
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // ---- 2D TEXTURE ENTITY ----
+// Provides a simple entity to draw an already loaded SDL texture to the screen.
 
 /* Opaque type to a 2D texture instance. */
 typedef struct BE_texture_2D BE_texture_2D;
@@ -179,6 +185,7 @@ tarasque_entity *BE_STATIC_texture_2D(SDL_Texture *texture, i32 draw_index);
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // ---- 2D SHAPE ENTITY ----
+// Entity representing a basic shape easily extended with a visual or a collision box.
 
 /* Opaque type to a 2D shape instance. */
 typedef struct BE_shape_2D BE_shape_2D;
@@ -212,6 +219,7 @@ BE_body_2D *BE_shape_2D_get_body(BE_shape_2D *shape);
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // ---- 2D SHAPE VISUAL ENTITY ----
+// Entity providing a visual to a parent shape entity.
 
 /* Opaque type to a 2D shape visual instance. */
 typedef struct BE_shape_2D_visual BE_shape_2D_visual;
@@ -228,24 +236,10 @@ tarasque_entity *BE_STATIC_shape_2D_visual(SDL_Color color, i32 draw_index);
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // ---- 2D SHAPE COLLIDER ENTITY ----
+// Entity providing a collision object to a parent shape, automatically associating to a parent collision manager.
 
-/* Type encoding a layer mask on 32 bits. */
-// TODO : downgrade this
-typedef u32 collision_bitmask;
-
-/**
- * @brief
- */
-// TODO : downgrade this
-typedef enum BE_shape_2D_collider_situation {
-    SHAPE_2D_COLLIDER_SITUATION_ON_ENTER,
-    SHAPE_2D_COLLIDER_SITUATION_ON_LEAVE,
-    SHAPE_2D_COLLIDER_SITUATION_IS_INSIDE,
-
-    SHAPE_2D_COLLIDER_SITUATIONS_NUMBER,
-} BE_shape_2D_collider_situation;
-
-// -------------------------------------------------------------------------------------------------
+/* Opaque type to a collision shape entity instance. */
+typedef struct BE_shape_2D_collider BE_shape_2D_collider;
 
 /**
  * @brief Callback information needed to resolve a collision.
@@ -257,16 +251,13 @@ typedef struct BE_shape_2D_collider_callback_info {
     void (*callback)(tarasque_entity *entity, BE_shape_2D_collider *hit, BE_shape_2D_collider *other);
 } BE_shape_2D_collider_callback_info;
 
-/* Opaque type to a collision shape entity instance. */
-typedef struct BE_shape_2D_collider BE_shape_2D_collider;
-
 // -------------------------------------------------------------------------------------------------
 
 /* Entity definition for a shape collider entity. */
 extern const tarasque_entity_definition BE_DEF_shape_2D_collider;
 
 /* Returns statically-allocated shape collider data, used to give the engine data to copy for instanciation. */
-tarasque_entity *BE_STATIC_shape_2D_collider(collision_bitmask mask_detected_on, collision_bitmask mask_can_detect_on);
+tarasque_entity *BE_STATIC_shape_2D_collider(void);
 
 // -------------------------------------------------------------------------------------------------
 
@@ -277,15 +268,16 @@ vector2_t BE_shape_2D_collider_support(BE_shape_2D_collider *col, vector2_t dire
 BE_body_2D *BE_shape_2D_collider_get_body(const BE_shape_2D_collider *col);
 
 /* Sets the callback executed on a collision involving a shape collider. */
-void BE_shape_2D_collider_set_callback(BE_shape_2D_collider *col, BE_shape_2D_collider_situation situation, BE_shape_2D_collider_callback_info callback);
+void BE_shape_2D_collider_set_callback(BE_shape_2D_collider *col, BE_shape_2D_collider_callback_info callback);
 
 /* Executes the collision callback associated to a shape collider. */
-void BE_shape_2D_collider_exec_callback(BE_shape_2D_collider *col, BE_shape_2D_collider_situation situation, BE_shape_2D_collider *hit, BE_shape_2D_collider *other);
+void BE_shape_2D_collider_exec_callback(BE_shape_2D_collider *col, BE_shape_2D_collider *hit, BE_shape_2D_collider *other);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // ---- 2D COLLISION MANAGER ENTITY ----
+// Collision-detection wrapper around the GJK algorithm shape colliders can register to.
 
 /* Opaque type to a collision manager instance. */
 typedef struct BE_collision_manager_2D BE_collision_manager_2D;
