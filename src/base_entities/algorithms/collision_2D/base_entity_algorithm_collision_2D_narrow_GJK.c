@@ -54,7 +54,7 @@ static vector2_t BE_shape_2D_collider_GJK_support_function(BE_shape_2D_collider 
 static simplex BE_shape_2D_collider_GJK_create_simplex(BE_shape_2D_collider *c1, BE_shape_2D_collider *c2);
 
 /* Checks that a simplex contains the origin. */
-static bool BE_shape_2D_collider_GJK_simplex_contains_origin(simplex tested);
+static bool BE_shape_2D_collider_GJK_simplex_contains_origin(simplex tested, collision_2D_info *collision_info);
 
 /* Checks that a Voronoï region described by a segment and a point on the opposite side of the region contains the origin. */
 static bool BE_shape_2D_collider_GJK_segment_Voronoi_contains_origin(vector2_t start, vector2_t end, vector2_t control);
@@ -70,9 +70,9 @@ static bool BE_shape_2D_collider_GJK_segment_Voronoi_contains_origin(vector2_t s
  * @param[in] c2 second shape collider, must have a parent shape
  * @return true if the shapes are colliding, false otherwise.
  */
-bool BE_collision_manager_2D_GJK_check(BE_shape_2D_collider *c1, BE_shape_2D_collider *c2)
+bool BE_collision_manager_2D_GJK_check(BE_shape_2D_collider *c1, BE_shape_2D_collider *c2, collision_2D_info *collision_info)
 {
-    return BE_shape_2D_collider_GJK_simplex_contains_origin(BE_shape_2D_collider_GJK_create_simplex(c1, c2));
+    return BE_shape_2D_collider_GJK_simplex_contains_origin(BE_shape_2D_collider_GJK_create_simplex(c1, c2), collision_info);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -160,10 +160,18 @@ static simplex BE_shape_2D_collider_GJK_create_simplex(BE_shape_2D_collider *c1,
  * @param[in] simplex
  * @return bool
  */
-static bool BE_shape_2D_collider_GJK_simplex_contains_origin(simplex tested)
+static bool BE_shape_2D_collider_GJK_simplex_contains_origin(simplex tested, collision_2D_info *collision_info)
 {
-    return !(BE_shape_2D_collider_GJK_segment_Voronoi_contains_origin(tested.C, tested.A, tested.B)
+    bool colliding = !(BE_shape_2D_collider_GJK_segment_Voronoi_contains_origin(tested.C, tested.A, tested.B)
             || BE_shape_2D_collider_GJK_segment_Voronoi_contains_origin(tested.C, tested.B, tested.A));
+
+    if (colliding && collision_info) {
+        *collision_info = (collision_2D_info) {
+                .normal = vector2_normalize(vector2_negate(tested.C)),
+        };
+    }
+
+    return colliding;
 }
 
 /**

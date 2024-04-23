@@ -33,7 +33,8 @@ static void init(tarasque_entity *self_data)
             .data = &(struct shape) {
                     .is_controllable = false,
                     .color = { .g = 255, .a = 255 },
-                    .shape_kind = SHAPE_2D_CIRCLE,
+                    // .shape_kind = SHAPE_2D_CIRCLE,
+                    .shape_kind = SHAPE_2D_RECT,
                     .properties = { .scale = { 1, 1 }, .position = { 110, 200 }, },
             }
     });

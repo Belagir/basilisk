@@ -135,13 +135,19 @@ void BE_shape_2D_collider_set_callback(BE_shape_2D_collider *col, BE_shape_2D_co
     col->callback_info = callback;
 }
 
-void BE_shape_2D_collider_exec_callback(BE_shape_2D_collider *col, BE_shape_2D_collider *hit, BE_shape_2D_collider *other)
+/**
+ * @brief
+ *
+ * @param hit
+ * @param other
+ */
+void BE_shape_2D_collider_exec_callback(BE_shape_2D_collider *hit, BE_shape_2D_collider *other, collision_2D_info collision_info)
 {
-    if (!col || !col->callback_info.callback) {
+    if (!hit || !hit->callback_info.callback) {
         return;
     }
 
-    col->callback_info.callback(col->callback_info.subject, hit, other);
+    hit->callback_info.callback(hit->callback_info.subject, hit, other, collision_info);
 }
 
 /**

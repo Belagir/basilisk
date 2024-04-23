@@ -98,7 +98,7 @@ static void BE_shape_2D_visual_on_draw(tarasque_entity *self_data, void *event_d
 {
     BE_shape_2D_visual *visual = (BE_shape_2D_visual *) self_data;
     BE_render_manager_sdl_event_draw *event_draw = (BE_render_manager_sdl_event_draw *) event_data;
-    shape_2D_rect rectangle = { 0u };
+    SDL_FRect rectangle = { 0u };
 
     SDL_SetRenderDrawColor(event_draw->renderer, visual->color.r, visual->color.g, visual->color.b, visual->color.a);
 
@@ -107,11 +107,12 @@ static void BE_shape_2D_visual_on_draw(tarasque_entity *self_data, void *event_d
             BE_shape_2D_visual_render_draw_circle(event_draw->renderer, BE_body_2D_global(BE_shape_2D_get_body(visual->visualized)).position, BE_shape_2D_as_circle(visual->visualized)->radius);
             break;
         case SHAPE_2D_RECT:
-            SDL_RenderDrawRectF(event_draw->renderer, &(const SDL_FRect) {
+            rectangle = (SDL_FRect) {
                     .x = BE_body_2D_global(BE_shape_2D_get_body(visual->visualized)).position.x,
                     .y = BE_body_2D_global(BE_shape_2D_get_body(visual->visualized)).position.y,
-                    .h = BE_shape_2D_as_rect(visual->visualized)->height,
-                    .w = BE_shape_2D_as_rect(visual->visualized)->width, });
+                    .w = BE_shape_2D_as_rect(visual->visualized)->width,
+                    .h = BE_shape_2D_as_rect(visual->visualized)->height, };
+            SDL_RenderDrawRectF(event_draw->renderer, &rectangle);
             break;
     }
 }

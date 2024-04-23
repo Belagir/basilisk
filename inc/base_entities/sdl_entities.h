@@ -242,13 +242,21 @@ tarasque_entity *BE_STATIC_shape_2D_visual(SDL_Color color, i32 draw_index);
 typedef struct BE_shape_2D_collider BE_shape_2D_collider;
 
 /**
+ * @brief
+ *
+ */
+typedef struct collision_2D_info {
+    vector2_t normal;
+} collision_2D_info;
+
+/**
  * @brief Callback information needed to resolve a collision.
  */
 typedef struct BE_shape_2D_collider_callback_info {
     /** Entity the callback will take as subject when resolving the collision. */
     tarasque_entity *subject;
     /** Pointer to a function to be executed on a collision. */
-    void (*callback)(tarasque_entity *entity, BE_shape_2D_collider *hit, BE_shape_2D_collider *other);
+    void (*callback)(tarasque_entity *entity, BE_shape_2D_collider *hit, BE_shape_2D_collider *other, collision_2D_info collision_info);
 } BE_shape_2D_collider_callback_info;
 
 // -------------------------------------------------------------------------------------------------
@@ -271,7 +279,7 @@ BE_body_2D *BE_shape_2D_collider_get_body(const BE_shape_2D_collider *col);
 void BE_shape_2D_collider_set_callback(BE_shape_2D_collider *col, BE_shape_2D_collider_callback_info callback);
 
 /* Executes the collision callback associated to a shape collider. */
-void BE_shape_2D_collider_exec_callback(BE_shape_2D_collider *col, BE_shape_2D_collider *hit, BE_shape_2D_collider *other);
+void BE_shape_2D_collider_exec_callback(BE_shape_2D_collider *hit, BE_shape_2D_collider *other, collision_2D_info collision_info);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------

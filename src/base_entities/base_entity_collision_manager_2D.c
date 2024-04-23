@@ -45,6 +45,13 @@ static void BE_collision_manager_2D_frame(tarasque_entity *self_data, float elap
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
+/*  */
+static collision_2D_info collision_2D_info_reflect(collision_2D_info info);
+
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+
 /**
  * @brief
  *
@@ -113,18 +120,37 @@ static void BE_collision_manager_2D_deinit(tarasque_entity *self_data)
 static void BE_collision_manager_2D_frame(tarasque_entity *self_data, float elapsed_time)
 {
     BE_collision_manager_2D *col_manager = (BE_collision_manager_2D *) self_data;
+    BE_shape_2D_collider *shape_1 = NULL;
+    BE_shape_2D_collider *shape_2 = NULL;
+    collision_2D_info collision_info = { 0u };
 
     for (size_t i = 0u ; i < col_manager->registered_collisions->length ; i++) {
         for (size_t j = i + 1u ; j < col_manager->registered_collisions->length ; j++) {
-            if (BE_collision_manager_2D_GJK_check(col_manager->registered_collisions->data[i], col_manager->registered_collisions->data[j])) {
-                BE_shape_2D_collider_exec_callback(col_manager->registered_collisions->data[i],
-                        col_manager->registered_collisions->data[i], col_manager->registered_collisions->data[j]);
-                BE_shape_2D_collider_exec_callback(col_manager->registered_collisions->data[j],
-                        col_manager->registered_collisions->data[j], col_manager->registered_collisions->data[i]);
-
+            shape_1 = col_manager->registered_collisions->data[i];
+            shape_2 = col_manager->registered_collisions->data[j];
+            if (BE_collision_manager_2D_GJK_check(shape_1, shape_2, &collision_info)) {
+                BE_shape_2D_collider_exec_callback(shape_1, shape_2, collision_info);
+                BE_shape_2D_collider_exec_callback(shape_2, shape_1, collision_2D_info_reflect(collision_info));
             }
         }
     }
+}
+
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+
+/**
+ * @brief
+ *
+ * @param info
+ * @return
+ */
+static collision_2D_info collision_2D_info_reflect(collision_2D_info info)
+{
+    return (collision_2D_info) {
+            .normal = vector2_negate(info.normal),
+    };
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -9,7 +9,7 @@ static void init(tarasque_entity *self_data);
 
 static void on_sdl_event(tarasque_entity *self_data, void *event_data);
 
-static void on_collision(tarasque_entity *entity, BE_shape_2D_collider *hit, BE_shape_2D_collider *other);
+static void on_collision(tarasque_entity *entity, BE_shape_2D_collider *hit, BE_shape_2D_collider *other, collision_2D_info collision_info);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -86,12 +86,9 @@ static void on_sdl_event(tarasque_entity *self_data, void *event_data)
 
 // -------------------------------------------------------------------------------------------------
 
-static void on_collision(tarasque_entity *entity, BE_shape_2D_collider *hit, BE_shape_2D_collider *other)
+static void on_collision(tarasque_entity *entity, BE_shape_2D_collider *hit, BE_shape_2D_collider *other, collision_2D_info collision_info)
 {
     struct shape *shape = (struct shape *) entity;
 
-    BE_body_2D_translate(shape->body, vector2_scale(0.0005f, vector2_substract(
-            BE_body_2D_global(BE_shape_2D_collider_get_body(other)).position,
-            BE_body_2D_global(shape->body).position
-    )));
+    BE_body_2D_translate(shape->body, vector2_scale(1.f, collision_info.normal));
 }
