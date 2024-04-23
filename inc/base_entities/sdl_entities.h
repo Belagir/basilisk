@@ -156,9 +156,9 @@ tarasque_entity *BE_STATIC_body_2D(properties_2D properties);
 // -------------------------------------------------------------------------------------------------
 
 /* Returns the local (relative to its first 2D body parent) properies of a 2D body. */
-properties_2D BE_body_2D_local(BE_body_2D *body);
+properties_2D BE_body_2D_local(const BE_body_2D *body);
 /* Returns the global properties of a 2D body. */
-properties_2D BE_body_2D_global(BE_body_2D *body);
+properties_2D BE_body_2D_global(const BE_body_2D *body);
 /* Overwrites the local properties of a 2D body. */
 void BE_body_2D_local_set(BE_body_2D *body, properties_2D new_properties);
 /* Linearly translates a 2D body. */

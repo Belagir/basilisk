@@ -1,4 +1,14 @@
-
+/**
+ * @file base_entity_collision_manager_2D.c
+ * @author gabriel ()
+ * @brief Implementation file for the collision manager entity.
+ *
+ * @version 0.1
+ * @date 2024-04-23
+ *
+ * @copyright Copyright (c) 2024
+ *
+ */
 #include <ustd/sorting.h>
 #include <ustd/range.h>
 
