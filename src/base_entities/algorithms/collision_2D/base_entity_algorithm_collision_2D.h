@@ -16,7 +16,7 @@
 #include <base_entities/sdl_entities.h>
 
 /* Checks the collision between two shape colldiers with the GJK algorithm. */
-bool BE_collision_manager_2D_GJK_check(BE_shape_2D_collider *c1, BE_shape_2D_collider *c2, collision_2D_info *collision_info);
+bool BE_collision_manager_2D_GJK_check(BE_shape_2D_collider *c1, BE_shape_2D_collider *c2, collision_2D_info *collision_info, SDL_Renderer *renderer);
 
 
 #endif

@@ -38,6 +38,12 @@
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
+#define GJK_ITERATION_LIMIT (2)
+
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+
 /**
  * @brief 2D simplex definition. Just three points.
  */
@@ -56,8 +62,9 @@ static simplex BE_shape_2D_collider_GJK_create_simplex(BE_shape_2D_collider *c1,
 /* Checks that a simplex contains the origin. */
 static bool BE_shape_2D_collider_GJK_simplex_contains_origin(simplex tested, collision_2D_info *collision_info);
 
-/* Checks that a Voronoï region described by a segment and a point on the opposite side of the region contains the origin. */
-static bool BE_shape_2D_collider_GJK_segment_Voronoi_contains_origin(vector2_t start, vector2_t end, vector2_t control);
+static vector2_t BE_shape_2D_collider_segment_normal_opposite(vector2_t start, vector2_t end, vector2_t control);
+
+static void BE_collision_manager_2D_GJK_draw_simplex(simplex s, SDL_Renderer *renderer);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -70,9 +77,13 @@ static bool BE_shape_2D_collider_GJK_segment_Voronoi_contains_origin(vector2_t s
  * @param[in] c2 second shape collider, must have a parent shape
  * @return true if the shapes are colliding, false otherwise.
  */
-bool BE_collision_manager_2D_GJK_check(BE_shape_2D_collider *c1, BE_shape_2D_collider *c2, collision_2D_info *collision_info)
+bool BE_collision_manager_2D_GJK_check(BE_shape_2D_collider *c1, BE_shape_2D_collider *c2, collision_2D_info *collision_info, SDL_Renderer *renderer)
 {
-    return BE_shape_2D_collider_GJK_simplex_contains_origin(BE_shape_2D_collider_GJK_create_simplex(c1, c2), collision_info);
+    simplex s = BE_shape_2D_collider_GJK_create_simplex(c1, c2);
+
+    BE_collision_manager_2D_GJK_draw_simplex(s, renderer);
+
+    return BE_shape_2D_collider_GJK_simplex_contains_origin(s, collision_info);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -104,8 +115,10 @@ static vector2_t BE_shape_2D_collider_GJK_support_function(BE_shape_2D_collider 
 static simplex BE_shape_2D_collider_GJK_create_simplex(BE_shape_2D_collider *c1, BE_shape_2D_collider *c2)
 {
     vector2_t direction = VECTOR2_ZERO;
+    vector2_t normal_C0 = VECTOR2_ZERO;
     vector2_t tmp = { 0u };
     simplex returned_simplex = { 0u };
+    size_t nb_iteration = 0u;
     bool simplex_needs_optimisation = false;
 
     if (!c1 || !c2) {
@@ -130,11 +143,17 @@ static simplex BE_shape_2D_collider_GJK_create_simplex(BE_shape_2D_collider *c1,
     returned_simplex.C = BE_shape_2D_collider_GJK_support_function(c1, c2, direction);
 
     // step the simplex to guarantee that it contains the origin
-    for (size_t i = 0u ; i < 2u ; i++){
-        if (BE_shape_2D_collider_GJK_segment_Voronoi_contains_origin(returned_simplex.C, returned_simplex.A, returned_simplex.B)) {
+    while (simplex_needs_optimisation || (nb_iteration > GJK_ITERATION_LIMIT)) {
+        simplex_needs_optimisation = false;
+
+        normal_C0 = vector2_normalize(vector2_substract(VECTOR2_ORIGIN, returned_simplex.C));
+
+        if (vector2_dot_product(BE_shape_2D_collider_segment_normal_opposite(returned_simplex.C, returned_simplex.A, returned_simplex.B), normal_C0) > 0.f) {
+            returned_simplex.A = returned_simplex.B;
             returned_simplex.B = returned_simplex.C;
             simplex_needs_optimisation = true;
-        } else if (BE_shape_2D_collider_GJK_segment_Voronoi_contains_origin(returned_simplex.C, returned_simplex.B, returned_simplex.A)) {
+        } else if (vector2_dot_product(BE_shape_2D_collider_segment_normal_opposite(returned_simplex.C, returned_simplex.B, returned_simplex.A), normal_C0) > 0.f) {
+            returned_simplex.B = returned_simplex.A;
             returned_simplex.A = returned_simplex.C;
             simplex_needs_optimisation = true;
         }
@@ -147,6 +166,8 @@ static simplex BE_shape_2D_collider_GJK_create_simplex(BE_shape_2D_collider *c1,
                     vector2_substract(returned_simplex.B, returned_simplex.A)));
             returned_simplex.C = BE_shape_2D_collider_GJK_support_function(c1, c2, direction);
         }
+
+        nb_iteration += 1u;
     }
 
     return returned_simplex;
@@ -162,8 +183,16 @@ static simplex BE_shape_2D_collider_GJK_create_simplex(BE_shape_2D_collider *c1,
  */
 static bool BE_shape_2D_collider_GJK_simplex_contains_origin(simplex tested, collision_2D_info *collision_info)
 {
-    bool colliding = !(BE_shape_2D_collider_GJK_segment_Voronoi_contains_origin(tested.C, tested.A, tested.B)
-            || BE_shape_2D_collider_GJK_segment_Voronoi_contains_origin(tested.C, tested.B, tested.A));
+    vector2_t normal_C0 = VECTOR2_ZERO;
+    vector2_t normal_CA = VECTOR2_ZERO;
+    vector2_t normal_CB = VECTOR2_ZERO;
+    bool colliding = false;
+
+    normal_C0 = vector2_normalize(vector2_substract(VECTOR2_ORIGIN, tested.C));
+    normal_CA = BE_shape_2D_collider_segment_normal_opposite(tested.C, tested.A, tested.B);
+    normal_CB = BE_shape_2D_collider_segment_normal_opposite(tested.C, tested.B, tested.A);
+
+    colliding = (vector2_dot_product(normal_C0, normal_CA) < 0.f) && (vector2_dot_product(normal_C0, normal_CB) < 0.f);
 
     if (colliding && collision_info) {
         *collision_info = (collision_2D_info) {
@@ -175,31 +204,37 @@ static bool BE_shape_2D_collider_GJK_simplex_contains_origin(simplex tested, col
 }
 
 /**
- * @brief Checks if some region in space contains the origin.
- * The region begins from by a segment (from `start` to `end`) and expands in the direction opposite to the `control` point.
+ * @brief
  *
- * @param[in] start starting point of the segment
- * @param[in] end ending point of the segment
- * @param[in] control point opposite of the region
- * @return bool
+ * @param start
+ * @param end
+ * @param control
+ * @return
  */
-static bool BE_shape_2D_collider_GJK_segment_Voronoi_contains_origin(vector2_t start, vector2_t end, vector2_t control)
+static vector2_t BE_shape_2D_collider_segment_normal_opposite(vector2_t start, vector2_t end, vector2_t control)
 {
-    vector2_t normal = VECTOR2_ZERO;
-    f32 dot_to_origin = 0.f;
-    vector2_t to_origin = VECTOR2_ZERO;
-
-    to_origin = vector2_normalize(vector2_substract(VECTOR2_ORIGIN, start));
-    normal = vector2_normalize(vector2_triple_product(
+    return vector2_normalize(vector2_triple_product(
             vector2_substract(control, start),
             vector2_substract(end, start),
             vector2_substract(end, start)));
-    dot_to_origin = vector2_dot_product(to_origin, normal);
-
-    return (dot_to_origin > 0.f);
 }
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
+static void BE_collision_manager_2D_GJK_draw_simplex(simplex s, SDL_Renderer *renderer)
+{
+    if (!renderer) {
+        return;
+    }
+
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    SDL_RenderDrawRect(renderer, &(const SDL_Rect) { .x = 298, .y = 148, .w = 4, .h = 4 });
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    SDL_RenderDrawLineF(renderer, s.A.x + 300, s.A.y + 150, s.B.x + 300, s.B.y + 150);
+    SDL_SetRenderDrawColor(renderer, 255,   0,   0, 255);
+    SDL_RenderDrawLineF(renderer, s.B.x + 300, s.B.y + 150, s.C.x + 300, s.C.y + 150);
+    SDL_SetRenderDrawColor(renderer,   0, 255,   0, 255);
+    SDL_RenderDrawLineF(renderer, s.C.x + 300, s.C.y + 150, s.A.x + 300, s.A.y + 150);
+}
