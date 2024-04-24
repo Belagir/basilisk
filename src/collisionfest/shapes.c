@@ -90,5 +90,5 @@ static void on_collision(tarasque_entity *entity, BE_shape_2D_collider *hit, BE_
 {
     struct shape *shape = (struct shape *) entity;
 
-    BE_body_2D_translate(shape->body, vector2_scale(1.f, collision_info.normal));
+    BE_body_2D_translate(shape->body, vector2_scale(-1.f, collision_info.normal));
 }

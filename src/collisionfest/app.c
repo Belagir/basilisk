@@ -33,9 +33,26 @@ static void init(tarasque_entity *self_data)
             .data = &(struct shape) {
                     .is_controllable = false,
                     .color = { .g = 255, .a = 255 },
-                    // .shape_kind = SHAPE_2D_CIRCLE,
                     .shape_kind = SHAPE_2D_RECT,
-                    .properties = { .scale = { 1, 1 }, .position = { 110, 200 }, },
+                    .properties = { .scale = { 1, 1 }, .position = { 250, 180 }, },
+            }
+    });
+    tarasque_entity_add_child(tarasque_entity_get_child(self_data, "Context/Window/Render Manager/Collision Manager", NULL),"shape 2", (tarasque_specific_entity) {
+            .entity_def = shape_def,
+            .data = &(struct shape) {
+                    .is_controllable = false,
+                    .color = { .g = 255, .a = 255 },
+                    .shape_kind = SHAPE_2D_CIRCLE,
+                    .properties = { .scale = { 1, 1 }, .position = { 150, 200 }, },
+            }
+    });
+    tarasque_entity_add_child(tarasque_entity_get_child(self_data, "Context/Window/Render Manager/Collision Manager", NULL),"shape 2", (tarasque_specific_entity) {
+            .entity_def = shape_def,
+            .data = &(struct shape) {
+                    .is_controllable = false,
+                    .color = { .g = 255, .a = 255 },
+                    .shape_kind = SHAPE_2D_RECT,
+                    .properties = { .scale = { 1, 1 }, .position = { 200, 220 }, },
             }
     });
 }
