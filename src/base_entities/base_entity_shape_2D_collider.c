@@ -89,9 +89,9 @@ vector2_t BE_shape_2D_collider_support(BE_shape_2D_collider *col, vector2_t dire
             return vector2_add(properties.position, vector2_scale(BE_shape_2D_as_circle(col->monitored)->radius, direction));
             break;
         case SHAPE_2D_RECT:
-            if ((direction.x < 0.f) && (direction.y < 0.f)) {           // upper left corner
+            if ((direction.x <= 0.f) && (direction.y <= 0.f)) {           // upper left corner
                 return properties.position;
-            } else if ((direction.x > 0.f) && (direction.y < 0.f)) {    // upper right corner
+            } else if ((direction.x > 0.f) && (direction.y <= 0.f)) {    // upper right corner
                 return vector2_add(properties.position, (vector2_t) { .x = BE_shape_2D_as_rect(col->monitored)->width });
             } else if ((direction.x > 0.f) && (direction.y > 0.f)) {    // lower right corner
                 return vector2_add(properties.position, (vector2_t) { .x = BE_shape_2D_as_rect(col->monitored)->width, .y = BE_shape_2D_as_rect(col->monitored)->height });

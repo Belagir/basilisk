@@ -41,9 +41,6 @@ static void BE_collision_manager_2D_deinit(tarasque_entity *self_data);
 /*  */
 static void BE_collision_manager_2D_frame(tarasque_entity *self_data, float elapsed_time);
 
-// TODO : temp
-static void BE_collision_manager_on_draw(tarasque_entity *self_data, void *event_data);
-
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -100,8 +97,6 @@ static void BE_collision_manager_2D_init(tarasque_entity *self_data)
     BE_collision_manager_2D *col_manager = (BE_collision_manager_2D *) self_data;
 
     col_manager->registered_collisions = range_create_dynamic(make_system_allocator(), sizeof(*col_manager->registered_collisions->data), 8u);
-
-    tarasque_entity_queue_subscribe_to_event(self_data, "sdl renderer draw", (tarasque_specific_event_subscription) { .callback = &BE_collision_manager_on_draw, .index = 5 });
 }
 
 /**
@@ -129,32 +124,11 @@ static void BE_collision_manager_2D_frame(tarasque_entity *self_data, float elap
     BE_shape_2D_collider *shape_2 = NULL;
     collision_2D_info collision_info = { 0u };
 
-    // for (size_t i = 0u ; i < col_manager->registered_collisions->length ; i++) {
-    //     for (size_t j = i + 1u ; j < col_manager->registered_collisions->length ; j++) {
-    //         shape_1 = col_manager->registered_collisions->data[i];
-    //         shape_2 = col_manager->registered_collisions->data[j];
-    //         if (BE_collision_manager_2D_GJK_check(shape_1, shape_2, &collision_info)) {
-    //             BE_shape_2D_collider_exec_callback(shape_1, shape_2, collision_info);
-    //             BE_shape_2D_collider_exec_callback(shape_2, shape_1, collision_2D_info_reflect(collision_info));
-    //         }
-    //     }
-    // }
-}
-
-static void BE_collision_manager_on_draw(tarasque_entity *self_data, void *event_data)
-{
-    BE_render_manager_sdl_event_draw *event_draw = (BE_render_manager_sdl_event_draw *) event_data;
-
-    BE_collision_manager_2D *col_manager = (BE_collision_manager_2D *) self_data;
-    BE_shape_2D_collider *shape_1 = NULL;
-    BE_shape_2D_collider *shape_2 = NULL;
-    collision_2D_info collision_info = { 0u };
-
     for (size_t i = 0u ; i < col_manager->registered_collisions->length ; i++) {
         for (size_t j = i + 1u ; j < col_manager->registered_collisions->length ; j++) {
             shape_1 = col_manager->registered_collisions->data[i];
             shape_2 = col_manager->registered_collisions->data[j];
-            if (BE_collision_manager_2D_GJK_check(shape_1, shape_2, &collision_info, event_draw->renderer)) {
+            if (BE_collision_manager_2D_GJK_check(shape_1, shape_2, &collision_info)) {
                 BE_shape_2D_collider_exec_callback(shape_1, shape_2, collision_info);
                 BE_shape_2D_collider_exec_callback(shape_2, shape_1, collision_2D_info_reflect(collision_info));
             }

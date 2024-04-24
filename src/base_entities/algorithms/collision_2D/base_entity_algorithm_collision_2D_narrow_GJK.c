@@ -77,11 +77,9 @@ static void BE_collision_manager_2D_GJK_draw_simplex(simplex s, SDL_Renderer *re
  * @param[in] c2 second shape collider, must have a parent shape
  * @return true if the shapes are colliding, false otherwise.
  */
-bool BE_collision_manager_2D_GJK_check(BE_shape_2D_collider *c1, BE_shape_2D_collider *c2, collision_2D_info *collision_info, SDL_Renderer *renderer)
+bool BE_collision_manager_2D_GJK_check(BE_shape_2D_collider *c1, BE_shape_2D_collider *c2, collision_2D_info *collision_info)
 {
     simplex s = BE_shape_2D_collider_GJK_create_simplex(c1, c2);
-
-    BE_collision_manager_2D_GJK_draw_simplex(s, renderer);
 
     return BE_shape_2D_collider_GJK_simplex_contains_origin(s, collision_info);
 }
@@ -196,7 +194,7 @@ static bool BE_shape_2D_collider_GJK_simplex_contains_origin(simplex tested, col
 
     if (colliding && collision_info) {
         *collision_info = (collision_2D_info) {
-                .normal = vector2_normalize(vector2_negate(tested.C)),
+                .normal = (vector2_euclidian_norm(tested.A) > vector2_euclidian_norm(tested.B)) ? normal_CB : normal_CA,
         };
     }
 
