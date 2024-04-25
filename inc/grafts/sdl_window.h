@@ -36,6 +36,7 @@ typedef struct graft_sdl_window_args {
     /** Configuration given to the render manager entity. */
     struct {
         SDL_RendererFlags flags;
+        size_t w, h;
         SDL_Color clear_color;
     } for_renderer;
 } graft_sdl_window_args;

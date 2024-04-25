@@ -15,8 +15,12 @@ typedef struct BE_render_manager_sdl {
     /** Flags passed to the SDL renderer creation method on initialization of the entity. */
     SDL_RendererFlags flags;
 
+    size_t w, h;
+
     /** Pointer to a renderer that will be created on entity initialization. Overriden on initialization. */
     SDL_Renderer *renderer;
+    /** Pointer to a screen buffer texture. */
+    SDL_Texture *buffer;
 } BE_render_manager_sdl;
 
 // -------------------------------------------------------------------------------------------------
@@ -58,6 +62,8 @@ static void BE_render_manager_sdl_init(tarasque_entity *self_data)
     init_data->renderer = SDL_CreateRenderer(parent_window, -1, init_data->flags);
 
     if (init_data->renderer) {
+        init_data->buffer = SDL_CreateTexture(init_data->renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, (int) init_data->w, (int) init_data->h);
+
         tarasque_entity_queue_subscribe_to_event(self_data, "sdl renderer pre draw",  (tarasque_specific_event_subscription) { .callback = &BE_render_manager_sdl_pre_draw });
         tarasque_entity_queue_subscribe_to_event(self_data, "sdl renderer post draw", (tarasque_specific_event_subscription) { .callback = &BE_render_manager_sdl_post_draw });
     }
@@ -115,7 +121,7 @@ static void BE_render_manager_sdl_pre_draw(tarasque_entity *self_data, void *eve
 
     BE_render_manager_sdl *data = (BE_render_manager_sdl *) self_data;
 
-    SDL_SetRenderTarget(data->renderer, NULL);
+    SDL_SetRenderTarget(data->renderer, data->buffer);
     SDL_SetRenderDrawColor(data->renderer, data->clear_color.r, data->clear_color.g, data->clear_color.b, data->clear_color.a);
     SDL_RenderClear(data->renderer);
 }
@@ -137,6 +143,10 @@ static void BE_render_manager_sdl_post_draw(tarasque_entity *self_data, void *ev
     BE_render_manager_sdl *data = (BE_render_manager_sdl *) self_data;
 
     SDL_RenderPresent(data->renderer);
+
+    SDL_SetRenderTarget(data->renderer, NULL);
+    SDL_RenderCopy(data->renderer, data->buffer, NULL, NULL);
+    SDL_RenderPresent(data->renderer);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -150,13 +160,14 @@ static void BE_render_manager_sdl_post_draw(tarasque_entity *self_data, void *ev
  * @param flags
  * @return
  */
-tarasque_entity *BE_STATIC_render_manager_sdl(SDL_Color clear_color, SDL_RendererFlags flags)
+tarasque_entity *BE_STATIC_render_manager_sdl(SDL_Color clear_color, size_t w, size_t h, SDL_RendererFlags flags)
 {
     static BE_render_manager_sdl buffer = { 0u };
 
     buffer = (BE_render_manager_sdl) { 0u };
     buffer = (BE_render_manager_sdl) {
             .clear_color = clear_color,
+            .w = w, .h = h,
             .flags = flags,
     };
 

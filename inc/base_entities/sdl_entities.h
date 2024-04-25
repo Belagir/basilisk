@@ -134,7 +134,7 @@ typedef struct BE_render_manager_sdl BE_render_manager_sdl;
 extern const tarasque_entity_definition BE_DEF_render_manager_sdl;
 
 /* Returns statically-allocated SDL render manager entity data, used to give the engine data to copy for instanciation. */
-tarasque_entity *BE_STATIC_render_manager_sdl(SDL_Color clear_color, SDL_RendererFlags flags);
+tarasque_entity *BE_STATIC_render_manager_sdl(SDL_Color clear_color, size_t w, size_t h, SDL_RendererFlags flags);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------

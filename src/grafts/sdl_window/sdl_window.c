@@ -52,7 +52,7 @@ static void graft_sdl_window_callback(tarasque_entity *entity, void *graft_args)
 
     render_manager = tarasque_entity_add_child(window, "Render Manager", (tarasque_specific_entity) {
             .entity_def = BE_DEF_render_manager_sdl,
-            .data = BE_STATIC_render_manager_sdl(sdl_win_args.for_renderer.clear_color, sdl_win_args.for_renderer.flags) });
+            .data = BE_STATIC_render_manager_sdl(sdl_win_args.for_renderer.clear_color, sdl_win_args.for_renderer.w, sdl_win_args.for_renderer.h, sdl_win_args.for_renderer.flags) });
 
     collision_manager = tarasque_entity_add_child(render_manager, "Collision Manager", (tarasque_specific_entity) { .entity_def = BE_DEF_collision_manager_2D, });
 }
