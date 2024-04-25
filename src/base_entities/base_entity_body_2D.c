@@ -189,7 +189,6 @@ void BE_body_2D_translate(BE_body_2D *body_2D, vector2_t change)
  * Successive calls to this function will always yeild the same object, with some eventual differing content (depending on the given arguments).
  * Use this to build new 2D body instances with a call to `tarasque_entity_add_child()` that will copy the data inside the returned object.
  *
- *
  * @param[in] properties starting local position of the body
  * @return tarasque_entity*
  */
