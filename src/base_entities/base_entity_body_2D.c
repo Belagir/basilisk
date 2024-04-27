@@ -22,7 +22,7 @@
  * @brief Data layout of a "2D body" entity. Use it to configure 2D information of objects positioned in the world plane.
  */
 typedef struct BE_body_2D {
-    /** Parent 2D body this body is pulling its global position from, automatically pulled from the entity's parents. Could be NULL. Overriden on initialization. */
+    /** Parent 2D body this body is pulling its global position from, automatically pulled from the entity's parents. Could be NULL. Overriden on initialisation. */
     BE_body_2D *previous;
 
     /** Local position of the object in respect to its optional previous parent 2D body. */

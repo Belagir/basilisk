@@ -25,10 +25,10 @@ typedef struct BE_window_sdl {
     size_t x, y;
     /** Pixel position of the window on creation. */
     size_t w, h;
-    /** Flags passed to the SDL window creation method on initialization of the entity. See the SDL_WindowFlags enum for values. */
+    /** Flags passed to the SDL window creation method on initialisation of the entity. See the SDL_WindowFlags enum for values. */
     SDL_WindowFlags flags;
 
-    /** Pointer to a window that will be created on entity initialization. Overriden on initialization. */
+    /** Pointer to a window that will be created on entity initialisation. Overriden on initialisation. */
     SDL_Window *window;
 } BE_window_sdl;
 

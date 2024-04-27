@@ -20,7 +20,7 @@
 typedef struct BE_texture_2D {
     /** Position information of the texture entity. */
     BE_body_2D *body;
-    /** Draw index to register a drawing operation on initialization. */
+    /** Draw index to register a drawing operation on initialisation. */
     i32 draw_index;
 
     /** Texture rendered to the screen. */
