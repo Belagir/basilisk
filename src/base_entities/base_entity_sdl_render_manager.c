@@ -17,7 +17,7 @@
 
 /**
  * @brief Private data layout of a "render manager" base entity.
- * *
+ *
  * @see BE_STATIC_render_manager_sdl, BE_DEF_render_manager_sdl, BE_window_sdl
  */
 typedef struct BE_render_manager_sdl {

@@ -1,7 +1,7 @@
 /**
  * @file base_entity_body_2D.c
  * @author gabriel ()
- * @brief Implementation file of the body 2D entity.
+ * @brief Implementation file of the BE_body_2D entity.
  *
  * @version 0.1
  * @date 2024-04-22
@@ -19,7 +19,9 @@
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief Data layout of a "2D body" entity. Use it to configure 2D information of objects positioned in the world plane.
+ * @brief Private data layout of a "2D body" entity. Use it to configure 2D information of objects positioned in the world plane.
+ *
+ * @see BE_STATIC_body_2D, BE_DEF_body_2D
  */
 typedef struct BE_body_2D {
     /** Parent 2D body this body is pulling its global position from, automatically pulled from the entity's parents. Could be NULL. Overriden on initialisation. */
@@ -35,17 +37,17 @@ typedef struct BE_body_2D {
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-/* Body 2D initialisation function. */
+/* BE_body_2D initialisation callback. */
 static void BE_body_2D_init(tarasque_entity *self_data);
 
-/* Body 2D time step function.*/
+/* BE_body_2D time step callback.*/
 static void BE_body_2D_on_frame(tarasque_entity *self_data, float elapsed_ms);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-/* Updates the global properties from its local properties. */
+/* Updates the global properties of a BE_body_2D object from its local properties. */
 static void BE_body_2D_update(BE_body_2D *body);
 
 // -------------------------------------------------------------------------------------------------
@@ -53,9 +55,10 @@ static void BE_body_2D_update(BE_body_2D *body);
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief Fetches an eventual 2D body parent to sync its own position relative to the global position of this parent.
+ * @brief Initialisation callback for a BE_body_2D entity.
+ * Fetches an eventual BE_body_2D parent to sync its own position relative to the global position of this parent.
  *
- * @param[inout] self_data 2D body entity data (must point to a BE_body_2D object)
+ * @param[inout] self_data pointer to a BE_body_2D object
  */
 static void BE_body_2D_init(tarasque_entity *self_data)
 {
@@ -70,10 +73,11 @@ static void BE_body_2D_init(tarasque_entity *self_data)
 }
 
 /**
- * @brief Steps the body through time, updating its global position if it can.
+ * @brief Frame callback for a BE_body_2D entity.
+ * Steps the body through time, updating its global position if it can.
  *
- * @param[inout] self_data 2D body entity data (must point to a BE_body_2D object)
- * @param[in] elapsed_ms number of milliseconds that passed since the last frame.
+ * @param[inout] self_data pointer to a BE_body_2D object
+ * @param[in] elapsed_ms number of milliseconds that passed since the last frame
  */
 static void BE_body_2D_on_frame(tarasque_entity *self_data, float elapsed_ms)
 {
@@ -92,9 +96,9 @@ static void BE_body_2D_on_frame(tarasque_entity *self_data, float elapsed_ms)
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief Synchronise its global position relative to the global position of its parent (if it exists) using its own local position.
+ * @brief Synchronise the global position of a BE_body_2D relative to the global position of its parent (if it exists) using its own local position.
  *
- * @param body
+ * @param[inout] body target body to update
  */
 static void BE_body_2D_update(BE_body_2D *body)
 {
@@ -117,9 +121,9 @@ static void BE_body_2D_update(BE_body_2D *body)
 
 
 /**
- * @brief Returns the local properties of a 2D body. Those properties are relative to an eventual other parent 2D body.
+ * @brief Returns the local properties of a BE_body_2D entity. Those properties are relative to an eventual other parent BE_body_2D.
  *
- * @param[in] body 2D body to examine
+ * @param[in] body BE_body_2D to examine
  * @return properties_2D
  */
 properties_2D BE_body_2D_local(const BE_body_2D *body)
@@ -132,9 +136,9 @@ properties_2D BE_body_2D_local(const BE_body_2D *body)
 }
 
 /**
- * @brief Returns the global properties of a 2D body.
+ * @brief Returns the global properties of a BE_body_2D entity.
  *
- * @param[in] body 2D body to examine
+ * @param[in] body BE_body_2D to examine
  * @return properties_2D
  */
 properties_2D BE_body_2D_global(const BE_body_2D *body)
@@ -147,11 +151,11 @@ properties_2D BE_body_2D_global(const BE_body_2D *body)
 }
 
 /**
- * @brief Overrides the local properties of a 2D body.
- * This will also update the global properties of the 2D body.
+ * @brief Overrides the local properties of a BE_body_2D entity.
+ * This will also update the global properties of the BE_body_2D entity.
  *
- * @param[inout] body_2D 2D body to modify
- * @param[in] new_properties new local properties of the 2D body
+ * @param[inout] body_2D BE_body_2D entity to modify
+ * @param[in] new_properties new local properties of the BE_body_2D entity
  */
 void BE_body_2D_local_set(BE_body_2D *body_2D, properties_2D new_properties)
 {
@@ -164,10 +168,10 @@ void BE_body_2D_local_set(BE_body_2D *body_2D, properties_2D new_properties)
 }
 
 /**
- * @brief Offsets the position of a 2D body with a 2D vector.
- * This will also update the global properties of the 2D body.
+ * @brief Offsets the position of a BE_body_2D entity with a 2D vector.
+ * This will also update the global properties of the BE_body_2D entity.
  *
- * @param[inout] body_2D 2D body to move
+ * @param[inout] body_2D BE_body_2D entity to move
  * @param[in] change movement vector
  */
 void BE_body_2D_translate(BE_body_2D *body_2D, vector2_t change)
@@ -185,9 +189,11 @@ void BE_body_2D_translate(BE_body_2D *body_2D, vector2_t change)
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief Returns a statically allocated 2D body constructed from the given properties.
+ * @brief Returns a statically allocated BE_body_2D object constructed from the given properties.
  * Successive calls to this function will always yield the same object, with some eventual differing content (depending on the given arguments).
- * Use this to build new 2D body instances with a call to `tarasque_entity_add_child()` that will copy the data inside the returned object.
+ * Use this to build new BE_body_2D entity instances with a call to `tarasque_entity_add_child()` that will copy the data inside the returned object.
+ *
+ * @see BE_body_2D, BE_DEF_body_2D
  *
  * @param[in] properties starting local position of the body
  * @return tarasque_entity*
@@ -205,7 +211,7 @@ tarasque_entity *BE_STATIC_body_2D(properties_2D properties)
 }
 
 /**
- * @brief Defines the entity properties of a 2D body.
+ * @brief Defines the entity properties of a BE_body_2D entity.
  *
  * The goal of this entity is to provide a positioning utility that uses the game tree to determine its position relative to other 2D body parents.
  *
@@ -216,6 +222,8 @@ tarasque_entity *BE_STATIC_body_2D(properties_2D properties)
  * If no such parent is found, then the local position of the entity is the same as its global position.
  *
  * However, you can only change the entity's local position with `BE_body_2D_local_set()` and other setter functions.
+ *
+ * @see BE_STATIC_body_2D, BE_body_2D
  *
  */
 const tarasque_entity_definition BE_DEF_body_2D = {

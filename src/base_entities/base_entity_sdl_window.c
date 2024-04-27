@@ -1,7 +1,7 @@
 /**
  * @file base_entity_sdl_window.c
  * @author gabriel ()
- * @brief Implementation file for the SDL Window entity.
+ * @brief Implementation file for the BE_window_sdl entity.
  * @version 0.1
  * @date 2024-04-25
  *
@@ -16,7 +16,9 @@
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief Data needed by a SDL Window entity to work. It retains the initialisation values and a handle to the actual SDL Window.
+ * @brief Private data needed by a "SDL window" entity to work. It retains the initialisation values and a handle to the actual SDL Window.
+ *
+ * @see BE_STATIC_window_sdl, BE_DEF_window_sdl
  */
 typedef struct BE_window_sdl {
     /** Title of the window used on window creation. */
@@ -48,7 +50,7 @@ static void BE_window_sdl_quit(tarasque_entity *self_data, void *event_data);
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief Initializes the  entity. It will create a new SDL window and store a pointer to it.
+ * @brief Initializes a BE_window_sdl entity. It will create a new SDL_Window and store a pointer to it.
  *
  * @param[inout] self_data points to some SDL Window entity data
  */
@@ -74,7 +76,7 @@ static void BE_window_sdl_init(tarasque_entity *self_data)
 /**
  * @brief Releases resources taken by the entity and closes the SDL Window it might be storing a pointer to.
  *
- * @param[inout] self_data points to some SDL Window entity data
+ * @param[inout] self_data pointer to a BE_window_sdl object
  */
 static void BE_window_sdl_deinit(tarasque_entity *self_data)
 {
@@ -93,7 +95,7 @@ static void BE_window_sdl_deinit(tarasque_entity *self_data)
 /**
  * @brief Callabck to quit the window. This will simply queue the removal of itself.
  *
- * @param[in] self_data points to some SDL Window entity data
+ * @param[inout] self_data pointer to a BE_window_sdl object
  */
 static void BE_window_sdl_quit(tarasque_entity *self_data, void *event_data)
 {
@@ -105,9 +107,11 @@ static void BE_window_sdl_quit(tarasque_entity *self_data, void *event_data)
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief Returns a statically allocated 2D body constructed from the given properties.
+ * @brief Returns a statically allocated BE_window_sdl object constructed from the given properties.
  * Successive calls to this function will always yield the same object, with some eventual differing content (depending on the given arguments).
- * Use this to build new 2D body instances with a call to `tarasque_entity_add_child()` that will copy the data inside the returned object.
+ * Use this to build new BE_window_sdl instances with a call to `tarasque_entity_add_child()` that will copy the data inside the returned object.
+ *
+ * @see BE_window_sdl, BE_DEF_window_sdl
  *
  * @param[in] title static null-terminated string to be the title of the window
  * @param[in] w width, in pixels, of the window
@@ -152,7 +156,9 @@ SDL_Window *BE_window_sdl_get_window(BE_window_sdl *window_entity)
 /**
  * @brief Defines an entity to manage a handle of SDL Window that will match the lifetime of the entity.
  *
- * It might be a child of a SDL Context entity (see BE_sdl_context).
+ * @see BE_STATIC_window_sdl, BE_window_sdl
+ *
+ * It might be a child of a BE_sdl_context entity.
  */
 const tarasque_entity_definition BE_DEF_window_sdl = {
         .data_size = sizeof(BE_window_sdl),

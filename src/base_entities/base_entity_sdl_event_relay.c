@@ -1,7 +1,7 @@
 /**
  * @file base_entity_sdl_event_relay.c
  * @author gabriel ()
- * @brief Implementation file for a SDL Event Relay entity.
+ * @brief Implementation file for a BE_event_relay_sdl entity.
  * @version 0.1
  * @date 2024-04-25
  *
@@ -23,13 +23,15 @@
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-/* Polls new SDL Events and sends them back through the engine. */
+/* Frame callback for a BE_event_relay_sdl entity. Polls new SDL Events and sends them back through the engine. */
 static void BE_event_relay_sdl_on_frame(tarasque_entity *self_data, float elapsed_ms);
 
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief Data layout of an "event relay" base entity.
+ * @brief Private data layout of an "sdl event relay" entity.
+ *
+ * @see BE_STATIC_event_relay_sdl, BE_DEF_event_relay_sdl
  */
 typedef struct BE_event_relay_sdl {
     /** Internal buffer to re-order the polled events. Overriden each frame. */
@@ -41,12 +43,14 @@ typedef struct BE_event_relay_sdl {
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief Poll events from the SDL library and resends them through the engine as an engine event.
+ * @brief Frame callback for a BE_event_relay_sdl entity.
+ *
+ * Polls events from the SDL library and resends them through the engine as an engine event.
  * SDL uses a FIFO collection to handle event, while the tarasque engine uses a FILO collection. On a frame,
  * the entity will poll the X first events, buffer them, and send them as events in the reverse order they were
  * received. This have the effect of stacking SDL events in the order SDL received them.
  *
- * @param[inout] self_data points to some SDL Event Relay data
+ * @param[inout] self_data pointer to a BE_event_relay_sdl object
  * @param[in] elapsed_ms number of elapsed ms since last frame
  */
 static void BE_event_relay_sdl_on_frame(tarasque_entity *self_data, float elapsed_ms)
@@ -76,8 +80,10 @@ static void BE_event_relay_sdl_on_frame(tarasque_entity *self_data, float elapse
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief Returns a NULL object, because the SDL Context entity does not need a memory object to be initialized.
+ * @brief Returns a NULL object, because the BE_event_relay_sdl entity does not need an external memory object to be initialized.
  * This function is provided for coherence with other entities and to future proof against possible extentions to this entity.
+ *
+ * @see BE_event_relay_sdl, BE_DEF_event_relay_sdl
  *
  * @return tarasque_entity *
  */
@@ -89,14 +95,17 @@ tarasque_entity *BE_STATIC_event_relay_sdl(void)
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief Defines an entity that will poll sdl events and retransmits them in the engine's event stack.
+ * @brief Defines the entity properties of a BE_event_relay_sdl entity
  *
- * It might be a child of a SDL Context entity (see BE_sdl_context).
+ * The goal of this entity is to poll sdl events and retransmit them through the engine's event stack. It might be a child of a BE_sdl_context entity.
  * The events transfered are stacked in a way that reflects the order they were polled : the later the event is polled, the deeper it will be placed on the event stack.
  *
  * This entity might send two events : "sdl event" and "sdl event quit"
  *  - "sdl event" is associated to a pointer to a SDL_Event object. It is one of the SDL events the entity polled on last frame.
  *  - "sdl event quit" is not associated to any data. It just carries the information that the users wants to quit the window.
+ *
+ * @see BE_STATIC_event_relay_sdl, BE_event_relay_sdl
+ *
  */
 const tarasque_entity_definition BE_DEF_event_relay_sdl = {
         .data_size = sizeof(BE_event_relay_sdl),
