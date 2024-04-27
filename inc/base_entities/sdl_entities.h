@@ -115,6 +115,7 @@ SDL_Window *BE_window_sdl_get_window(BE_window_sdl *window_entity);
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // ---- SDL RENDER MANAGER ENTITY ----
+// TODO : documentation
 // Orchestrate draw operations on a parent window, providing a "sdl renderer draw" event to other entities.
 
 /**
@@ -123,6 +124,7 @@ SDL_Window *BE_window_sdl_get_window(BE_window_sdl *window_entity);
 typedef struct BE_render_manager_sdl_event_draw {
     /** Renderer that is currently accepting drawing operations. */
     SDL_Renderer *renderer;
+    // TODO : add information about the rendering target : pointer to texture
 } BE_render_manager_sdl_event_draw;
 
 /* Opaque type to a render manager entity instance. */
@@ -185,6 +187,7 @@ tarasque_entity *BE_STATIC_texture_2D(SDL_Texture *texture, i32 draw_index);
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // ---- 2D SHAPE ENTITY ----
+// TODO : documentation
 // Entity representing a basic shape easily extended with a visual or a collision box.
 
 /* Opaque type to a 2D shape instance. */
@@ -219,6 +222,7 @@ BE_body_2D *BE_shape_2D_get_body(BE_shape_2D *shape);
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // ---- 2D SHAPE VISUAL ENTITY ----
+// TODO : documentation
 // Entity providing a visual to a parent shape entity.
 
 /* Opaque type to a 2D shape visual instance. */
@@ -236,6 +240,7 @@ tarasque_entity *BE_STATIC_shape_2D_visual(SDL_Color color, i32 draw_index);
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // ---- 2D SHAPE COLLIDER ENTITY ----
+// TODO : documentation
 // Entity providing a collision object to a parent shape, automatically associating to a parent collision manager.
 
 /* Opaque type to a collision shape entity instance. */
@@ -285,6 +290,7 @@ void BE_shape_2D_collider_exec_callback(BE_shape_2D_collider *hit, BE_shape_2D_c
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // ---- 2D COLLISION MANAGER ENTITY ----
+// TODO : documentation
 // Collision-detection wrapper around the GJK algorithm shape colliders can register to.
 
 /* Opaque type to a collision manager instance. */

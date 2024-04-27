@@ -1,4 +1,13 @@
-
+/**
+ * @file base_entity_texture_2D.c
+ * @author gabriel ()
+ * @brief
+ * @version 0.1
+ * @date 2024-04-27
+ *
+ * @copyright Copyright (c) 2024
+ *
+ */
 #include <base_entities/sdl_entities.h>
 
 // -------------------------------------------------------------------------------------------------
@@ -22,10 +31,10 @@ typedef struct BE_texture_2D {
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-/*  */
+/* Initializes the texture by finding its position by finding a 2D body parent. */
 static void BE_texture_2D_init(tarasque_entity *self_data);
 
-/*  */
+/* Draws event callback to render the texture to the current rendering target. */
 static void BE_texture_2D_on_draw(tarasque_entity *self_data, void *event_data);
 
 // -------------------------------------------------------------------------------------------------
@@ -33,9 +42,9 @@ static void BE_texture_2D_on_draw(tarasque_entity *self_data, void *event_data);
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief
+ * @brief Initialize the entity. This function will find the first 2D body parent entity to pull its position from.
  *
- * @param self_data
+ * @param[inout] self_data pointer to some 2D texture entity data
  */
 static void BE_texture_2D_init(tarasque_entity *self_data)
 {
@@ -51,10 +60,11 @@ static void BE_texture_2D_init(tarasque_entity *self_data)
 }
 
 /**
- * @brief
+ * @brief Draws the entity to the current rendering target.
+ * Takes some pointer to event data that must be a BE_render_manager_sdl_event_draw object.
  *
- * @param self_data
- * @param event_draw
+ * @param[inout] self_data pointer to some 2D texture entity data
+ * @param[in] event_draw pointer to a BE_render_manager_sdl_event_draw object
  */
 static void BE_texture_2D_on_draw(tarasque_entity *self_data, void *event_data)
 {
@@ -95,6 +105,14 @@ static void BE_texture_2D_on_draw(tarasque_entity *self_data, void *event_data)
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
+/**
+ * @brief Returns a statically allocated 2D texture entity wrapping around the given SDL texture.
+ * Successive calls to this function will always yield the same object, with some eventual differing content (depending on the given arguments).
+ * Use this to build new 2D texture instances with a call to `tarasque_entity_add_child()` that will copy the data inside the returned object.
+ *
+ * @param[in] properties starting local position of the body
+ * @return tarasque_entity*
+ */
 tarasque_entity *BE_STATIC_texture_2D(SDL_Texture *texture, i32 draw_index)
 {
     static BE_texture_2D buffer = { 0u };
@@ -112,9 +130,10 @@ tarasque_entity *BE_STATIC_texture_2D(SDL_Texture *texture, i32 draw_index)
     return &buffer;
 }
 
-
 /**
- * @brief
+ * @brief Defines the entity properties of a 2D texture.
+ *
+ * This entity provides a wrapper around a SDL texture to render it when a "sdl renderer draw" event is received. This entity will know where to draw the texture by finding a 2D body parent and pulling the positionning information it needs from it. If such a parent is not found, the texture will be rendered as-is on the top left corner of the screen.
  *
  */
 const tarasque_entity_definition BE_DEF_texture_2D = {

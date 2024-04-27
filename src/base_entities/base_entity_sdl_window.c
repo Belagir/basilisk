@@ -15,6 +15,9 @@
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
+/**
+ * @brief Data needed by a SDL Window entity to work. It retains the initialisation values and a handle to the actual SDL Window.
+ */
 typedef struct BE_window_sdl {
     /** Title of the window used on window creation. */
     const char *title;
@@ -103,7 +106,7 @@ static void BE_window_sdl_quit(tarasque_entity *self_data, void *event_data)
 
 /**
  * @brief Returns a statically allocated 2D body constructed from the given properties.
- * Successive calls to this function will always yeild the same object, with some eventual differing content (depending on the given arguments).
+ * Successive calls to this function will always yield the same object, with some eventual differing content (depending on the given arguments).
  * Use this to build new 2D body instances with a call to `tarasque_entity_add_child()` that will copy the data inside the returned object.
  *
  * @param[in] title static null-terminated string to be the title of the window
