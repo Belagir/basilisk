@@ -1,9 +1,0 @@
-
-#ifndef __APP_H__
-#define __APP_H__
-
-#include <tarasque.h>
-
-extern const tarasque_entity_definition application_def;
-
-#endif
