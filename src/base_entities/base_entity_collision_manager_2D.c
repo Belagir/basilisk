@@ -21,8 +21,9 @@
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief
+ * @brief Private data definition of a collision manager entity.
  *
+ * @see BE_DEF_collision_manager_2D, BE_STATIC_collision_manager_2D, BE_shape_2D_collider
  */
 typedef struct BE_collision_manager_2D {
     RANGE(BE_shape_2D_collider *) *registered_collisions;
@@ -32,20 +33,20 @@ typedef struct BE_collision_manager_2D {
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-/*  */
+/* Initialisation callback for the BE_collision_manager_2D entity. */
 static void BE_collision_manager_2D_init(tarasque_entity *self_data);
 
-/*  */
+/* Deinitialisation callback for the BE_collision_manager_2D entity. */
 static void BE_collision_manager_2D_deinit(tarasque_entity *self_data);
 
-/*  */
+/* Frame callback for the for the BE_collision_manager_2D entity. */
 static void BE_collision_manager_2D_frame(tarasque_entity *self_data, float elapsed_time);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-/*  */
+/* Returns the inverse of some collision info. */
 static collision_2D_info collision_2D_info_reflect(collision_2D_info info);
 
 // -------------------------------------------------------------------------------------------------
@@ -53,10 +54,10 @@ static collision_2D_info collision_2D_info_reflect(collision_2D_info info);
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief
+ * @brief Adds a shape collision entity to the manager. Each frame, the manager will check for collisions between this collider and other colliders registered to it.
  *
- * @param collision_manager
- * @param col
+ * @param[inout] collision_manager target collision manager
+ * @param[in] col added collider
  */
 void BE_collision_manager_2D_register_shape(BE_collision_manager_2D *collision_manager, BE_shape_2D_collider *col)
 {
@@ -69,10 +70,10 @@ void BE_collision_manager_2D_register_shape(BE_collision_manager_2D *collision_m
 }
 
 /**
- * @brief
+ * @brief Removes a shape collider from the list of colliders to monitor.
  *
- * @param collision_manager
- * @param col
+ * @param[inout] collision_manager target collision manager
+ * @param[in] col removed collider
  */
 void BE_collision_manager_2D_unregister_shape(BE_collision_manager_2D *collision_manager, BE_shape_2D_collider *col)
 {
@@ -88,9 +89,9 @@ void BE_collision_manager_2D_unregister_shape(BE_collision_manager_2D *collision
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief
+ * @brief Initialises the internal data of the entity.
  *
- * @param self_data
+ * @param[in] self_data pointer to a BE_collision_manager_2D object.
  */
 static void BE_collision_manager_2D_init(tarasque_entity *self_data)
 {
@@ -100,9 +101,9 @@ static void BE_collision_manager_2D_init(tarasque_entity *self_data)
 }
 
 /**
- * @brief
+ * @brief Deinitialise internals and releases resources taken by the entity.
  *
- * @param self_data
+ * @param[in] self_data pointer to a BE_collision_manager_2D object.
  */
 static void BE_collision_manager_2D_deinit(tarasque_entity *self_data)
 {
@@ -112,10 +113,10 @@ static void BE_collision_manager_2D_deinit(tarasque_entity *self_data)
 }
 
 /**
- * @brief
+ * @brief Checks for collision between all colliders.
  *
- * @param self_data
- * @param elapsed_time
+ * @param[in] self_data pointer to a BE_collision_manager_2D object.
+ * @param[in] elapsed_time milliseconds elapsed since the last frame.
  */
 static void BE_collision_manager_2D_frame(tarasque_entity *self_data, float elapsed_time)
 {
@@ -141,10 +142,10 @@ static void BE_collision_manager_2D_frame(tarasque_entity *self_data, float elap
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief
+ * @brief Inverts some collision info that represents a hit from an object 1 to another object 2 so it represents a hit from object 2  to object 1.
  *
- * @param info
- * @return
+ * @param[in] info
+ * @return collision_2D_info
  */
 static collision_2D_info collision_2D_info_reflect(collision_2D_info info)
 {
@@ -157,13 +158,26 @@ static collision_2D_info collision_2D_info_reflect(collision_2D_info info)
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
+/**
+ * @brief Returns a NULL object, because the BE_collision_manager_2D entity does not need a memory object to be initialised.
+ * This function is provided for coherence with other entities and to future proof against possible extentions to this entity.
+ *
+ * @see BE_DEF_collision_manager_2D, BE_collision_manager_2D, BE_shape_2D_collider
+ *
+ * @return tarasque_entity *
+ */
 tarasque_entity *BE_STATIC_collision_manager_2D(void)
 {
     return NULL;
 }
 
 /**
- * @brief
+ * @brief Defines the properties of a BE_collision_manager_2D entity.
+ *
+ * This entity provides a way to listen for collision between children entities.
+ * The collision engine is not finished and supports circles and axis-aligned rectangles, and contains bugs.
+ *
+ * @see BE_collision_manager_2D, BE_STATIC_collision_manager_2D, BE_shape_2D_collider
  *
  */
 const tarasque_entity_definition BE_DEF_collision_manager_2D = {

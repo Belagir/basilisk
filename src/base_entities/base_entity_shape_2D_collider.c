@@ -185,6 +185,8 @@ tarasque_entity *BE_STATIC_shape_2D_collider(void)
  *
  * The BE_shape_2D_visual entity provides a way to extend the functionalities of a BE_shape_2D entity so it can detect collision with other shapes, using the parent BE_shape_2D as the collision shape.
  *
+ * @see BE_STATIC_shape_2D_collider, BE_shape_2D_collider
+ *
  */
 const tarasque_entity_definition BE_DEF_shape_2D_collider = {
         .data_size = sizeof(BE_shape_2D_collider),
