@@ -19,19 +19,11 @@
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
+/**
+ * @typedef tarasque_entity_storage
+ * @brief Shorthand typedef for a byte array with a more explicit syntax.
+ */
 typedef byte tarasque_entity_storage[];
-
-typedef struct tarasque_entity_definition_unit {
-    /** Size, in bytes, of the entity's specific data. */
-    unsigned long data_size;
-
-    /** Function ran on the entity-specific data when it is first created. */
-    void (*on_init)(tarasque_entity *self_data);
-    /** Function ran on the entity-specific data when it is destroyed. */
-    void (*on_deinit)(tarasque_entity *self_data);
-    /** Function ran on the entity-specific data each frame. */
-    void (*on_frame)(tarasque_entity *self_data, float elapsed_ms);
-} tarasque_entity_definition_unit;
 
 /**
  * @brief Entity data structure aggregating user data with engine-related data.
@@ -46,7 +38,7 @@ typedef struct tarasque_engine_entity {
     /** Engine owning the entity, used to redirect user's actions back to the whole engine. */
     tarasque_engine *host_handle;
 
-    tarasque_entity_definition_unit self_definition;
+    tarasque_entity_definition self_definition;
 
     /** The user's data. */
     tarasque_entity_storage data;
@@ -56,7 +48,7 @@ typedef struct tarasque_engine_entity {
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-static bool tarasque_entity_definition_unit_is_same_as(tarasque_entity_definition_unit def_unit, tarasque_entity_definition broad_def);
+static bool tarasque_entity_definition_unit_is_same_as(tarasque_entity_definition def_unit, tarasque_entity_definition broad_def);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -433,7 +425,7 @@ void tarasque_engine_entity_deinit(tarasque_engine_entity *target)
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-static bool tarasque_entity_definition_unit_is_same_as(tarasque_entity_definition_unit def_unit, tarasque_entity_definition broad_def)
+static bool tarasque_entity_definition_unit_is_same_as(tarasque_entity_definition def_unit, tarasque_entity_definition broad_def)
 {
     return   (def_unit.data_size == broad_def.data_size)
             && (def_unit.on_init   == broad_def.on_init)

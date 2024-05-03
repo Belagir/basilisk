@@ -43,6 +43,9 @@ typedef void tarasque_entity;
 // -------------------------------------------------------------------------------------------------
 // CONSTRUCTOR DATA STRUCTURES
 
+/**
+ * @brief Basic entity information. Contains expected callbacks and the data size the engine allocate for a "class" of entity.
+ */
 typedef struct tarasque_entity_definition tarasque_entity_definition;
 typedef struct tarasque_entity_definition {
     /** Size, in bytes, of the entity's specific data. */

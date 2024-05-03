@@ -243,10 +243,10 @@ tarasque_entity *BE_STATIC_shape_2D_visual(SDL_Color color, i32 draw_index);
 typedef struct BE_shape_2D_collider BE_shape_2D_collider;
 
 /**
- * @brief
- *
+ * @brief Contains basic information about a collision happening between two objects.
  */
 typedef struct collision_2D_info {
+    /** Direction of the collision. The normal points toward the other object. */
     vector2_t normal;
 } collision_2D_info;
 
