@@ -17,7 +17,7 @@
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-/* Initialize a minimal SDL library configuration. */
+/* Initialise a minimal SDL library configuration. */
 static void BE_context_sdl_init(tarasque_entity *self_data);
 /* Quits the SDL library instance. */
 static void BE_context_sdl_deinit(tarasque_entity *self_data);
@@ -30,7 +30,7 @@ static void BE_context_sdl_deinit(tarasque_entity *self_data);
 
 /**
  * @brief BE_context_sdl initialisation callback.
- * Initialize the entity and SDL context by calling `SDL_Init()` without module specified.
+ * Initialise the entity and SDL context by calling `SDL_Init()` without module specified.
  *
  * @param[in] self_data discarded entity data
  */
@@ -61,7 +61,7 @@ static void BE_context_sdl_deinit(tarasque_entity *self_data)
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief Returns a NULL object, because the BE_context_sdl entity does not need a memory object to be initialized.
+ * @brief Returns a NULL object, because the BE_context_sdl entity does not need a memory object to be initialised.
  * This function is provided for coherence with other entities and to future proof against possible extentions to this entity.
  *
  * @see BE_DEF_context_sdl

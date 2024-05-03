@@ -60,7 +60,7 @@ static void BE_render_manager_sdl_post_draw(tarasque_entity *self_data, void *ev
 
 /**
  * @brief Initialisation callback for a BE_render_manager_sdl entity.
- * Initializes the data of a render manager, creating a renderer and buffer to organize draw operations.
+ * Initialises the data of a render manager, creating a renderer and buffer to organize draw operations.
  * The renderer is bound to a parent BE_window_sdl entity. If no such entity is found, the renderer will not be created.
  *
  * @see BE_render_manager_sdl, BE_DEF_render_manager_sdl, BE_STATIC_render_manager_sdl

@@ -80,7 +80,7 @@ static void BE_event_relay_sdl_on_frame(tarasque_entity *self_data, float elapse
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief Returns a NULL object, because the BE_event_relay_sdl entity does not need an external memory object to be initialized.
+ * @brief Returns a NULL object, because the BE_event_relay_sdl entity does not need an external memory object to be initialised.
  * This function is provided for coherence with other entities and to future proof against possible extentions to this entity.
  *
  * @see BE_event_relay_sdl, BE_DEF_event_relay_sdl

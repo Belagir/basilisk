@@ -33,7 +33,7 @@ typedef struct BE_texture_2D {
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-/* Initializes the texture by finding its position by finding a BE_2D_body parent. */
+/* Initialises the texture by finding its position by finding a BE_2D_body parent. */
 static void BE_texture_2D_init(tarasque_entity *self_data);
 
 /* Draw event callback to render the texture to the current rendering target. */
@@ -44,7 +44,7 @@ static void BE_texture_2D_on_draw(tarasque_entity *self_data, void *event_data);
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief Initialize the entity. This function will find the first BE_2D_body parent entity to pull its position from.
+ * @brief Initialise the entity. This function will find the first BE_2D_body parent entity to pull its position from.
  *
  * @param[inout] self_data pointer to BE_texture_2D object
  */

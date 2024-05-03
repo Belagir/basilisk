@@ -40,7 +40,7 @@ typedef struct BE_window_sdl {
 
 /* Creates a new window. */
 static void BE_window_sdl_init(tarasque_entity *self_data);
-/* Closes the window assiciated with the SDL Window entity. */
+/* Closes the window associated with the SDL Window entity. */
 static void BE_window_sdl_deinit(tarasque_entity *self_data);
 /* Callback for the special "sdl event quit" used to remove this entity. See the SDL Event Relay entity (BE_sdl_event_relay). */
 static void BE_window_sdl_quit(tarasque_entity *self_data, void *event_data);
@@ -50,7 +50,7 @@ static void BE_window_sdl_quit(tarasque_entity *self_data, void *event_data);
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief Initializes a BE_window_sdl entity. It will create a new SDL_Window and store a pointer to it.
+ * @brief Initialises a BE_window_sdl entity. It will create a new SDL_Window and store a pointer to it.
  *
  * @param[inout] self_data points to some SDL Window entity data
  */

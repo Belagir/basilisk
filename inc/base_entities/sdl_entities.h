@@ -115,7 +115,6 @@ SDL_Window *BE_window_sdl_get_window(BE_window_sdl *window_entity);
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // ---- SDL RENDER MANAGER ENTITY ----
-// TODO : documentation
 // Orchestrate draw operations on a parent window, providing a "sdl renderer draw" event to other entities.
 
 /**
@@ -187,7 +186,6 @@ tarasque_entity *BE_STATIC_texture_2D(SDL_Texture *texture, i32 draw_index);
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // ---- 2D SHAPE ENTITY ----
-// TODO : documentation
 // Entity representing a basic shape easily extended with a visual or a collision box.
 
 /* Opaque type to a 2D shape instance. */
@@ -207,7 +205,7 @@ tarasque_entity *BE_STATIC_shape_2D_rectangle(shape_2D_rect rect);
 // -------------------------------------------------------------------------------------------------
 
 /* Returns the kind of shape an entity is. */
-shape_2D_id BE_shape_2D_what(BE_shape_2D *shape);
+shape_2D_id BE_shape_2D_what(const BE_shape_2D *shape);
 
 /* Returns a shape's circle information. */
 shape_2D_circle *BE_shape_2D_as_circle(BE_shape_2D *shape);
