@@ -142,7 +142,7 @@ static void BE_shape_2D_visual_on_draw(tarasque_entity *self_data, void *event_d
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief Returns a statically allocated BE_STATIC_shape_2D_visual constructed as an axis-aligned rectangle.
+ * @brief Returns a statically allocated BE_shape_2D_visual constructed as an axis-aligned rectangle.
  * Successive calls to this function will always yield the same object, with some eventual differing content (depending on the given arguments).
  * Use this to build new BE_shape_2D_visual instances with a call to `tarasque_entity_add_child()` that will copy the data inside the returned object.
  *

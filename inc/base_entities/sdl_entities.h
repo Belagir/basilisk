@@ -237,7 +237,6 @@ tarasque_entity *BE_STATIC_shape_2D_visual(SDL_Color color, i32 draw_index);
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // ---- 2D SHAPE COLLIDER ENTITY ----
-// TODO : documentation
 // Entity providing a collision object to a parent shape, automatically associating to a parent collision manager.
 
 /* Opaque type to a collision shape entity instance. */
@@ -272,7 +271,7 @@ tarasque_entity *BE_STATIC_shape_2D_collider(void);
 // -------------------------------------------------------------------------------------------------
 
 /* Returns the support point of a shape collider in a given direction. This is the furthest point of the shape in this direction. */
-vector2_t BE_shape_2D_collider_support(BE_shape_2D_collider *col, vector2_t direction);
+vector2_t BE_shape_2D_collider_support(const BE_shape_2D_collider *col, vector2_t direction);
 
 /* Returns the body of the shape the collider found. */
 BE_body_2D *BE_shape_2D_collider_get_body(const BE_shape_2D_collider *col);
