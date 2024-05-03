@@ -10,9 +10,9 @@
  */
 #include <ustd/sorting.h>
 
-#include "resource.h"
+#include "tarasque_resource.h"
 
-#include "resource_storage/resource_storage.h"
+#include "resource_storage/tarasque_resource_storage.h"
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------

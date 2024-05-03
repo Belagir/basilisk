@@ -10,8 +10,8 @@
  * @copyright Copyright (c) 2024
  *
  */
-#ifndef __SDL2_WINDOW_H__
-#define __SDL2_WINDOW_H__
+#ifndef __TARASQUE_SDL2_WINDOW_H__
+#define __TARASQUE_SDL2_WINDOW_H__
 
 #include <SDL2/SDL.h>
 

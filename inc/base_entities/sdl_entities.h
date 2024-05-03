@@ -8,8 +8,8 @@
  * @copyright Copyright (c) 2024
  *
  */
-#ifndef __BASE_ENTITIES_SDL_ENTITIES_H__
-#define __BASE_ENTITIES_SDL_ENTITIES_H__
+#ifndef __TARASQUE_BASE_ENTITIES_SDL_ENTITIES_H__
+#define __TARASQUE_BASE_ENTITIES_SDL_ENTITIES_H__
 
 #include <SDL2/SDL.h>
 #include <ustd/math2d.h>

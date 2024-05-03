@@ -20,12 +20,12 @@
 
 #include <tarasque.h>
 
-#include "../common.h"
+#include "../tarasque_common.h"
 
-#include "../command/command.h"
-#include "../entity/entity.h"
-#include "../event/event.h"
-#include "../resource/resource.h"
+#include "../command/tarasque_command.h"
+#include "../entity/tarasque_entity.h"
+#include "../event/tarasque_event.h"
+#include "../resource/tarasque_resource.h"
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------

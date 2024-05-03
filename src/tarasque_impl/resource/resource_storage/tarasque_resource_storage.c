@@ -15,7 +15,7 @@
 #include <stdio.h>
 #include <sys/stat.h>
 
-#include "resource_storage.h"
+#include "tarasque_resource_storage.h"
 
 
 // -------------------------------------------------------------------------------------------------

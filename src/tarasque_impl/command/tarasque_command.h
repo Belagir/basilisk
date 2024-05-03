@@ -11,8 +11,8 @@
 #ifndef __COMMAND_H__
 #define __COMMAND_H__
 
-#include "../common.h"
-#include "../entity/entity.h"
+#include "../tarasque_common.h"
+#include "../entity/tarasque_entity.h"
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
