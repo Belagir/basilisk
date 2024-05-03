@@ -220,7 +220,6 @@ BE_body_2D *BE_shape_2D_get_body(BE_shape_2D *shape);
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // ---- 2D SHAPE VISUAL ENTITY ----
-// TODO : documentation
 // Entity providing a visual to a parent shape entity.
 
 /* Opaque type to a 2D shape visual instance. */
