@@ -11,9 +11,9 @@
 #ifndef __EVENT_SUBSCRIPTION_H__
 #define __EVENT_SUBSCRIPTION_H__
 
-#include "../../common.h"
-#include "../../event/event.h"
-#include "../../entity/entity.h"
+#include "../../tarasque_common.h"
+#include "../../event/tarasque_event.h"
+#include "../../entity/tarasque_entity.h"
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------

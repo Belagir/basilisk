@@ -10,9 +10,9 @@
  */
 #include <ustd/sorting.h>
 
-#include "../entity/entity.h"
-#include "event.h"
-#include "event_subscription/event_subscription.h"
+#include "../entity/tarasque_entity.h"
+#include "tarasque_event.h"
+#include "event_subscription/tarasque_event_subscription.h"
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------

@@ -8,7 +8,7 @@
  * @copyright Copyright (c) 2024
  *
  */
-#include "event_subscription.h"
+#include "tarasque_event_subscription.h"
 
 #include <ustd/sorting.h>
 

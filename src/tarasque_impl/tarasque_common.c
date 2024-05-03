@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <math.h>
 
-#include "common.h"
+#include "tarasque_common.h"
 
 
 // -------------------------------------------------------------------------------------------------
@@ -193,21 +193,6 @@ void print_path(const path *p)
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief Compares two pointers (themselves passed by pointers) as two unsigned integers.
- *
- * @param lhs
- * @param rhs
- * @return i32
- */
-i32 raw_pointer_compare(const void *lhs, const void *rhs)
-{
-    uintptr_t lhs_val = (uintptr_t) *(const void **) lhs;
-    uintptr_t rhs_val = (uintptr_t) *(const void **) rhs;
-
-    return (lhs_val > rhs_val) - (lhs_val < rhs_val);
-}
-
-/**
  * @brief Compares an identifier to a NULL-terminated string.
  *
  * @param id
@@ -255,87 +240,6 @@ i32 identifier_compare(const void *lhs, const void *rhs)
     identifier *name_rhs = { *(identifier **) rhs };
 
     return range_compare(&RANGE_TO_ANY(name_lhs), &RANGE_TO_ANY(name_rhs), &identifier_compare_character);
-}
-
-// -------------------------------------------------------------------------------------------------
-
-bool character_is_num(char c)
-{
-    return (c >= '0') && (c <= '9');
-}
-
-size_t c_string_length(const char *str, bool keep_terminator)
-{
-    size_t str_length = 0u;
-
-    if (!str) {
-        return 0u;
-    }
-
-    while (str[str_length] != '\0') {
-        str_length += 1;
-    }
-
-    str_length += (size_t) keep_terminator;
-
-    return str_length;
-}
-
-// -------------------------------------------------------------------------------------------------
-
-u32 hash_jenkins_one_at_a_time(const byte *key, size_t length, u32 seed)
-{
-    size_t i = 0u;
-    u32 hash = seed;
-
-    while (i < length) {
-        hash += key[i++];
-        hash += hash << 10u;
-        hash ^= hash >> 6u;
-    }
-
-    hash += hash << 3u;
-    hash ^= hash >> 11u;
-    hash += hash << 15u;
-
-    return hash;
-}
-
-u32 hash_indentifier(const identifier *id, u32 (*hash_function)(const byte *key, size_t length, u32 seed))
-{
-    if (!id || !hash_function) {
-        return 0u;
-    }
-
-    return hash_function((const byte *) id->data, id->length, 0u);
-}
-
-u32 hash_path(const path *p, u32 (*hash_function)(const byte *key, size_t length, u32 seed))
-{
-    u32 full_hash = 0u;
-
-    if (!p || !hash_function) {
-        return 0u;
-    }
-
-    for (size_t i = 0u ; i < p->length ; i++) {
-        full_hash = hash_function((const byte *) p->data[i]->data, p->data[i]->length, full_hash);
-    }
-
-    return full_hash;
-}
-
-i32 hash_compare(const void *lhs, const void *rhs)
-{
-    u32 val_lhs = *(u32 *) lhs;
-    u32 val_rhs = *(u32 *) rhs;
-
-    return (val_lhs > val_rhs) - (val_lhs < val_rhs);
-}
-
-i32 hash_compare_doubleref(const void *lhs, const void *rhs)
-{
-    return hash_compare(*(u32 **) lhs, *(u32 **) rhs);
 }
 
 // -------------------------------------------------------------------------------------------------

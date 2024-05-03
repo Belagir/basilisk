@@ -10,12 +10,12 @@
  * @copyright Copyright (c) 2024
  *
  */
-#ifndef __SDL2_WINDOW_H__
-#define __SDL2_WINDOW_H__
+#ifndef __TARASQUE_SDL2_WINDOW_H__
+#define __TARASQUE_SDL2_WINDOW_H__
 
 #include <SDL2/SDL.h>
 
-#include <tarasque_bare.h>
+#include <tarasque.h>
 
 // Importing base entities included in the graft.
 
@@ -36,6 +36,7 @@ typedef struct graft_sdl_window_args {
     /** Configuration given to the render manager entity. */
     struct {
         SDL_RendererFlags flags;
+        size_t w, h;
         SDL_Color clear_color;
     } for_renderer;
 } graft_sdl_window_args;

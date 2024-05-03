@@ -11,27 +11,19 @@
 #include <ustd/sorting.h>
 #include <stdio.h>
 
-#include <tarasque_bare.h>
+#include <tarasque.h>
 
-#include "entity.h"
+#include "tarasque_entity.h"
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
+/**
+ * @typedef tarasque_entity_storage
+ * @brief Shorthand typedef for a byte array with a more explicit syntax.
+ */
 typedef byte tarasque_entity_storage[];
-
-typedef struct tarasque_entity_definition_unit {
-    /** Size, in bytes, of the entity's specific data. */
-    unsigned long data_size;
-
-    /** Function ran on the entity-specific data when it is first created. */
-    void (*on_init)(tarasque_entity *self_data);
-    /** Function ran on the entity-specific data when it is destroyed. */
-    void (*on_deinit)(tarasque_entity *self_data);
-    /** Function ran on the entity-specific data each frame. */
-    void (*on_frame)(tarasque_entity *self_data, float elapsed_ms);
-} tarasque_entity_definition_unit;
 
 /**
  * @brief Entity data structure aggregating user data with engine-related data.
@@ -46,8 +38,7 @@ typedef struct tarasque_engine_entity {
     /** Engine owning the entity, used to redirect user's actions back to the whole engine. */
     tarasque_engine *host_handle;
 
-    RANGE(tarasque_entity_definition_unit) *subtype_definitions;
-    tarasque_entity_definition_unit self_definition;
+    tarasque_entity_definition self_definition;
 
     /** The user's data. */
     tarasque_entity_storage data;
@@ -57,7 +48,7 @@ typedef struct tarasque_engine_entity {
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-static bool tarasque_entity_definition_unit_is_same_as(tarasque_entity_definition_unit def_unit, tarasque_entity_definition broad_def);
+static bool tarasque_entity_definition_unit_is_same_as(tarasque_entity_definition def_unit, tarasque_entity_definition broad_def);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -100,18 +91,6 @@ tarasque_engine_entity *tarasque_engine_entity_create(const identifier *id, tara
         if (user_data.data) {
             bytewise_copy(new_entity->data, user_data.data, user_data.entity_def.data_size);
         }
-
-        // optional subtypes
-        if (user_data.entity_def.subtype) {
-            new_entity->subtype_definitions = range_create_dynamic(alloc, sizeof(*new_entity->subtype_definitions->data), TARASQUE_COLLECTIONS_START_LENGTH);
-
-            subtyped_definition = user_data.entity_def.subtype;
-            while (subtyped_definition) {
-                new_entity->subtype_definitions = range_ensure_capacity(alloc, RANGE_TO_ANY(new_entity->subtype_definitions), 1);
-                range_insert_value(RANGE_TO_ANY(new_entity->subtype_definitions), 0u, subtyped_definition);
-                subtyped_definition = subtyped_definition->subtype;
-            }
-        }
     }
 
     return new_entity;
@@ -130,9 +109,6 @@ void tarasque_engine_entity_destroy(tarasque_engine_entity **target, allocator a
         return;
     }
 
-    if ((*target)->subtype_definitions) {
-        range_destroy_dynamic(alloc, &RANGE_TO_ANY((*target)->subtype_definitions));
-    }
     range_destroy_dynamic(alloc, &RANGE_TO_ANY((*target)->children));
     range_destroy_dynamic(alloc, &RANGE_TO_ANY((*target)->id));
 
@@ -234,15 +210,6 @@ bool tarasque_engine_entity_has_definition(tarasque_engine_entity *entity, taras
     }
 
     has_def = tarasque_entity_definition_unit_is_same_as(entity->self_definition, entity_def);
-
-    if (!entity->subtype_definitions) {
-        return has_def;
-    }
-
-    while ((!has_def) && (pos < entity->subtype_definitions->length)) {
-        has_def = tarasque_entity_definition_unit_is_same_as(entity->subtype_definitions->data[pos], entity_def);
-        pos += 1;
-    }
 
     return has_def;
 }
@@ -401,14 +368,6 @@ void tarasque_engine_entity_step_frame(tarasque_engine_entity *target, f32 elaps
         return;
     }
 
-    if (target->subtype_definitions) {
-        for (size_t i = 0u ; i < target->subtype_definitions->length ; i++) {
-            if (target->subtype_definitions->data[i].on_frame) {
-                target->subtype_definitions->data[i].on_frame(target->data, elapsed_ms);
-            }
-        }
-    }
-
     if (target->self_definition.on_frame) {
         target->self_definition.on_frame(target->data, elapsed_ms);
     }
@@ -441,14 +400,6 @@ void tarasque_engine_entity_init(tarasque_engine_entity *target)
         return;
     }
 
-    if (target->subtype_definitions) {
-        for (size_t i = 0u ; i < target->subtype_definitions->length ; i++) {
-            if (target->subtype_definitions->data[i].on_init) {
-                target->subtype_definitions->data[i].on_init(target->data);
-            }
-        }
-    }
-
     if (target->self_definition.on_init) {
         target->self_definition.on_init(target->data);
     }
@@ -468,22 +419,13 @@ void tarasque_engine_entity_deinit(tarasque_engine_entity *target)
     if (target->self_definition.on_deinit) {
         target->self_definition.on_deinit(target->data);
     }
-
-    if (target->subtype_definitions) {
-        for (i64 i = (i64) target->subtype_definitions->length - 1 ; i >= 0 ; i--) {
-            if (target->subtype_definitions->data[i].on_deinit) {
-                target->subtype_definitions->data[i].on_deinit(target->data);
-            }
-        }
-    }
 }
 
-
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-static bool tarasque_entity_definition_unit_is_same_as(tarasque_entity_definition_unit def_unit, tarasque_entity_definition broad_def)
+static bool tarasque_entity_definition_unit_is_same_as(tarasque_entity_definition def_unit, tarasque_entity_definition broad_def)
 {
     return   (def_unit.data_size == broad_def.data_size)
             && (def_unit.on_init   == broad_def.on_init)
