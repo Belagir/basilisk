@@ -101,8 +101,10 @@ static void BE_shape_2D_visual_on_init(tarasque_entity *self_data)
 
     visual->visualized = tarasque_entity_get_parent(visual, NULL, &BE_DEF_shape_2D);
 
-    tarasque_entity_queue_subscribe_to_event(visual, "sdl renderer draw",
-            (tarasque_specific_event_subscription) { .callback = &BE_shape_2D_visual_on_draw, .index = visual->draw_index, });
+    if (visual->visualized) {
+        tarasque_entity_queue_subscribe_to_event(visual, "sdl renderer draw",
+                (tarasque_specific_event_subscription) { .callback = &BE_shape_2D_visual_on_draw, .index = visual->draw_index, });
+    }
 }
 
 /**
