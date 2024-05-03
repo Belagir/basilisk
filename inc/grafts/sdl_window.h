@@ -15,7 +15,7 @@
 
 #include <SDL2/SDL.h>
 
-#include <tarasque_bare.h>
+#include <tarasque.h>
 
 // Importing base entities included in the graft.
 

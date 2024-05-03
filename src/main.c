@@ -7,7 +7,7 @@ int main(void) {
     tarasque_engine *engine = tarasque_engine_create();
 
     tarasque_entity_add_child(tarasque_engine_root_entity(engine), "app", (tarasque_specific_entity) {
-            .data = NULL,
+            .data = 0u,
             .entity_def = application_def,
     });
 

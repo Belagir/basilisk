@@ -2,7 +2,7 @@
 #ifndef __SHAPES_H__
 #define __SHAPES_H__
 
-#include <tarasque_bare.h>
+#include <tarasque.h>
 #include <base_entities/sdl_entities.h>
 
 struct shape {

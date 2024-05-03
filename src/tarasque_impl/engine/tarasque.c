@@ -18,7 +18,7 @@
 
 #include <ustd/logging.h>
 
-#include <tarasque_bare.h>
+#include <tarasque.h>
 
 #include "../common.h"
 

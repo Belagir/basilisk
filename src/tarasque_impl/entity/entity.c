@@ -11,7 +11,7 @@
 #include <ustd/sorting.h>
 #include <stdio.h>
 
-#include <tarasque_bare.h>
+#include <tarasque.h>
 
 #include "entity.h"
 
