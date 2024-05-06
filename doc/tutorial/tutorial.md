@@ -1,19 +1,45 @@
 
 # Building a side scrolling shooter with Tarasque
 
-Explanation + Goals
+-- Explanation + Goals
 
-Steps
+Prerequisites :
 
-End result + why it matters
+```
+gcc-13
+make
+git
+```
+
+-- Steps
+
+-- End result + why it matters
 
 ## Creating a project
 
-Explanation + Goals
+-- Explanation + Goals
 
-Steps
+-- Steps
 
-End result + why it matters
+Create a new folder for your project. It will contain all your sources and the engine's.
+
+```bash
+mkdir tarasque-side-shooter
+```
+
+```bash
+git init -b main
+git submodule add git@github.com:Belagir/untarasque.git
+git submodule update --init --recursive
+```
+
+```bash
+touch main.c
+```
+
+Once our files have been set up, let's see how we can compile and link everything. You can use your prefered toolchain.
+
+-- End result + why it matters
 
 ```
 .
@@ -40,17 +66,17 @@ End result + why it matters
     +-- Makefile
 ```
 
-what was learnt
+-- what was learnt
 
-segway to next step
+-- segway to next step
 
 ## Running the engine
 
-Explanation + Goals
+-- Explanation + Goals
 
-Steps
+-- Steps
 
-End result + why it matters
+-- End result + why it matters
 
 ```c
 // main.c
@@ -70,9 +96,9 @@ int main(void)
 
 ```
 
-what was learnt
+-- what was learnt
 
-segway to next step
+-- segway to next step
 
 ## Extending the engine with a provided graft : spawning a window
 
