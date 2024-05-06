@@ -97,7 +97,7 @@ static void BE_texture_2D_on_draw(tarasque_entity *self_data, void *event_data)
             texture_data->texture,
             NULL,
             &dest,
-            0.f, // TODO : angle
+            BE_body_2D_global(texture_data->body).angle,
             NULL,
             SDL_FLIP_NONE
     );

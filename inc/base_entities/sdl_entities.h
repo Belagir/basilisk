@@ -286,7 +286,6 @@ void BE_shape_2D_collider_exec_callback(BE_shape_2D_collider *hit, BE_shape_2D_c
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // ---- 2D COLLISION MANAGER ENTITY ----
-// TODO : documentation
 // Collision-detection wrapper around the GJK algorithm shape colliders can register to.
 
 /* Opaque type to a collision manager instance. */
