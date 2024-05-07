@@ -12,8 +12,8 @@
 #define __TARASQUE_BASE_ENTITIES_SDL_ENTITIES_H__
 
 #include <SDL2/SDL.h>
-#include <ustd/math2d.h>
-#include <tarasque.h>
+#include "../unstandard/inc/ustd/math2d.h"
+#include "tarasque.h"
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
