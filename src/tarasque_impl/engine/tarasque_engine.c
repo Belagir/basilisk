@@ -340,10 +340,9 @@ void tarasque_entity_queue_remove(tarasque_entity *entity)
  * Grafts are usually used to add entities in bulk.
  *
  * @param[in] entity Target entity from which the graft will take place.
- * @param[in] str_id Name (copied) to give to the root of the graft.
  * @param[in] graft_data Data (copied) describing the graft and its arguments.
  */
-void tarasque_entity_graft(tarasque_entity *entity, const char *str_id, tarasque_specific_graft graft_data)
+void tarasque_entity_graft(tarasque_entity *entity, tarasque_specific_graft graft_data)
 {
     if (!entity || !graft_data.graft_procedure) {
         return;

@@ -147,7 +147,7 @@ tarasque_entity *tarasque_entity_add_child(tarasque_entity *entity, const char *
 /* Adds a pending command to remove an entity from the game tree. */
 void tarasque_entity_queue_remove(tarasque_entity *entity);
 /* Realizes a graft in the game tree relative to an entity. */
-void tarasque_entity_graft(tarasque_entity *entity, const char *str_id, tarasque_specific_graft graft_data);
+void tarasque_entity_graft(tarasque_entity *entity, tarasque_specific_graft graft_data);
 
 // -------------------------------------------------------------------------------------------------
 // ENTITY SEARCHING
