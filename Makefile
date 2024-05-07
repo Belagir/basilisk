@@ -28,24 +28,23 @@ DOC_DIR = doc-gen
 
 ## compiler
 CC = gcc-13
+## archiver
+AR = ar
 
 ## compilation flags
 CFLAGS += -Wextra -Wconversion -Wdangling-pointer -Wparentheses -Wpedantic -g --std=c2x
 CFLAGS += -Werror
 CFLAGS += -lc
-## linker flags
-LFLAGS += -lm
-LFLAGS += `sdl2-config --cflags --libs`
-LFLAGS += -lSDL2_image
-LFLAGS += -lGL
+## archiver flags
+ARFLAGS = rvcs
 
 # additional flags for defines
 DFLAGS += -D_POSIX_C_SOURCE=199309L
 
 # --------------- Internal variables -------------------------------------------
 
-## absolute path to executable name
-TARGET = $(EXC_DIR)/$(PROJECT_NAME)
+## absolute path to the library
+LIBRARY = $(EXC_DIR)/lib$(PROJECT_NAME).a
 ## list of all c files without their path
 SRC := $(notdir $(shell find $(SRC_DIR) -name *.c))
 ## list of all duplicate c files to enforce uniqueness of filenames
@@ -73,10 +72,10 @@ vpath %.c $(sort $(dir $(shell find $(SRC_DIR) -name *.c)))
 
 # -------- compilation -----------------
 
-all: check $(PROJECT_SUBMODULES) $(BUILD_DIRS) $(TARGET) | count_lines
+all: check $(PROJECT_SUBMODULES) $(BUILD_DIRS) $(LIBRARY) | count_lines
 
-$(TARGET): $(OBJ)
-	$(CC) $^ -o $@ $(LFLAGS)
+$(LIBRARY): $(OBJ)
+	$(AR) $(ARFLAGS) $@ $^
 
 $(OBJ_DIR)/%.o: %.c
 	$(CC) -c $? -o $@ $(ARGS_INCL) $(CFLAGS) $(DFLAGS)
