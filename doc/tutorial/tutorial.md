@@ -40,7 +40,7 @@ git submodule update --init --recursive
 Now that we have the files, let's build our library for the architecture of your computer :
 
 ```bash
-make untarasque
+make -C untarasque
 ```
 
 Once the library successfully compiled and archived, you should have access to two interesting files : `untarasque/bin/libtarasque.a` and `untarasque/inc/tarasque.h`. Those two be very useful for our next steps.
@@ -249,4 +249,90 @@ The `tarasque_entity_definition` structure describes what the engine needs to kn
 
 Once this is defined, we pass data in the `tarasque_specific_entity` structure that matches in length the `.data_size` field in the definition passed as `.entity_def` (or a NULL pointer if we don't care about the entity's starting state).
 
+### The game entity
 
+```c
+// game/game.h
+
+#ifndef __GAME_H__
+#define __GAME_H__
+
+#include <tarasque.h>
+
+extern const tarasque_specific_entity game_entity;
+
+#endif
+
+```
+
+```c
+// game/game.c
+
+#include "game.h"
+
+#include <stddef.h>
+
+const tarasque_specific_entity game_entity = {
+        .entity_def = {
+                .data_size = 0u,
+
+                .on_init   = NULL,
+                .on_deinit = NULL,
+                .on_frame  = NULL,
+        },
+        .data = NULL,
+};
+
+```
+
+```c
+// main.c
+
+// ...
+
+#include "game/game.h"
+
+int main(void)
+{
+    // ...
+
+    tarasque_entity_add_child(tarasque_entity_get_child(tarasque_engine_root_entity(handle), "Context/Window/Render Manager/Collision Manager", NULL), "game", game_entity);
+
+    tarasque_engine_run(handle, 60);
+
+    // ...
+}
+
+
+```
+
+```c
+// game/game.c
+
+// ...
+
+static void game_init(tarasque_entity *self_data);
+
+static void game_init(tarasque_entity *self_data)
+{
+    (void) self_data;
+
+    // game creation will go here
+}
+
+const tarasque_specific_entity game_entity = {
+        .entity_def = {
+                .data_size = 0u,
+
+                .on_init   = &game_init,
+                .on_deinit = NULL,
+                .on_frame  = NULL,
+        },
+        .data = NULL,
+};
+
+create the resources directory
+
+
+
+```
