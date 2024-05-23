@@ -23,6 +23,8 @@ Knowing how to setup a C project.
 
 Our first step is to create our project. Since the tarasque engine does not impose a specific toolchain or external tools to actually work, you have a lot of liberty on how you will organize your project. Liberty is nice when you know what you are doing. If you are confident in the intricacies of C project management, feel free to cook your own file structure & toolchain and adapt the commands shown in this section.
 
+### File organization
+
 Create a new folder for your project. It will contain all your sources and the engine's.
 
 ```bash
@@ -45,17 +47,22 @@ make -C untarasque
 
 Once the library successfully compiled and archived, you should have access to two interesting files : `untarasque/bin/libtarasque.a` and `untarasque/inc/tarasque.h`. Those two be very useful for our next steps.
 
-For now, let's start our own game with a main file :
+For now, let's start our own game with a main file and our own cozy source directory :
 
 ```bash
-touch main.c
+mkdir src
+touch src/main.c
 ```
 And you can fill our new main file with the good old `main()` function for now.
+
+### Compilation & linking
 
 Once our files have been set up, let's see how we can compile and link everything. You can use your prefered toolchain for that, but be sure to include those options to have access to the tarasque library :
 
  - compilation flags : `-Iuntarasque/inc`
- - linker flags : `-Luntarasque/bin -ltarasque`
+ - linker flags : `-Luntarasque/bin -ltarasque -lm`
+
+> Notice the  `-lm` flag going *after* the tarasque library flag.
 
 And for the purpose of this turorial :
 
@@ -66,9 +73,10 @@ Right now, you should be able to compile the project to an empty executable, and
 
 ```
 .
-+-- main.c
++-- src
+    +-- main.c
 |
-+-- ...                         // your prefered toolchain meybe here ?
++-- ...                         // your prefered toolchain here ?
 |
 +-- tarasque
     |
@@ -93,7 +101,7 @@ If our project compiles, that means we can dive in the functional side of the ga
 
 ## Running the engine
 
-The first thing we want to do is create an engine instance. This is done through the `tarasque_engine` opaque type and `tarasque_engine_*()` namespace, that will change the global state of the program. We will not interact a lot with such opertaions though (there are not many methods tied to this type anyway) but we need to instanciate one to control the lifetime of our game :
+The first thing we want to do is create an engine instance. This is done through the `tarasque_engine` opaque type and `tarasque_engine_*()` namespace, that will change the global state of the program. We will not interact a lot with such operations though (there are not many methods tied to this type anyway) but we need to instanciate one to control the lifetime of our game engine :
 
 ```c
 // main.c
@@ -205,11 +213,12 @@ For our tranquility of mind, we will create an entity that, when added to the ga
 
 ```
 .
-+-- main.c
-|
-+-- game
-|   +-- game.h
-|   +-- game.c
++--src
+|   +-- main.c
+|   |
+|   +-- game
+|       +-- game.h
+|       +-- game.c
 |
 +-- ...
 |
@@ -247,7 +256,7 @@ typedef struct tarasque_specific_entity {
 
 The `tarasque_entity_definition` structure describes what the engine needs to know about our entity to interact with it : we may see it as some kind of dynamic class. It holds information about how many bytes the engine needs to allocate for it, a callback to run at the creation of the entity (`.on_init`) the data inside the entity, a callback to run when the entity is removed (`.on_deinit`), and a callback to call on each frame of the main loop (`.on_frame`).
 
-Once this is defined, we pass data in the `tarasque_specific_entity` structure that matches in length the `.data_size` field in the definition passed as `.entity_def` (or a NULL pointer if we don't care about the entity's starting state).
+Once this is defined, we pass data in the `tarasque_specific_entity` structure that matches in length the `.data_size` field in the definition passed as `.entity_def` (or a NULL pointer if we don't care about the entity's starting state -- in this case, the contents of the entity will be all zeroes).
 
 ### The game entity
 
@@ -303,7 +312,6 @@ int main(void)
     // ...
 }
 
-
 ```
 
 ```c
@@ -315,8 +323,6 @@ static void game_init(tarasque_entity *self_data);
 
 static void game_init(tarasque_entity *self_data)
 {
-    (void) self_data;
-
     // game creation will go here
 }
 
@@ -331,8 +337,68 @@ const tarasque_specific_entity game_entity = {
         .data = NULL,
 };
 
-create the resources directory
+```
 
+### Organizing and using game resources
 
+create the resources directory :
 
 ```
+.
++-- res
+|
++-- src
+|   +-- ...
+|
++-- ...                         // your prefered toolchain here ?
+|
++-- tarasque
+|   +-- ...
+
+```
+
+This directory will hold our game resources such as images, sounds, etc. Basicaly, everything that must be packaged with the game for it to run, but isn't code.
+For now, we want to populate it with our background, starship, bullet, and enemy sprites :
+
+![almost decent background]()
+
+![crude sprite of a starship]()
+
+![crude sprite of a bullet]()
+
+![crude sprite of an alien vessel]()
+
+Just copy those sprites in the new `./res/` directory for now. To package those files with the game, we need to declare them to the engine :
+
+```c
+// main.c
+
+// ...
+
+#include "game/game.h"
+
+int main(void)
+{
+    tarasque_engine *handle = tarasque_engine_create();
+
+    tarasque_engine_declare_resource(handle, "default", "res/background.png");
+    tarasque_engine_declare_resource(handle, "default", "res/starship.png");
+    tarasque_engine_declare_resource(handle, "default", "res/bullet.png");
+    tarasque_engine_declare_resource(handle, "default", "res/alien.png");
+
+    // ...
+
+    tarasque_engine_run(handle, 60);
+
+    // ...
+}
+
+```
+
+Once the game is compiled and tested, you will notice that the *executable*, when ran, will create a folder `./program_data/` in which a new `default.data` file lives. This file is updated everytime the engine encounters a resource declaration, and contains all of the resources declared as part  of the `"default"` resource storage.
+
+This behavior is very inefficient and may induce stutter every time you launch your game. Fortunately, this only happens as long as you compile without the `TARASQUE_RELEASE` switch : if it were set, the game would just trust that the `default.data` file would exist and merely check that the declared resource exists in it. But as long as we are developping our game, we will live with it.
+
+### Basic background texture
+
+
