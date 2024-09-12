@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <math.h>
 
-#include "tarasque_common.h"
+#include "basilisk_common.h"
 
 
 // -------------------------------------------------------------------------------------------------
@@ -76,7 +76,7 @@ path *path_from_cstring(const char *str, allocator alloc)
 
     // allocating read data & output data
     source_string = identifier_create_base(str, alloc, false);
-    new_path = range_create_dynamic(alloc, sizeof(*new_path->data), TARASQUE_COLLECTIONS_START_LENGTH);
+    new_path = range_create_dynamic(alloc, sizeof(*new_path->data), BASILISK_COLLECTIONS_START_LENGTH);
 
     // search for tokens
     while (end_of_token < source_string->length) {

@@ -42,18 +42,18 @@ typedef struct BE_render_manager_sdl {
 // -------------------------------------------------------------------------------------------------
 
 /* Initailize the internals needed by a BE_render_manager_sdl entity. */
-static void BE_render_manager_sdl_init(tarasque_entity *self_data);
+static void BE_render_manager_sdl_init(basilisk_entity *self_data);
 
 /* Releases the ressources taken by a BE_render_manager_sdl. */
-static void BE_render_manager_sdl_deinit(tarasque_entity *self_data);
+static void BE_render_manager_sdl_deinit(basilisk_entity *self_data);
 
 /* Frame callback to make a BE_render_manager_sdl send drawing events. */
-static void BE_render_manager_sdl_on_frame(tarasque_entity *self_data, float elapsed_ms);
+static void BE_render_manager_sdl_on_frame(basilisk_entity *self_data, float elapsed_ms);
 
 /* Event callback enacting operations needed to draw on the screen later. */
-static void BE_render_manager_sdl_pre_draw(tarasque_entity *self_data, void *event_data);
+static void BE_render_manager_sdl_pre_draw(basilisk_entity *self_data, void *event_data);
 /* Event callback enacting operations needed to present the pixel buffer to the screen. */
-static void BE_render_manager_sdl_post_draw(tarasque_entity *self_data, void *event_data);
+static void BE_render_manager_sdl_post_draw(basilisk_entity *self_data, void *event_data);
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -67,7 +67,7 @@ static void BE_render_manager_sdl_post_draw(tarasque_entity *self_data, void *ev
  *
  * @param[inout] self_data pointer to a BE_render_manager_sdl object
  */
-static void BE_render_manager_sdl_init(tarasque_entity *self_data)
+static void BE_render_manager_sdl_init(basilisk_entity *self_data)
 {
     if (!self_data) {
         return;
@@ -75,15 +75,15 @@ static void BE_render_manager_sdl_init(tarasque_entity *self_data)
 
     BE_render_manager_sdl *init_data = (BE_render_manager_sdl *) self_data;
 
-    SDL_Window *parent_window = BE_window_sdl_get_window(tarasque_entity_get_parent(self_data, NULL, &BE_DEF_window_sdl));
+    SDL_Window *parent_window = BE_window_sdl_get_window(basilisk_entity_get_parent(self_data, NULL, &BE_DEF_window_sdl));
 
     init_data->renderer = SDL_CreateRenderer(parent_window, -1, init_data->flags);
 
     if (init_data->renderer) {
         init_data->buffer = SDL_CreateTexture(init_data->renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, (int) init_data->w, (int) init_data->h);
 
-        tarasque_entity_queue_subscribe_to_event(self_data, "sdl renderer pre draw",  (tarasque_specific_event_subscription) { .callback = &BE_render_manager_sdl_pre_draw });
-        tarasque_entity_queue_subscribe_to_event(self_data, "sdl renderer post draw", (tarasque_specific_event_subscription) { .callback = &BE_render_manager_sdl_post_draw });
+        basilisk_entity_queue_subscribe_to_event(self_data, "sdl renderer pre draw",  (basilisk_specific_event_subscription) { .callback = &BE_render_manager_sdl_pre_draw });
+        basilisk_entity_queue_subscribe_to_event(self_data, "sdl renderer post draw", (basilisk_specific_event_subscription) { .callback = &BE_render_manager_sdl_post_draw });
     }
 }
 
@@ -95,7 +95,7 @@ static void BE_render_manager_sdl_init(tarasque_entity *self_data)
  *
  * @param[inout] self_data pointer to a BE_render_manager_sdl object
  */
-static void BE_render_manager_sdl_deinit(tarasque_entity *self_data)
+static void BE_render_manager_sdl_deinit(basilisk_entity *self_data)
 {
     if (!self_data) {
         return;
@@ -117,7 +117,7 @@ static void BE_render_manager_sdl_deinit(tarasque_entity *self_data)
  * @param[inout] self_data pointer to a BE_render_manager_sdl object
  * @param[in] elapsed_ms number of milliseconds elapsed since last frame
  */
-static void BE_render_manager_sdl_on_frame(tarasque_entity *self_data, float elapsed_ms)
+static void BE_render_manager_sdl_on_frame(basilisk_entity *self_data, float elapsed_ms)
 {
     if (!self_data) {
         return;
@@ -125,9 +125,9 @@ static void BE_render_manager_sdl_on_frame(tarasque_entity *self_data, float ela
 
     BE_render_manager_sdl *data = (BE_render_manager_sdl *) self_data;
 
-    tarasque_entity_stack_event(self_data, "sdl renderer post draw", (tarasque_specific_event) { 0u });
-    tarasque_entity_stack_event(self_data, "sdl renderer draw", (tarasque_specific_event) { .data_size = sizeof(BE_render_manager_sdl_event_draw), .data = &(BE_render_manager_sdl_event_draw) { data->renderer } });
-    tarasque_entity_stack_event(self_data, "sdl renderer pre draw", (tarasque_specific_event) { 0u });
+    basilisk_entity_stack_event(self_data, "sdl renderer post draw", (basilisk_specific_event) { 0u });
+    basilisk_entity_stack_event(self_data, "sdl renderer draw", (basilisk_specific_event) { .data_size = sizeof(BE_render_manager_sdl_event_draw), .data = &(BE_render_manager_sdl_event_draw) { data->renderer } });
+    basilisk_entity_stack_event(self_data, "sdl renderer pre draw", (basilisk_specific_event) { 0u });
 }
 
 /**
@@ -139,7 +139,7 @@ static void BE_render_manager_sdl_on_frame(tarasque_entity *self_data, float ela
  * @param[inout] self_data pointer to a BE_render_manager_sdl object
  * @param[in] event_data discarded event data
  */
-static void BE_render_manager_sdl_pre_draw(tarasque_entity *self_data, void *event_data)
+static void BE_render_manager_sdl_pre_draw(basilisk_entity *self_data, void *event_data)
 {
     (void) event_data;
 
@@ -163,7 +163,7 @@ static void BE_render_manager_sdl_pre_draw(tarasque_entity *self_data, void *eve
  * @param[inout] self_data pointer to a BE_render_manager_sdl object
  * @param[in] event_data discarded event data
  */
-static void BE_render_manager_sdl_post_draw(tarasque_entity *self_data, void *event_data)
+static void BE_render_manager_sdl_post_draw(basilisk_entity *self_data, void *event_data)
 {
     (void) event_data;
 
@@ -187,7 +187,7 @@ static void BE_render_manager_sdl_post_draw(tarasque_entity *self_data, void *ev
 /**
  * @brief Returns a statically allocated BE_render_manager_sdl object constructed from the given configuration.
  * Successive calls to this function will always yield the same object, with some eventual differing content (depending on the given arguments).
- * Use this to build new BE_render_manager_sdl entity instances with a call to `tarasque_entity_add_child()` that will copy the data inside the returned object.
+ * Use this to build new BE_render_manager_sdl entity instances with a call to `basilisk_entity_add_child()` that will copy the data inside the returned object.
  *
  * @see BE_render_manager_sdl, BE_DEF_render_manager_sdl, BE_window_sdl
  *
@@ -195,9 +195,9 @@ static void BE_render_manager_sdl_post_draw(tarasque_entity *self_data, void *ev
  * @param[in] w width, in pixels, of the renderer's buffer ; a value of 0 will make it match the size of the parent window
  * @param[in] h height, in pixels,  of the renderer's buffer ; a value of 0 will make it match the size of the parent window
  * @param[in] flags SDL-specific renderer flags
- * @return tarasque_entity *
+ * @return basilisk_entity *
  */
-tarasque_entity *BE_STATIC_render_manager_sdl(SDL_Color clear_color, size_t w, size_t h, SDL_RendererFlags flags)
+basilisk_entity *BE_STATIC_render_manager_sdl(SDL_Color clear_color, size_t w, size_t h, SDL_RendererFlags flags)
 {
     static BE_render_manager_sdl buffer = { 0u };
 
@@ -226,7 +226,7 @@ tarasque_entity *BE_STATIC_render_manager_sdl(SDL_Color clear_color, size_t w, s
  * @see BE_render_manager_sdl, BE_STATIC_render_manager_sdl, BE_window_sdl, BE_render_manager_sdl_event_draw
  *
  */
-const tarasque_entity_definition BE_DEF_render_manager_sdl = {
+const basilisk_entity_definition BE_DEF_render_manager_sdl = {
         .data_size = sizeof(BE_render_manager_sdl),
         .on_init = &BE_render_manager_sdl_init,
         .on_frame = &BE_render_manager_sdl_on_frame,

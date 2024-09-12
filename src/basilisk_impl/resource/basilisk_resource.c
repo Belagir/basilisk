@@ -10,9 +10,9 @@
  */
 #include <ustd/sorting.h>
 
-#include "tarasque_resource.h"
+#include "basilisk_resource.h"
 
-#include "resource_storage/tarasque_resource_storage.h"
+#include "resource_storage/basilisk_resource_storage.h"
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -45,7 +45,7 @@ resource_manager *resource_manager_create(allocator alloc)
 
     if (new_res_manager) {
         *new_res_manager = (resource_manager) {
-            .storages = range_create_dynamic(alloc, sizeof(*new_res_manager->storages->data), TARASQUE_COLLECTIONS_START_LENGTH),
+            .storages = range_create_dynamic(alloc, sizeof(*new_res_manager->storages->data), BASILISK_COLLECTIONS_START_LENGTH),
         };
     }
 
@@ -146,7 +146,7 @@ void *resource_manager_fetch(resource_manager *res_manager, const char *str_stor
  * @param[in] entity Entity object added as supplicant, the value of the memory location is used to identify it.
  * @param[inout] alloc Allocator used for the eventual resource loading.
  */
-void resource_manager_add_supplicant(resource_manager *res_manager, const char *str_storage_path, tarasque_entity *entity, allocator alloc)
+void resource_manager_add_supplicant(resource_manager *res_manager, const char *str_storage_path, basilisk_entity *entity, allocator alloc)
 {
     size_t found_storage_index = 0u;
     u32 storage_name_hash = 0u;
@@ -169,7 +169,7 @@ void resource_manager_add_supplicant(resource_manager *res_manager, const char *
  * @param[in] str_storage_path Path to the storage file the entity withdraws from.
  * @param[inout] alloc Allocator used for the eventual resource unloading.
  */
-void resource_manager_remove_supplicant(resource_manager *res_manager, tarasque_entity *entity, allocator alloc)
+void resource_manager_remove_supplicant(resource_manager *res_manager, basilisk_entity *entity, allocator alloc)
 {
     if (!res_manager) {
         return;

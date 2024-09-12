@@ -39,11 +39,11 @@ typedef struct BE_window_sdl {
 // -------------------------------------------------------------------------------------------------
 
 /* Creates a new window. */
-static void BE_window_sdl_init(tarasque_entity *self_data);
+static void BE_window_sdl_init(basilisk_entity *self_data);
 /* Closes the window associated with the SDL Window entity. */
-static void BE_window_sdl_deinit(tarasque_entity *self_data);
+static void BE_window_sdl_deinit(basilisk_entity *self_data);
 /* Callback for the special "sdl event quit" used to remove this entity. See the SDL Event Relay entity (BE_sdl_event_relay). */
-static void BE_window_sdl_quit(tarasque_entity *self_data, void *event_data);
+static void BE_window_sdl_quit(basilisk_entity *self_data, void *event_data);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -54,7 +54,7 @@ static void BE_window_sdl_quit(tarasque_entity *self_data, void *event_data);
  *
  * @param[inout] self_data points to some SDL Window entity data
  */
-static void BE_window_sdl_init(tarasque_entity *self_data)
+static void BE_window_sdl_init(basilisk_entity *self_data)
 {
     if (!self_data) {
         return;
@@ -70,7 +70,7 @@ static void BE_window_sdl_init(tarasque_entity *self_data)
             (int) window_data->w, (int) window_data->h,
             window_data->flags);
 
-    tarasque_entity_queue_subscribe_to_event(self_data, "sdl event quit", (tarasque_specific_event_subscription) { .callback = &BE_window_sdl_quit });
+    basilisk_entity_queue_subscribe_to_event(self_data, "sdl event quit", (basilisk_specific_event_subscription) { .callback = &BE_window_sdl_quit });
 }
 
 /**
@@ -78,7 +78,7 @@ static void BE_window_sdl_init(tarasque_entity *self_data)
  *
  * @param[inout] self_data pointer to a BE_window_sdl object
  */
-static void BE_window_sdl_deinit(tarasque_entity *self_data)
+static void BE_window_sdl_deinit(basilisk_entity *self_data)
 {
     if (!self_data) {
         return;
@@ -97,9 +97,9 @@ static void BE_window_sdl_deinit(tarasque_entity *self_data)
  *
  * @param[inout] self_data pointer to a BE_window_sdl object
  */
-static void BE_window_sdl_quit(tarasque_entity *self_data, void *event_data)
+static void BE_window_sdl_quit(basilisk_entity *self_data, void *event_data)
 {
-    tarasque_entity_queue_remove(self_data);
+    basilisk_entity_queue_remove(self_data);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -109,7 +109,7 @@ static void BE_window_sdl_quit(tarasque_entity *self_data, void *event_data)
 /**
  * @brief Returns a statically allocated BE_window_sdl object constructed from the given properties.
  * Successive calls to this function will always yield the same object, with some eventual differing content (depending on the given arguments).
- * Use this to build new BE_window_sdl instances with a call to `tarasque_entity_add_child()` that will copy the data inside the returned object.
+ * Use this to build new BE_window_sdl instances with a call to `basilisk_entity_add_child()` that will copy the data inside the returned object.
  *
  * @see BE_window_sdl, BE_DEF_window_sdl
  *
@@ -119,9 +119,9 @@ static void BE_window_sdl_quit(tarasque_entity *self_data, void *event_data)
  * @param[in] x horizontal position, in pixels, of the window on the screen ; might be a SDL-specific value like SDL_WINDOWPOS_CENTERED
  * @param[in] y vertical position, in pixels, of the window on the screen ; might be a SDL-specific value like SDL_WINDOWPOS_CENTERED
  * @param[in] flags SDL-specific window flags
- * @return tarasque_entity *
+ * @return basilisk_entity *
  */
-tarasque_entity *BE_STATIC_window_sdl(const char *title, size_t w, size_t h, size_t x, size_t y, SDL_WindowFlags flags)
+basilisk_entity *BE_STATIC_window_sdl(const char *title, size_t w, size_t h, size_t x, size_t y, SDL_WindowFlags flags)
 {
     static BE_window_sdl buffer = { 0u };
 
@@ -160,7 +160,7 @@ SDL_Window *BE_window_sdl_get_window(BE_window_sdl *window_entity)
  *
  * It might be a child of a BE_sdl_context entity.
  */
-const tarasque_entity_definition BE_DEF_window_sdl = {
+const basilisk_entity_definition BE_DEF_window_sdl = {
         .data_size = sizeof(BE_window_sdl),
 
         .on_init = &BE_window_sdl_init,

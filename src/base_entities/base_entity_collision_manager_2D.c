@@ -34,13 +34,13 @@ typedef struct BE_collision_manager_2D {
 // -------------------------------------------------------------------------------------------------
 
 /* Initialisation callback for the BE_collision_manager_2D entity. */
-static void BE_collision_manager_2D_init(tarasque_entity *self_data);
+static void BE_collision_manager_2D_init(basilisk_entity *self_data);
 
 /* Deinitialisation callback for the BE_collision_manager_2D entity. */
-static void BE_collision_manager_2D_deinit(tarasque_entity *self_data);
+static void BE_collision_manager_2D_deinit(basilisk_entity *self_data);
 
 /* Frame callback for the for the BE_collision_manager_2D entity. */
-static void BE_collision_manager_2D_frame(tarasque_entity *self_data, float elapsed_time);
+static void BE_collision_manager_2D_frame(basilisk_entity *self_data, float elapsed_time);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -93,7 +93,7 @@ void BE_collision_manager_2D_unregister_shape(BE_collision_manager_2D *collision
  *
  * @param[in] self_data pointer to a BE_collision_manager_2D object.
  */
-static void BE_collision_manager_2D_init(tarasque_entity *self_data)
+static void BE_collision_manager_2D_init(basilisk_entity *self_data)
 {
     BE_collision_manager_2D *col_manager = (BE_collision_manager_2D *) self_data;
 
@@ -105,7 +105,7 @@ static void BE_collision_manager_2D_init(tarasque_entity *self_data)
  *
  * @param[in] self_data pointer to a BE_collision_manager_2D object.
  */
-static void BE_collision_manager_2D_deinit(tarasque_entity *self_data)
+static void BE_collision_manager_2D_deinit(basilisk_entity *self_data)
 {
     BE_collision_manager_2D *col_manager = (BE_collision_manager_2D *) self_data;
 
@@ -118,7 +118,7 @@ static void BE_collision_manager_2D_deinit(tarasque_entity *self_data)
  * @param[in] self_data pointer to a BE_collision_manager_2D object.
  * @param[in] elapsed_time milliseconds elapsed since the last frame.
  */
-static void BE_collision_manager_2D_frame(tarasque_entity *self_data, float elapsed_time)
+static void BE_collision_manager_2D_frame(basilisk_entity *self_data, float elapsed_time)
 {
     BE_collision_manager_2D *col_manager = (BE_collision_manager_2D *) self_data;
     BE_shape_2D_collider *shape_1 = NULL;
@@ -164,9 +164,9 @@ static collision_2D_info collision_2D_info_reflect(collision_2D_info info)
  *
  * @see BE_DEF_collision_manager_2D, BE_collision_manager_2D, BE_shape_2D_collider
  *
- * @return tarasque_entity *
+ * @return basilisk_entity *
  */
-tarasque_entity *BE_STATIC_collision_manager_2D(void)
+basilisk_entity *BE_STATIC_collision_manager_2D(void)
 {
     return NULL;
 }
@@ -180,7 +180,7 @@ tarasque_entity *BE_STATIC_collision_manager_2D(void)
  * @see BE_collision_manager_2D, BE_STATIC_collision_manager_2D, BE_shape_2D_collider
  *
  */
-const tarasque_entity_definition BE_DEF_collision_manager_2D = {
+const basilisk_entity_definition BE_DEF_collision_manager_2D = {
         .data_size = sizeof(BE_collision_manager_2D),
 
         .on_init = &BE_collision_manager_2D_init,

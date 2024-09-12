@@ -5,7 +5,7 @@
 
 ## Name of the project. This will be the name of the executable placed in the
 ## executable directory.
-PROJECT_NAME = tarasque
+PROJECT_NAME = basilisk
 ## Submodules the project depends on. The script will assume the subprojects
 ## have an 'inc/' directory object files can be pulled from after running
 ## make -C in the submodule.

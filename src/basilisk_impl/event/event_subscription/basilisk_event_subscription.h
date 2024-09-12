@@ -11,9 +11,9 @@
 #ifndef __EVENT_SUBSCRIPTION_H__
 #define __EVENT_SUBSCRIPTION_H__
 
-#include "../../tarasque_common.h"
-#include "../../event/tarasque_event.h"
-#include "../../entity/tarasque_entity.h"
+#include "../../basilisk_common.h"
+#include "../../event/basilisk_event.h"
+#include "../../entity/basilisk_entity.h"
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -26,9 +26,9 @@ typedef struct event_subscription {
 
     i32 index;
     /** Reference to an entity thye callback is linked to */
-    tarasque_engine_entity *subscribed;
+    basilisk_engine_entity *subscribed;
     /** Pointer to some callback function to execute code on an event reception. */
-    tarasque_specific_event_subscription subscription_data;
+    basilisk_specific_event_subscription subscription_data;
 } event_subscription;
 
 /**
@@ -55,13 +55,13 @@ void event_subscription_list_destroy(event_subscription_list *list, allocator al
 // -------------------------------------------------------------------------------------------------
 
 /* Inserts a new entry in the callback list. */
-void event_subscription_list_append(event_subscription_list *list, tarasque_engine_entity *subscribed, tarasque_specific_event_subscription subscription_data, allocator alloc);
+void event_subscription_list_append(event_subscription_list *list, basilisk_engine_entity *subscribed, basilisk_specific_event_subscription subscription_data, allocator alloc);
 
 /* Removes an entry from the callback list. */
-void event_subscription_list_remove(event_subscription_list *list, tarasque_engine_entity *subscribed, tarasque_specific_event_subscription subscription_data);
+void event_subscription_list_remove(event_subscription_list *list, basilisk_engine_entity *subscribed, basilisk_specific_event_subscription subscription_data);
 
 /* Removes all entries tied to some entity. */
-void event_subscription_list_remove_all_from(event_subscription_list *list, tarasque_engine_entity *subscribed);
+void event_subscription_list_remove_all_from(event_subscription_list *list, basilisk_engine_entity *subscribed);
 
 // -------------------------------------------------------------------------------------------------
 

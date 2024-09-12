@@ -18,9 +18,9 @@
 // -------------------------------------------------------------------------------------------------
 
 /* Initialise a minimal SDL library configuration. */
-static void BE_context_sdl_init(tarasque_entity *self_data);
+static void BE_context_sdl_init(basilisk_entity *self_data);
 /* Quits the SDL library instance. */
-static void BE_context_sdl_deinit(tarasque_entity *self_data);
+static void BE_context_sdl_deinit(basilisk_entity *self_data);
 
 // TODO : make the entity accept empty "log SDL Error" event
 
@@ -34,7 +34,7 @@ static void BE_context_sdl_deinit(tarasque_entity *self_data);
  *
  * @param[in] self_data discarded entity data
  */
-static void BE_context_sdl_init(tarasque_entity *self_data)
+static void BE_context_sdl_init(basilisk_entity *self_data)
 {
     (void) self_data;
 
@@ -47,7 +47,7 @@ static void BE_context_sdl_init(tarasque_entity *self_data)
  *
  * @param[in] self_data discarded entity data
  */
-static void BE_context_sdl_deinit(tarasque_entity *self_data)
+static void BE_context_sdl_deinit(basilisk_entity *self_data)
 {
     (void) self_data;
 
@@ -66,9 +66,9 @@ static void BE_context_sdl_deinit(tarasque_entity *self_data)
  *
  * @see BE_DEF_context_sdl
  *
- * @return tarasque_entity *
+ * @return basilisk_entity *
  */
-tarasque_entity *BE_STATIC_context_sdl(void)
+basilisk_entity *BE_STATIC_context_sdl(void)
 {
     return NULL;
 }
@@ -85,7 +85,7 @@ tarasque_entity *BE_STATIC_context_sdl(void)
  * @see BE_STATIC_context_sdl
  *
  */
-const tarasque_entity_definition BE_DEF_context_sdl = {
+const basilisk_entity_definition BE_DEF_context_sdl = {
         .on_init = &BE_context_sdl_init,
         .on_deinit = &BE_context_sdl_deinit,
 };

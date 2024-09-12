@@ -11,10 +11,10 @@
  *
  */
 
-#ifndef __TARASQUE_RESOURCE_H__
-#define __TARASQUE_RESOURCE_H__
+#ifndef __BASILISK_RESOURCE_H__
+#define __BASILISK_RESOURCE_H__
 
-#include <tarasque.h>
+#include <basilisk.h>
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -42,10 +42,10 @@ bool resource_manager_touch(resource_manager *res_manager, const char *str_stora
 void *resource_manager_fetch(resource_manager *res_manager, const char *str_storage_path, const char *str_res_path, size_t *out_size);
 
 /* Registers an entity as using a storage, adding it as a supplicant to the storage. If it is the first supplicant, the storage is loaded. */
-void resource_manager_add_supplicant(resource_manager *res_manager, const char *str_storage_path, tarasque_entity *entity, allocator alloc);
+void resource_manager_add_supplicant(resource_manager *res_manager, const char *str_storage_path, basilisk_entity *entity, allocator alloc);
 
 /* Removes an entity as using a storage. If it was the last supplicant, the storage is unloaded. */
-void resource_manager_remove_supplicant(resource_manager *res_manager, tarasque_entity *entity, allocator alloc);
+void resource_manager_remove_supplicant(resource_manager *res_manager, basilisk_entity *entity, allocator alloc);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------

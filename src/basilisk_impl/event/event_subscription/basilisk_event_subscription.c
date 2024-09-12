@@ -8,7 +8,7 @@
  * @copyright Copyright (c) 2024
  *
  */
-#include "tarasque_event_subscription.h"
+#include "basilisk_event_subscription.h"
 
 #include <ustd/sorting.h>
 
@@ -40,7 +40,7 @@ event_subscription_list event_subscription_list_create(identifier *event_name, a
 
     new_list = (event_subscription_list) {
             .event_name = range_create_dynamic_from_copy_of(alloc, RANGE_TO_ANY(event_name)),
-            .subscription_list = range_create_dynamic(alloc, sizeof(*(new_list.subscription_list->data)), TARASQUE_COLLECTIONS_START_LENGTH),
+            .subscription_list = range_create_dynamic(alloc, sizeof(*(new_list.subscription_list->data)), BASILISK_COLLECTIONS_START_LENGTH),
     };
 
     return new_list;
@@ -74,7 +74,7 @@ void event_subscription_list_destroy(event_subscription_list *list, allocator al
  * @param[in] subscription_data Data about the function called to receive the event.
  * @param[inout] alloc Allocator used to eventually extend the list.
  */
-void event_subscription_list_append(event_subscription_list *list, tarasque_engine_entity *subscribed, tarasque_specific_event_subscription subscription_data, allocator alloc)
+void event_subscription_list_append(event_subscription_list *list, basilisk_engine_entity *subscribed, basilisk_specific_event_subscription subscription_data, allocator alloc)
 {
     if (!list || !subscribed || !subscription_data.callback) {
         return;
@@ -94,7 +94,7 @@ void event_subscription_list_append(event_subscription_list *list, tarasque_engi
  * @param[in] subscribed Entity that subscribed a callback.
  * @param[in] subscription_data Data about the function called to receive the event.
  */
-void event_subscription_list_remove(event_subscription_list *list, tarasque_engine_entity *subscribed, tarasque_specific_event_subscription subscription_data)
+void event_subscription_list_remove(event_subscription_list *list, basilisk_engine_entity *subscribed, basilisk_specific_event_subscription subscription_data)
 {
     if (!list || !subscribed) {
         return;
@@ -112,7 +112,7 @@ void event_subscription_list_remove(event_subscription_list *list, tarasque_engi
  * @param[inout] list List containing the elements to remove.
  * @param[in] subscribed Entity that subscribed a (some) callback(s).
  */
-void event_subscription_list_remove_all_from(event_subscription_list *list, tarasque_engine_entity *subscribed)
+void event_subscription_list_remove_all_from(event_subscription_list *list, basilisk_engine_entity *subscribed)
 {
     // size_t subs_index = 0u;
     size_t pos = 0u;
@@ -150,7 +150,7 @@ void event_subscription_list_publish(event_subscription_list *list, event ev)
     for (size_t i = 0u ; i < list->subscription_list->length ; i++) {
         tmp_sub = list->subscription_list->data[i];
         if (tmp_sub.subscription_data.callback) {
-            tarasque_engine_entity_send_event(tmp_sub.subscribed, tmp_sub.subscription_data, ev.data);
+            basilisk_engine_entity_send_event(tmp_sub.subscribed, tmp_sub.subscription_data, ev.data);
         }
     }
 }

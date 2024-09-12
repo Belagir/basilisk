@@ -38,10 +38,10 @@ typedef struct BE_body_2D {
 // -------------------------------------------------------------------------------------------------
 
 /* BE_body_2D initialisation callback. */
-static void BE_body_2D_init(tarasque_entity *self_data);
+static void BE_body_2D_init(basilisk_entity *self_data);
 
 /* BE_body_2D time step callback.*/
-static void BE_body_2D_on_frame(tarasque_entity *self_data, float elapsed_ms);
+static void BE_body_2D_on_frame(basilisk_entity *self_data, float elapsed_ms);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -60,7 +60,7 @@ static void BE_body_2D_update(BE_body_2D *body);
  *
  * @param[inout] self_data pointer to a BE_body_2D object
  */
-static void BE_body_2D_init(tarasque_entity *self_data)
+static void BE_body_2D_init(basilisk_entity *self_data)
 {
     if (!self_data) {
         return;
@@ -68,7 +68,7 @@ static void BE_body_2D_init(tarasque_entity *self_data)
 
     BE_body_2D *self_body = (BE_body_2D *) self_data;
 
-    self_body->previous = tarasque_entity_get_parent(self_data, NULL, &BE_DEF_body_2D);
+    self_body->previous = basilisk_entity_get_parent(self_data, NULL, &BE_DEF_body_2D);
     BE_body_2D_update(self_body);
 }
 
@@ -79,7 +79,7 @@ static void BE_body_2D_init(tarasque_entity *self_data)
  * @param[inout] self_data pointer to a BE_body_2D object
  * @param[in] elapsed_ms number of milliseconds that passed since the last frame
  */
-static void BE_body_2D_on_frame(tarasque_entity *self_data, float elapsed_ms)
+static void BE_body_2D_on_frame(basilisk_entity *self_data, float elapsed_ms)
 {
     (void) elapsed_ms;
 
@@ -191,14 +191,14 @@ void BE_body_2D_translate(BE_body_2D *body_2D, vector2_t change)
 /**
  * @brief Returns a statically allocated BE_body_2D object constructed from the given properties.
  * Successive calls to this function will always yield the same object, with some eventual differing content (depending on the given arguments).
- * Use this to build new BE_body_2D entity instances with a call to `tarasque_entity_add_child()` that will copy the data inside the returned object.
+ * Use this to build new BE_body_2D entity instances with a call to `basilisk_entity_add_child()` that will copy the data inside the returned object.
  *
  * @see BE_body_2D, BE_DEF_body_2D
  *
  * @param[in] properties starting local position of the body
- * @return tarasque_entity*
+ * @return basilisk_entity*
  */
-tarasque_entity *BE_STATIC_body_2D(properties_2D properties)
+basilisk_entity *BE_STATIC_body_2D(properties_2D properties)
 {
     static BE_body_2D buffer = { 0u };
 
@@ -226,7 +226,7 @@ tarasque_entity *BE_STATIC_body_2D(properties_2D properties)
  * @see BE_STATIC_body_2D, BE_body_2D
  *
  */
-const tarasque_entity_definition BE_DEF_body_2D = {
+const basilisk_entity_definition BE_DEF_body_2D = {
         .data_size = sizeof(BE_body_2D),
         .on_init = BE_body_2D_init,
         .on_frame = &BE_body_2D_on_frame,

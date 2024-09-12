@@ -33,10 +33,10 @@ typedef struct BE_shape_2D_collider {
 // -------------------------------------------------------------------------------------------------
 
 /* Initialisation callback for a BE_shape_2D_collider entity. */
-static void BE_shape_2D_collider_init(tarasque_entity *self_data);
+static void BE_shape_2D_collider_init(basilisk_entity *self_data);
 
 /* De-initialisation callback for a BE_shape_2D_collider entity. */
-static void BE_shape_2D_collider_deinit(tarasque_entity *self_data);
+static void BE_shape_2D_collider_deinit(basilisk_entity *self_data);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -47,14 +47,14 @@ static void BE_shape_2D_collider_deinit(tarasque_entity *self_data);
  *
  * @param[inout] self_data pointer to a BE_shape_2D_collider object.
  */
-static void BE_shape_2D_collider_init(tarasque_entity *self_data)
+static void BE_shape_2D_collider_init(basilisk_entity *self_data)
 {
     BE_shape_2D_collider *collider = (BE_shape_2D_collider *) self_data;
 
-    collider->monitored = tarasque_entity_get_parent(collider, NULL, &BE_DEF_shape_2D);
+    collider->monitored = basilisk_entity_get_parent(collider, NULL, &BE_DEF_shape_2D);
 
     if (collider->monitored) {
-        collider->manager = tarasque_entity_get_parent(collider, NULL, &BE_DEF_collision_manager_2D);
+        collider->manager = basilisk_entity_get_parent(collider, NULL, &BE_DEF_collision_manager_2D);
         BE_collision_manager_2D_register_shape(collider->manager, collider);
     }
 }
@@ -64,7 +64,7 @@ static void BE_shape_2D_collider_init(tarasque_entity *self_data)
  *
  * @param[inout] self_data pointer to a BE_shape_2D_collider object.
  */
-static void BE_shape_2D_collider_deinit(tarasque_entity *self_data)
+static void BE_shape_2D_collider_deinit(basilisk_entity *self_data)
 {
     BE_shape_2D_collider *collider = (BE_shape_2D_collider *) self_data;
 
@@ -167,9 +167,9 @@ void BE_shape_2D_collider_exec_callback(BE_shape_2D_collider *hit, BE_shape_2D_c
  *
  * @see BE_DEF_shape_2D_collider, BE_shape_2D_collider
  *
- * @return tarasque_entity *
+ * @return basilisk_entity *
  */
-tarasque_entity *BE_STATIC_shape_2D_collider(void)
+basilisk_entity *BE_STATIC_shape_2D_collider(void)
 {
     return NULL;
 }
@@ -188,7 +188,7 @@ tarasque_entity *BE_STATIC_shape_2D_collider(void)
  * @see BE_STATIC_shape_2D_collider, BE_shape_2D_collider
  *
  */
-const tarasque_entity_definition BE_DEF_shape_2D_collider = {
+const basilisk_entity_definition BE_DEF_shape_2D_collider = {
         .data_size = sizeof(BE_shape_2D_collider),
 
         .on_init = &BE_shape_2D_collider_init, // register to a parent collision manager

@@ -8,20 +8,20 @@
  * @copyright Copyright (c) 2024
  *
  */
-#ifndef __TARASQUE_COMMON_H__
-#define __TARASQUE_COMMON_H__
+#ifndef __BASILISK_COMMON_H__
+#define __BASILISK_COMMON_H__
 
 #include <ustd/allocation.h>
 #include <ustd/range.h>
 
-#include <tarasque.h>
+#include <basilisk.h>
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
 /// Starting number of items of all collections used by the engine.
-#define TARASQUE_COLLECTIONS_START_LENGTH (8)
+#define BASILISK_COLLECTIONS_START_LENGTH (8)
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------

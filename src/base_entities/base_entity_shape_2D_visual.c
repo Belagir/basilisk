@@ -38,10 +38,10 @@ typedef struct BE_shape_2D_visual {
 static void BE_shape_2D_visual_render_draw_circle(SDL_Renderer *renderer, vector2_t center, f32 radius);
 
 /* Initialisation callback for a BE_shape_2D_visual entity. */
-static void BE_shape_2D_visual_on_init(tarasque_entity *self_data);
+static void BE_shape_2D_visual_on_init(basilisk_entity *self_data);
 
 /* Draw event callback for a BE_shape_2D_visual entity. */
-static void BE_shape_2D_visual_on_draw(tarasque_entity *self_data, void *event_data);
+static void BE_shape_2D_visual_on_draw(basilisk_entity *self_data, void *event_data);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -95,15 +95,15 @@ static void BE_shape_2D_visual_render_draw_circle(SDL_Renderer *renderer, vector
  *
  * @param[inout] self_data pointer to a BE_DEF_shape_2D object
  */
-static void BE_shape_2D_visual_on_init(tarasque_entity *self_data)
+static void BE_shape_2D_visual_on_init(basilisk_entity *self_data)
 {
     BE_shape_2D_visual *visual = (BE_shape_2D_visual *) self_data;
 
-    visual->visualized = tarasque_entity_get_parent(visual, NULL, &BE_DEF_shape_2D);
+    visual->visualized = basilisk_entity_get_parent(visual, NULL, &BE_DEF_shape_2D);
 
     if (visual->visualized) {
-        tarasque_entity_queue_subscribe_to_event(visual, "sdl renderer draw",
-                (tarasque_specific_event_subscription) { .callback = &BE_shape_2D_visual_on_draw, .index = visual->draw_index, });
+        basilisk_entity_queue_subscribe_to_event(visual, "sdl renderer draw",
+                (basilisk_specific_event_subscription) { .callback = &BE_shape_2D_visual_on_draw, .index = visual->draw_index, });
     }
 }
 
@@ -114,7 +114,7 @@ static void BE_shape_2D_visual_on_init(tarasque_entity *self_data)
  * @param[inout] self_data pointer to a BE_DEF_shape_2D object
  * @param[inout] event_data pointer to a BE_render_manager_sdl_event_draw` object
  */
-static void BE_shape_2D_visual_on_draw(tarasque_entity *self_data, void *event_data)
+static void BE_shape_2D_visual_on_draw(basilisk_entity *self_data, void *event_data)
 {
     BE_shape_2D_visual *visual = (BE_shape_2D_visual *) self_data;
     BE_render_manager_sdl_event_draw *event_draw = (BE_render_manager_sdl_event_draw *) event_data;
@@ -144,15 +144,15 @@ static void BE_shape_2D_visual_on_draw(tarasque_entity *self_data, void *event_d
 /**
  * @brief Returns a statically allocated BE_shape_2D_visual constructed as an axis-aligned rectangle.
  * Successive calls to this function will always yield the same object, with some eventual differing content (depending on the given arguments).
- * Use this to build new BE_shape_2D_visual instances with a call to `tarasque_entity_add_child()` that will copy the data inside the returned object.
+ * Use this to build new BE_shape_2D_visual instances with a call to `basilisk_entity_add_child()` that will copy the data inside the returned object.
  *
  * @see BE_shape_2D_visual, BE_DEF_shape_2D_visual, BE_shape_2D
  *
  * @param[in] color color of the drawn shape
  * @param[in] draw_index drazw index of the drawn shape
- * @return tarasque_entity *
+ * @return basilisk_entity *
  */
-tarasque_entity *BE_STATIC_shape_2D_visual(SDL_Color color, i32 draw_index)
+basilisk_entity *BE_STATIC_shape_2D_visual(SDL_Color color, i32 draw_index)
 {
     static BE_shape_2D_visual buffer = { 0u };
 
@@ -178,7 +178,7 @@ tarasque_entity *BE_STATIC_shape_2D_visual(SDL_Color color, i32 draw_index)
  * @see BE_shape_2D_visual, BE_STATIC_shape_2D_visual, BE_shape_2D
  *
  */
-const tarasque_entity_definition BE_DEF_shape_2D_visual = {
+const basilisk_entity_definition BE_DEF_shape_2D_visual = {
         .data_size = sizeof(BE_shape_2D_visual),
 
         .on_init = &BE_shape_2D_visual_on_init,

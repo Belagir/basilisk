@@ -8,12 +8,12 @@
  * @copyright Copyright (c) 2024
  *
  */
-#ifndef __TARASQUE_BASE_ENTITIES_SDL_ENTITIES_H__
-#define __TARASQUE_BASE_ENTITIES_SDL_ENTITIES_H__
+#ifndef __BASILISK_BASE_ENTITIES_SDL_ENTITIES_H__
+#define __BASILISK_BASE_ENTITIES_SDL_ENTITIES_H__
 
 #include <SDL2/SDL.h>
 #include "../unstandard/inc/ustd/math2d.h"
-#include "tarasque.h"
+#include "basilisk.h"
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -67,10 +67,10 @@ typedef struct shape_2D_rect {
 // Manage the SDL library initialisation and exit. This is not a necessary parent for other SDL-related entities, but provides a clean lifetime to SDL modules.
 
 /* Entity definition of a SDL context, managing the broader SDL lifetime. */
-extern const tarasque_entity_definition BE_DEF_context_sdl;
+extern const basilisk_entity_definition BE_DEF_context_sdl;
 
 /* Returns statically-allocated SDL Context entity data, used to give the engine data to copy for instanciation. */
-tarasque_entity *BE_STATIC_context_sdl(void);
+basilisk_entity *BE_STATIC_context_sdl(void);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -84,10 +84,10 @@ typedef struct BE_event_relay_sdl BE_event_relay_sdl;
 // -------------------------------------------------------------------------------------------------
 
 /* Entity definition of a SDL event relay, sending back events polled from the SDL library on the event stack. */
-extern const tarasque_entity_definition BE_DEF_event_relay_sdl;
+extern const basilisk_entity_definition BE_DEF_event_relay_sdl;
 
 /* Returns statically-allocated SDL event relay entity data, used to give the engine data to copy for instanciation. */
-tarasque_entity *BE_STATIC_event_relay_sdl(void);
+basilisk_entity *BE_STATIC_event_relay_sdl(void);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -101,10 +101,10 @@ typedef struct BE_window_sdl BE_window_sdl;
 // -------------------------------------------------------------------------------------------------
 
 /* Entity definition of a SDL window, that creates a desktop window.*/
-extern const tarasque_entity_definition BE_DEF_window_sdl;
+extern const basilisk_entity_definition BE_DEF_window_sdl;
 
 /* Returns statically-allocated SDL window entity data, used to give the engine data to copy for instanciation. */
-tarasque_entity *BE_STATIC_window_sdl(const char *title, size_t w, size_t h, size_t x, size_t y, SDL_WindowFlags flags);
+basilisk_entity *BE_STATIC_window_sdl(const char *title, size_t w, size_t h, size_t x, size_t y, SDL_WindowFlags flags);
 
 // -------------------------------------------------------------------------------------------------
 
@@ -132,10 +132,10 @@ typedef struct BE_render_manager_sdl BE_render_manager_sdl;
 // -------------------------------------------------------------------------------------------------
 
 /* Entity definition of a SDL render manager, that sends draw events through the game tree to draw content onto a window. */
-extern const tarasque_entity_definition BE_DEF_render_manager_sdl;
+extern const basilisk_entity_definition BE_DEF_render_manager_sdl;
 
 /* Returns statically-allocated SDL render manager entity data, used to give the engine data to copy for instanciation. */
-tarasque_entity *BE_STATIC_render_manager_sdl(SDL_Color clear_color, size_t w, size_t h, SDL_RendererFlags flags);
+basilisk_entity *BE_STATIC_render_manager_sdl(SDL_Color clear_color, size_t w, size_t h, SDL_RendererFlags flags);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -149,10 +149,10 @@ typedef struct BE_body_2D BE_body_2D;
 // -------------------------------------------------------------------------------------------------
 
 /* Entity definition of an object that is positioned in a 2D space. */
-extern const tarasque_entity_definition BE_DEF_body_2D;
+extern const basilisk_entity_definition BE_DEF_body_2D;
 
 /* Returns statically-allocated body 2D data, used to give the engine data to copy for instanciation. */
-tarasque_entity *BE_STATIC_body_2D(properties_2D properties);
+basilisk_entity *BE_STATIC_body_2D(properties_2D properties);
 
 // -------------------------------------------------------------------------------------------------
 
@@ -177,10 +177,10 @@ typedef struct BE_texture_2D BE_texture_2D;
 // -------------------------------------------------------------------------------------------------
 
 /* Entity definition of a textured object that is positioned in a 2D space. */
-extern const tarasque_entity_definition BE_DEF_texture_2D;
+extern const basilisk_entity_definition BE_DEF_texture_2D;
 
 /* Returns statically-allocated texture 2D data, used to give the engine data to copy for instanciation. */
-tarasque_entity *BE_STATIC_texture_2D(SDL_Texture *texture, i32 draw_index);
+basilisk_entity *BE_STATIC_texture_2D(SDL_Texture *texture, i32 draw_index);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -194,13 +194,13 @@ typedef struct BE_shape_2D BE_shape_2D;
 // -------------------------------------------------------------------------------------------------
 
 /* Entity definition for a basic 2D shape. It brings no function by itself, add a BE_shape_2D_visual and/or BE_shape_2D_collider below it to have an effect. */
-extern const tarasque_entity_definition BE_DEF_shape_2D;
+extern const basilisk_entity_definition BE_DEF_shape_2D;
 
 /* Returns statically-allocated circle shape data, used to give the engine data to copy for instanciation.*/
-tarasque_entity *BE_STATIC_shape_2D_circle(shape_2D_circle circle);
+basilisk_entity *BE_STATIC_shape_2D_circle(shape_2D_circle circle);
 
 /* Returns statically-allocated rectangle shape data, used to give the engine data to copy for instanciation. */
-tarasque_entity *BE_STATIC_shape_2D_rectangle(shape_2D_rect rect);
+basilisk_entity *BE_STATIC_shape_2D_rectangle(shape_2D_rect rect);
 
 // -------------------------------------------------------------------------------------------------
 
@@ -228,10 +228,10 @@ typedef struct BE_shape_2D_visual BE_shape_2D_visual;
 // -------------------------------------------------------------------------------------------------
 
 /* Entity definition for a visual extending a 2D shape. */
-extern const tarasque_entity_definition BE_DEF_shape_2D_visual;
+extern const basilisk_entity_definition BE_DEF_shape_2D_visual;
 
 /* Returns statically-allocated shape visual data, used to give the engine data to copy for instanciation. */
-tarasque_entity *BE_STATIC_shape_2D_visual(SDL_Color color, i32 draw_index);
+basilisk_entity *BE_STATIC_shape_2D_visual(SDL_Color color, i32 draw_index);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -255,18 +255,18 @@ typedef struct collision_2D_info {
  */
 typedef struct BE_shape_2D_collider_callback_info {
     /** Entity the callback will take as subject when resolving the collision. */
-    tarasque_entity *subject;
+    basilisk_entity *subject;
     /** Pointer to a function to be executed on a collision. */
-    void (*callback)(tarasque_entity *entity, BE_shape_2D_collider *hit, BE_shape_2D_collider *other, collision_2D_info collision_info);
+    void (*callback)(basilisk_entity *entity, BE_shape_2D_collider *hit, BE_shape_2D_collider *other, collision_2D_info collision_info);
 } BE_shape_2D_collider_callback_info;
 
 // -------------------------------------------------------------------------------------------------
 
 /* Entity definition for a shape collider entity. */
-extern const tarasque_entity_definition BE_DEF_shape_2D_collider;
+extern const basilisk_entity_definition BE_DEF_shape_2D_collider;
 
 /* Returns statically-allocated shape collider data, used to give the engine data to copy for instanciation. */
-tarasque_entity *BE_STATIC_shape_2D_collider(void);
+basilisk_entity *BE_STATIC_shape_2D_collider(void);
 
 // -------------------------------------------------------------------------------------------------
 
@@ -294,10 +294,10 @@ typedef struct BE_collision_manager_2D BE_collision_manager_2D;
 // -------------------------------------------------------------------------------------------------
 
 /* Entity definition for a collision manager. */
-extern const tarasque_entity_definition BE_DEF_collision_manager_2D;
+extern const basilisk_entity_definition BE_DEF_collision_manager_2D;
 
 /* Returns statically-allocated collision manager data, used to give the engine data to copy for instanciation. */
-tarasque_entity *BE_STATIC_collision_manager_2D(void);
+basilisk_entity *BE_STATIC_collision_manager_2D(void);
 
 // -------------------------------------------------------------------------------------------------
 

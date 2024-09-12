@@ -12,12 +12,12 @@
  * @copyright Copyright (c) 2024
  *
  */
-#ifndef __TARASQUE_RESOURCE_STORAGE_H__
-#define __TARASQUE_RESOURCE_STORAGE_H__
+#ifndef __BASILISK_RESOURCE_STORAGE_H__
+#define __BASILISK_RESOURCE_STORAGE_H__
 
-#include <tarasque.h>
+#include <basilisk.h>
 
-#include "../../tarasque_common.h"
+#include "../../basilisk_common.h"
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -49,10 +49,10 @@ void *resource_storage_get(resource_storage *storage_data, const char *str_path,
 
 /* Adds an entity as a supplicant, or user, of a storage. If it is the first one, the storage file will be
   loaded in memory.*/
-void resource_storage_add_supplicant(resource_storage *storage_data, tarasque_entity *entity, allocator alloc);
+void resource_storage_add_supplicant(resource_storage *storage_data, basilisk_entity *entity, allocator alloc);
 
 /* Removes an entity as a supplicant from a storage. If no supplicants are left, the storage unloads its resources. */
-void resource_storage_remove_supplicant(resource_storage *storage_data, tarasque_entity *entity, allocator alloc);
+void resource_storage_remove_supplicant(resource_storage *storage_data, basilisk_entity *entity, allocator alloc);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------

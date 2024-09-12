@@ -15,7 +15,7 @@
 #include <stdio.h>
 #include <sys/stat.h>
 
-#include "tarasque_resource_storage.h"
+#include "basilisk_resource_storage.h"
 
 
 // -------------------------------------------------------------------------------------------------
@@ -67,7 +67,7 @@ typedef struct resource_storage {
     RANGE(resource_item_deserialized) *items;
 
     /** Collection of entities that are using the resources of this storage. */
-    RANGE(tarasque_entity *) *supplicants;
+    RANGE(basilisk_entity *) *supplicants;
 } resource_storage;
 
 // -------------------------------------------------------------------------------------------------
@@ -94,7 +94,7 @@ static bool storage_file_append(const char *storage_file_path, const char *res_p
  * @brief Creates a data storage object meant to load, store, service and release resources present in a single storage file.
  * In nominal (development -- with no compilation switch) mode, calling this function will not only create the object, but also
  * create or empty the given storage file. On failure to do this, the function will abort the object creation, and will return NULL.
- * With TARASQUE_RELEASE set, this function will just check that the given file can be opened in read mode. On failure, the
+ * With BASILISK_RELEASE set, this function will just check that the given file can be opened in read mode. On failure, the
  * object will not be created and the function will return NULL.
  *
  * Calling this function will not load the resources present in the storage file.
@@ -112,8 +112,8 @@ resource_storage *resource_storage_create(const char *str_storage_path, allocato
         return NULL;
     }
 
-#ifndef TARASQUE_RELEASE
-    (void) mkdir(TARASQUE_RESOURCE_STORAGES_FOLDER, S_IRWXU);
+#ifndef BASILISK_RELEASE
+    (void) mkdir(BASILISK_RESOURCE_STORAGES_FOLDER, S_IRWXU);
     storage_file = fopen(str_storage_path, "w");
 #else
     storage_file = fopen(str_storage_path, "r");
@@ -130,8 +130,8 @@ resource_storage *resource_storage_create(const char *str_storage_path, allocato
         *new_storage = (resource_storage) {
                 .storage_name_hash = hash_jenkins_one_at_a_time((const byte *) str_storage_path, c_string_length(str_storage_path, false), 0u),
                 .file_path = str_storage_path,
-                .items = range_create_dynamic(alloc, sizeof(*new_storage->items->data), TARASQUE_COLLECTIONS_START_LENGTH),
-                .supplicants = range_create_dynamic(alloc, sizeof(*new_storage->supplicants->data), TARASQUE_COLLECTIONS_START_LENGTH),
+                .items = range_create_dynamic(alloc, sizeof(*new_storage->items->data), BASILISK_COLLECTIONS_START_LENGTH),
+                .supplicants = range_create_dynamic(alloc, sizeof(*new_storage->supplicants->data), BASILISK_COLLECTIONS_START_LENGTH),
         };
     }
 
@@ -165,7 +165,7 @@ void resource_storage_destroy(resource_storage **storage_data, allocator alloc)
 /**
  * @brief Checks that a resource (by its path) exists in a storage file.
  * In nominal (development -- with no compilation switch) mode, this function will try to load the file present at the given path
- * and append it to the storage file associated to the storage object. With TARASQUE_RELEASE set, this step is skipped.
+ * and append it to the storage file associated to the storage object. With BASILISK_RELEASE set, this step is skipped.
  * Then, the function will check that the resource is present in the storage file and return true if it finds it and false if not.
  *
  * @param[inout] storage_data Storage object.
@@ -184,7 +184,7 @@ bool resource_storage_check(resource_storage *storage_data, const char *str_path
         return false;
     }
 
-#ifndef TARASQUE_RELEASE
+#ifndef BASILISK_RELEASE
     if (!storage_file_append(storage_data->file_path, str_path, alloc)) {
         return false;
     }
@@ -256,7 +256,7 @@ void *resource_storage_get(resource_storage *storage_data, const char *str_path,
  * @param[in] entity Entity marked as using the storage.
  * @param[inout] alloc Allocator used for the eventual range allocation and resource loading.
  */
-void resource_storage_add_supplicant(resource_storage *storage_data, tarasque_entity *entity, allocator alloc)
+void resource_storage_add_supplicant(resource_storage *storage_data, basilisk_entity *entity, allocator alloc)
 {
     if (!storage_data || !entity) {
         return;
@@ -282,7 +282,7 @@ void resource_storage_add_supplicant(resource_storage *storage_data, tarasque_en
  * @param[in] entity Entity withdrawing its usage from the storage.
  * @param[inout] alloc Allocator used to unlaod the resources.
  */
-void resource_storage_remove_supplicant(resource_storage *storage_data, tarasque_entity *entity, allocator alloc)
+void resource_storage_remove_supplicant(resource_storage *storage_data, basilisk_entity *entity, allocator alloc)
 {
     if (!storage_data || !entity) {
         return;

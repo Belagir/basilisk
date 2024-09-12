@@ -32,7 +32,7 @@ typedef struct BE_shape_2D {
 // -------------------------------------------------------------------------------------------------
 
 /* Initialises a shape by searching for a BE_body_2D parent. */
-static void BE_shape_2D_init(tarasque_entity *self_data);
+static void BE_shape_2D_init(basilisk_entity *self_data);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -44,7 +44,7 @@ static void BE_shape_2D_init(tarasque_entity *self_data);
  *
  * @param[inout] self_data pointer to a BE_shape_2D object.
  */
-static void BE_shape_2D_init(tarasque_entity *self_data)
+static void BE_shape_2D_init(basilisk_entity *self_data)
 {
     BE_shape_2D *shape = (BE_shape_2D *) self_data;
 
@@ -52,7 +52,7 @@ static void BE_shape_2D_init(tarasque_entity *self_data)
         return;
     }
 
-    shape->body = tarasque_entity_get_parent(self_data, NULL, &BE_DEF_body_2D);
+    shape->body = basilisk_entity_get_parent(self_data, NULL, &BE_DEF_body_2D);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -62,12 +62,12 @@ static void BE_shape_2D_init(tarasque_entity *self_data)
 /**
  * @brief Returns a statically allocated BE_shape_2D constructed as a circle.
  * Successive calls to this function will always yield the same object, with some eventual differing content (depending on the given arguments).
- * Use this to build new BE_shape_2D circle instances with a call to `tarasque_entity_add_child()` that will copy the data inside the returned object.
+ * Use this to build new BE_shape_2D circle instances with a call to `basilisk_entity_add_child()` that will copy the data inside the returned object.
  *
  * @param[in] circle Properties of the new circle shape.
- * @return tarasque_entity *
+ * @return basilisk_entity *
  */
-tarasque_entity *BE_STATIC_shape_2D_circle(shape_2D_circle circle)
+basilisk_entity *BE_STATIC_shape_2D_circle(shape_2D_circle circle)
 {
     static BE_shape_2D buffer = { 0u };
 
@@ -83,14 +83,14 @@ tarasque_entity *BE_STATIC_shape_2D_circle(shape_2D_circle circle)
 /**
  * @brief Returns a statically allocated BE_shape_2D constructed as an axis-aligned rectangle.
  * Successive calls to this function will always yield the same object, with some eventual differing content (depending on the given arguments).
- * Use this to build new BE_shape_2D rectangle instances with a call to `tarasque_entity_add_child()` that will copy the data inside the returned object.
+ * Use this to build new BE_shape_2D rectangle instances with a call to `basilisk_entity_add_child()` that will copy the data inside the returned object.
  *
  * @see BE_shape_2D, BE_DEF_shape_2D
  *
  * @param[in] rect Properties of the new rectangular shape.
- * @return tarasque_entity *
+ * @return basilisk_entity *
  */
-tarasque_entity *BE_STATIC_shape_2D_rectangle(shape_2D_rect rect)
+basilisk_entity *BE_STATIC_shape_2D_rectangle(shape_2D_rect rect)
 {
     static BE_shape_2D buffer = { 0u };
 
@@ -177,7 +177,7 @@ BE_body_2D *BE_shape_2D_get_body(BE_shape_2D *shape)
  * @see BE_shape_2D, BE_STATIC_shape_2D, BE_shape_2D_collider, BE_shape_2D_visual
  *
  */
-const tarasque_entity_definition BE_DEF_shape_2D = {
+const basilisk_entity_definition BE_DEF_shape_2D = {
         .data_size = sizeof(BE_shape_2D),
         .on_init = &BE_shape_2D_init,
 };

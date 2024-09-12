@@ -9,7 +9,7 @@
  *
  */
 
-#include "tarasque_command.h"
+#include "basilisk_command.h"
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -34,7 +34,7 @@ typedef struct command_queue {
  * @param[inout] alloc Allocator used for the allocation of the command.
  * @return A fresh command to be queued.
  */
-command command_create_remove_entity(tarasque_engine_entity *source, allocator alloc)
+command command_create_remove_entity(basilisk_engine_entity *source, allocator alloc)
 {
     command new_cmd = { 0u };
 
@@ -62,7 +62,7 @@ command command_create_remove_entity(tarasque_engine_entity *source, allocator a
  * @param[inout] alloc Allocator used for the allocation of the command.
  * @return A fresh command to be queued.
  */
-command command_create_subscribe_to_event(tarasque_engine_entity *source, const char *event_name, tarasque_specific_event_subscription subscription_data, allocator alloc)
+command command_create_subscribe_to_event(basilisk_engine_entity *source, const char *event_name, basilisk_specific_event_subscription subscription_data, allocator alloc)
 {
     command new_cmd = { 0u };
 
@@ -131,7 +131,7 @@ command_queue *command_queue_create(allocator alloc)
 
     if (new_queue) {
         *new_queue = (command_queue) {
-            .queue_impl = range_create_dynamic(alloc, sizeof(*new_queue->queue_impl->data), TARASQUE_COLLECTIONS_START_LENGTH),
+            .queue_impl = range_create_dynamic(alloc, sizeof(*new_queue->queue_impl->data), BASILISK_COLLECTIONS_START_LENGTH),
         };
     }
 
@@ -222,7 +222,7 @@ size_t command_queue_length(const command_queue *queue)
  * @param[in] target Entity the function must remove commands of.
  * @param[inout] alloc Allocator used for the commands destruction.
  */
-void command_queue_remove_commands_of(command_queue *queue, tarasque_engine_entity *target, allocator alloc)
+void command_queue_remove_commands_of(command_queue *queue, basilisk_engine_entity *target, allocator alloc)
 {
     size_t pos = 0u;
 

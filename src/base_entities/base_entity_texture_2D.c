@@ -34,10 +34,10 @@ typedef struct BE_texture_2D {
 // -------------------------------------------------------------------------------------------------
 
 /* Initialises the texture by finding its position by finding a BE_2D_body parent. */
-static void BE_texture_2D_init(tarasque_entity *self_data);
+static void BE_texture_2D_init(basilisk_entity *self_data);
 
 /* Draw event callback to render the texture to the current rendering target. */
-static void BE_texture_2D_on_draw(tarasque_entity *self_data, void *event_data);
+static void BE_texture_2D_on_draw(basilisk_entity *self_data, void *event_data);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -48,7 +48,7 @@ static void BE_texture_2D_on_draw(tarasque_entity *self_data, void *event_data);
  *
  * @param[inout] self_data pointer to BE_texture_2D object
  */
-static void BE_texture_2D_init(tarasque_entity *self_data)
+static void BE_texture_2D_init(basilisk_entity *self_data)
 {
     if (!self_data) {
         return;
@@ -56,9 +56,9 @@ static void BE_texture_2D_init(tarasque_entity *self_data)
 
     BE_texture_2D *texture_data = (BE_texture_2D *) self_data;
 
-    texture_data->body = tarasque_entity_get_parent(self_data, NULL, &BE_DEF_body_2D);
+    texture_data->body = basilisk_entity_get_parent(self_data, NULL, &BE_DEF_body_2D);
 
-    tarasque_entity_queue_subscribe_to_event(self_data, "sdl renderer draw", (tarasque_specific_event_subscription) { .index = texture_data->draw_index, .callback = &BE_texture_2D_on_draw });
+    basilisk_entity_queue_subscribe_to_event(self_data, "sdl renderer draw", (basilisk_specific_event_subscription) { .index = texture_data->draw_index, .callback = &BE_texture_2D_on_draw });
 }
 
 /**
@@ -68,7 +68,7 @@ static void BE_texture_2D_init(tarasque_entity *self_data)
  * @param[inout] self_data pointer to BE_texture_2D object
  * @param[in] event_draw pointer to a BE_render_manager_sdl_event_draw object
  */
-static void BE_texture_2D_on_draw(tarasque_entity *self_data, void *event_data)
+static void BE_texture_2D_on_draw(basilisk_entity *self_data, void *event_data)
 {
     SDL_Rect dest = { 0u };
 
@@ -110,14 +110,14 @@ static void BE_texture_2D_on_draw(tarasque_entity *self_data, void *event_data)
 /**
  * @brief Returns a statically allocated BE_texture_2D object wrapping around the given SDL texture.
  * Successive calls to this function will always yield the same object, with some eventual differing content (depending on the given arguments).
- * Use this to build new BE_texture_2D instances with a call to `tarasque_entity_add_child()` that will copy the data inside the returned object.
+ * Use this to build new BE_texture_2D instances with a call to `basilisk_entity_add_child()` that will copy the data inside the returned object.
  *
  * @see BE_texture_2D, BE_DEF_texture_2D
  *
  * @param[in] properties starting local position of the body
- * @return tarasque_entity*
+ * @return basilisk_entity*
  */
-tarasque_entity *BE_STATIC_texture_2D(SDL_Texture *texture, i32 draw_index)
+basilisk_entity *BE_STATIC_texture_2D(SDL_Texture *texture, i32 draw_index)
 {
     static BE_texture_2D buffer = { 0u };
 
@@ -141,7 +141,7 @@ tarasque_entity *BE_STATIC_texture_2D(SDL_Texture *texture, i32 draw_index)
  *
  * @see BE_STATIC_texture_2D, BE_texture_2D
  */
-const tarasque_entity_definition BE_DEF_texture_2D = {
+const basilisk_entity_definition BE_DEF_texture_2D = {
         .data_size = sizeof(BE_texture_2D),
 
         .on_init = &BE_texture_2D_init,

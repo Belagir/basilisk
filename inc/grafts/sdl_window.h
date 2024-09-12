@@ -10,12 +10,12 @@
  * @copyright Copyright (c) 2024
  *
  */
-#ifndef __TARASQUE_SDL2_WINDOW_H__
-#define __TARASQUE_SDL2_WINDOW_H__
+#ifndef __BASILISK_SDL2_WINDOW_H__
+#define __BASILISK_SDL2_WINDOW_H__
 
 #include <SDL2/SDL.h>
 
-#include "tarasque.h"
+#include "basilisk.h"
 
 // Importing base entities included in the graft.
 
@@ -42,6 +42,6 @@ typedef struct graft_sdl_window_args {
 } graft_sdl_window_args;
 
 /* Generates a graft configuration for the engine with arguments given from the callsite. */
-tarasque_specific_graft graft_sdl_window(graft_sdl_window_args *args);
+basilisk_specific_graft graft_sdl_window(graft_sdl_window_args *args);
 
 #endif

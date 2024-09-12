@@ -1,7 +1,7 @@
 /**
- * @file tarasque.c
+ * @file basilisk.c
  * @author gabriel ()
- * @brief Implementation file for the engine main header tarasque_bare.h and support header tarasque_impl.h.
+ * @brief Implementation file for the engine main header basilisk_bare.h and support header basilisk_impl.h.
  *
  * This file's responsability is to aggregate the implementation of core operations of the engine.
  *
@@ -18,14 +18,14 @@
 
 #include <ustd/logging.h>
 
-#include <tarasque.h>
+#include <basilisk.h>
 
-#include "../tarasque_common.h"
+#include "../basilisk_common.h"
 
-#include "../command/tarasque_command.h"
-#include "../entity/tarasque_entity.h"
-#include "../event/tarasque_event.h"
-#include "../resource/tarasque_resource.h"
+#include "../command/basilisk_command.h"
+#include "../entity/basilisk_entity.h"
+#include "../event/basilisk_event.h"
+#include "../resource/basilisk_resource.h"
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -36,7 +36,7 @@
  * stored in this struct : this is the central data structure of the engine, from which we can navigate
  * to any engine-owned memory.
  */
-typedef struct tarasque_engine {
+typedef struct basilisk_engine {
     /** Allocator object used for all memory operations done by the engine instance. */
     allocator alloc;
 
@@ -52,49 +52,49 @@ typedef struct tarasque_engine {
     resource_manager *res_manager;
 
     /** Root of the game tree as an empty entity. */
-    tarasque_engine_entity *root_entity;
+    basilisk_engine_entity *root_entity;
 
     /** Buffer of references to entities to use for the main loop. */
-    tarasque_engine_entity_range *active_entities;
+    basilisk_engine_entity_range *active_entities;
     /** Flags that the active entities buffer needs to be reloaded. */
     bool update_active_entities;
 
     /** Flag signaling wether the engine should exit or not the main loop. */
     bool should_quit;
-} tarasque_engine;
+} basilisk_engine;
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
 /* Removes an entity from the tree, cleaning all objects referencing to it, and does so for all its children. */
-static void tarasque_engine_annihilate_entity_and_chilren(tarasque_engine *handle, tarasque_engine_entity *target);
+static void basilisk_engine_annihilate_entity_and_chilren(basilisk_engine *handle, basilisk_engine_entity *target);
 /* Removes an entity from the tree and cleaning all objects referencing to it */
-static void tarasque_engine_annihilate_entity(tarasque_engine *handle, tarasque_engine_entity *target);
+static void basilisk_engine_annihilate_entity(basilisk_engine *handle, basilisk_engine_entity *target);
 
 // -------------------------------------------------------------------------------------------------
 
 /* Processes a general command, applying its effects and then destroying it. */
-static void tarasque_engine_process_command(tarasque_engine *handle, command cmd);
+static void basilisk_engine_process_command(basilisk_engine *handle, command cmd);
 /* Processes a specific command to remove an entity from the engine, changing the state of the game tree. */
-static void tarasque_engine_process_command_remove_entity(tarasque_engine *handle, tarasque_engine_entity *subject, command_remove_entity *cmd);
+static void basilisk_engine_process_command_remove_entity(basilisk_engine *handle, basilisk_engine_entity *subject, command_remove_entity *cmd);
 /* Processes a specific command to subscribe an entity to an event, changing the state of the publisher / susbcriber collection. */
-static void tarasque_engine_process_command_subscribe_to_event(tarasque_engine *handle, command_subscribe_to_event *cmd);
+static void basilisk_engine_process_command_subscribe_to_event(basilisk_engine *handle, command_subscribe_to_event *cmd);
 
 // -------------------------------------------------------------------------------------------------
 
 /* Processes an event, passing it to registered entities and then destroying it. */
-static void tarasque_engine_process_event(tarasque_engine *handle, event processed_event);
+static void basilisk_engine_process_event(basilisk_engine *handle, event processed_event);
 
 // -------------------------------------------------------------------------------------------------
 
 /* Steps all entities forward in time with their on_frame() callback. */
-static void tarasque_engine_frame_step_entities(tarasque_engine *handle, f32 elapsed_time);
+static void basilisk_engine_frame_step_entities(basilisk_engine *handle, f32 elapsed_time);
 
 // -------------------------------------------------------------------------------------------------
 
 /* Updates the active entities buffer if needed. */
-static void tarasque_engine_update_active_entities(tarasque_engine *handle);
+static void basilisk_engine_update_active_entities(basilisk_engine *handle);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -120,18 +120,18 @@ static void cockatrice_engine_int_handler(int val) {
 /**
  * @brief Creates an engine instance on the heap, and returns a pointer to its data on success.
  *
- * @return tarasque_engine*
+ * @return basilisk_engine*
  */
-tarasque_engine *tarasque_engine_create(void)
+basilisk_engine *basilisk_engine_create(void)
 {
     allocator used_alloc = make_system_allocator();
-    tarasque_engine *new_engine = NULL;
+    basilisk_engine *new_engine = NULL;
 
     signal(SIGINT, &cockatrice_engine_int_handler);
 
     new_engine = used_alloc.malloc(used_alloc, sizeof(*new_engine));
     if (new_engine) {
-        *new_engine = (tarasque_engine) {
+        *new_engine = (basilisk_engine) {
                 .alloc = used_alloc,
 
                 .logger = logger_create(stdout, LOGGER_ON_DESTROY_DO_NOTHING),
@@ -141,7 +141,7 @@ tarasque_engine *tarasque_engine_create(void)
                 .pub_sub     = event_broker_create(used_alloc),
                 .res_manager = resource_manager_create(used_alloc),
 
-                .root_entity = tarasque_engine_entity_create(identifier_root, (tarasque_specific_entity) { 0u }, new_engine, used_alloc),
+                .root_entity = basilisk_engine_entity_create(identifier_root, (basilisk_specific_entity) { 0u }, new_engine, used_alloc),
 
                 .active_entities = NULL,
                 .update_active_entities = false,
@@ -161,7 +161,7 @@ tarasque_engine *tarasque_engine_create(void)
  *
  * @param[inout] handle double pointer to an engine instance.
  */
-void tarasque_engine_destroy(tarasque_engine **handle)
+void basilisk_engine_destroy(basilisk_engine **handle)
 {
     allocator used_alloc = { 0u };
 
@@ -180,7 +180,7 @@ void tarasque_engine_destroy(tarasque_engine **handle)
     event_stack_destroy(&(*handle)->events, used_alloc);
     command_queue_destroy(&(*handle)->commands, used_alloc);
 
-    tarasque_engine_annihilate_entity_and_chilren((*handle), (*handle)->root_entity);
+    basilisk_engine_annihilate_entity_and_chilren((*handle), (*handle)->root_entity);
 
     logger_log((*handle)->logger, LOGGER_SEVERITY_INFO, "Engine shut down.\n");
 
@@ -191,19 +191,19 @@ void tarasque_engine_destroy(tarasque_engine **handle)
 }
 
 /**
- * @brief Returns the data pointer of the root entity to be used with tarasque_entity_*() functions.
+ * @brief Returns the data pointer of the root entity to be used with basilisk_entity_*() functions.
  * The pointer itself points to unallocated memory and cannot be dereferenced.
  *
  * @param[in] handle Handle to an engine instance. If NULL, the functions returns NULL.
- * @return tarasque_entity *
+ * @return basilisk_entity *
  */
-tarasque_entity *tarasque_engine_root_entity(tarasque_engine *handle)
+basilisk_entity *basilisk_engine_root_entity(basilisk_engine *handle)
 {
     if (!handle) {
         return NULL;
     }
 
-    return tarasque_engine_entity_get_specific_data(handle->root_entity);
+    return basilisk_engine_entity_get_specific_data(handle->root_entity);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -218,7 +218,7 @@ tarasque_entity *tarasque_engine_root_entity(tarasque_engine *handle)
  * @param[inout] handle Engine instance.
  * @param[in] fps Target frequency of the main loop.
  */
-void tarasque_engine_run(tarasque_engine *handle, int fps) {
+void basilisk_engine_run(basilisk_engine *handle, int fps) {
     f64 frame_delay = { 0. };
 
     if (!handle || (fps == 0u)) {
@@ -234,16 +234,16 @@ void tarasque_engine_run(tarasque_engine *handle, int fps) {
         handle->should_quit = (shared_interrupt_flag == 1);
 
         while (command_queue_length(handle->commands) > 0u) {
-            tarasque_engine_process_command(handle, command_queue_pop_front(handle->commands));
+            basilisk_engine_process_command(handle, command_queue_pop_front(handle->commands));
         }
 
         while (event_stack_length(handle->events) > 0u) {
-            tarasque_engine_process_event(handle, event_stack_pop(handle->events));
+            basilisk_engine_process_event(handle, event_stack_pop(handle->events));
         }
 
-        tarasque_engine_update_active_entities(handle);
+        basilisk_engine_update_active_entities(handle);
 
-        tarasque_engine_frame_step_entities(handle, (f32) frame_delay);
+        basilisk_engine_frame_step_entities(handle, (f32) frame_delay);
 
         (void) nanosleep(&(struct timespec) { .tv_nsec = (long) (frame_delay * 1000000.f) }, NULL);
     } while (!handle->should_quit);
@@ -255,15 +255,15 @@ void tarasque_engine_run(tarasque_engine *handle, int fps) {
  *
  * @param[inout] entity entity querying the end of process.
  */
-void tarasque_entity_quit(tarasque_entity *entity)
+void basilisk_entity_quit(basilisk_entity *entity)
 {
     if (!entity) {
         return;
     }
 
-    tarasque_engine_entity *full_entity = tarasque_engine_entity_get_containing_full_entity(entity);
+    basilisk_engine_entity *full_entity = basilisk_engine_entity_get_containing_full_entity(entity);
 
-    tarasque_engine_entity_get_host_engine_handle(full_entity)->should_quit = true;
+    basilisk_engine_entity_get_host_engine_handle(full_entity)->should_quit = true;
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -276,15 +276,15 @@ void tarasque_entity_quit(tarasque_entity *entity)
  * @param[in] entity Entity soon-to-be parent.
  * @param[in] str_id Name (copied) of the new entity.
  * @param[in] user_data Definition (copied) of the entity.
- * @return tarasque_entity *
+ * @return basilisk_entity *
  */
-tarasque_entity *tarasque_entity_add_child(tarasque_entity *entity, const char *str_id, tarasque_specific_entity user_data)
+basilisk_entity *basilisk_entity_add_child(basilisk_entity *entity, const char *str_id, basilisk_specific_entity user_data)
 {
-    tarasque_entity *new_entity = NULL;
+    basilisk_entity *new_entity = NULL;
     identifier *new_entity_id = NULL;
 
-    tarasque_engine_entity *full_entity = tarasque_engine_entity_get_containing_full_entity(entity);
-    tarasque_engine *handle = tarasque_engine_entity_get_host_engine_handle(full_entity);
+    basilisk_engine_entity *full_entity = basilisk_engine_entity_get_containing_full_entity(entity);
+    basilisk_engine *handle = basilisk_engine_entity_get_host_engine_handle(full_entity);
 
     if (!full_entity || !handle) {
         return NULL;
@@ -296,21 +296,21 @@ tarasque_entity *tarasque_entity_add_child(tarasque_entity *entity, const char *
         return NULL;
     }
 
-    while (tarasque_engine_entity_get_direct_child(full_entity, new_entity_id) != NULL) {
+    while (basilisk_engine_entity_get_direct_child(full_entity, new_entity_id) != NULL) {
         identifier_increment(&new_entity_id, handle->alloc);
     }
 
-    new_entity = tarasque_engine_entity_create(new_entity_id, user_data, handle, handle->alloc);
-    tarasque_engine_entity_add_child(full_entity, new_entity, handle->alloc);
-    tarasque_engine_entity_init(new_entity);
+    new_entity = basilisk_engine_entity_create(new_entity_id, user_data, handle, handle->alloc);
+    basilisk_engine_entity_add_child(full_entity, new_entity, handle->alloc);
+    basilisk_engine_entity_init(new_entity);
 
-    logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Added entity \"%s\" under parent \"%s\".\n", tarasque_engine_entity_get_name(new_entity)->data, tarasque_engine_entity_get_name(full_entity)->data);
+    logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Added entity \"%s\" under parent \"%s\".\n", basilisk_engine_entity_get_name(new_entity)->data, basilisk_engine_entity_get_name(full_entity)->data);
 
     range_destroy_dynamic(handle->alloc, &RANGE_TO_ANY(new_entity_id));
 
     handle->update_active_entities = true;
 
-    return tarasque_engine_entity_get_specific_data(new_entity);
+    return basilisk_engine_entity_get_specific_data(new_entity);
 }
 
 /**
@@ -318,15 +318,15 @@ tarasque_entity *tarasque_entity_add_child(tarasque_entity *entity, const char *
  *
  * @param[in] entity Entity to remove.
  */
-void tarasque_entity_queue_remove(tarasque_entity *entity)
+void basilisk_entity_queue_remove(basilisk_entity *entity)
 {
     if (!entity) {
         return;
     }
 
     command cmd = { 0u };
-    tarasque_engine_entity *full_entity = tarasque_engine_entity_get_containing_full_entity(entity);
-    tarasque_engine *handle = tarasque_engine_entity_get_host_engine_handle(full_entity);
+    basilisk_engine_entity *full_entity = basilisk_engine_entity_get_containing_full_entity(entity);
+    basilisk_engine *handle = basilisk_engine_entity_get_host_engine_handle(full_entity);
 
     if (handle) {
         cmd = command_create_remove_entity(full_entity, handle->alloc);
@@ -342,7 +342,7 @@ void tarasque_entity_queue_remove(tarasque_entity *entity)
  * @param[in] entity Target entity from which the graft will take place.
  * @param[in] graft_data Data (copied) describing the graft and its arguments.
  */
-void tarasque_entity_graft(tarasque_entity *entity, tarasque_specific_graft graft_data)
+void basilisk_entity_graft(basilisk_entity *entity, basilisk_specific_graft graft_data)
 {
     if (!entity || !graft_data.graft_procedure) {
         return;
@@ -359,15 +359,15 @@ void tarasque_entity_graft(tarasque_entity *entity, tarasque_specific_graft graf
  * @param[in] str_event_name Name (copied) of the event the entity wants to subscribe a callback to.
  * @param[in] callback Pointer to the callback that will receive the entity's data and event data.
  */
-void tarasque_entity_queue_subscribe_to_event(tarasque_entity *entity,  const char *str_event_name, tarasque_specific_event_subscription subscription_data)
+void basilisk_entity_queue_subscribe_to_event(basilisk_entity *entity,  const char *str_event_name, basilisk_specific_event_subscription subscription_data)
 {
     if (!entity) {
         return;
     }
 
     command cmd = { 0u };
-    tarasque_engine_entity *full_entity = tarasque_engine_entity_get_containing_full_entity(entity);
-    tarasque_engine *handle = tarasque_engine_entity_get_host_engine_handle(full_entity);
+    basilisk_engine_entity *full_entity = basilisk_engine_entity_get_containing_full_entity(entity);
+    basilisk_engine *handle = basilisk_engine_entity_get_host_engine_handle(full_entity);
 
     if (handle) {
         cmd = command_create_subscribe_to_event(full_entity, str_event_name, subscription_data, handle->alloc);
@@ -382,14 +382,14 @@ void tarasque_entity_queue_subscribe_to_event(tarasque_entity *entity,  const ch
  * @param[in] str_event_name Name (copied) of the event stacked.
  * @param[in] event_data Event's specific data (copied).
  */
-void tarasque_entity_stack_event(tarasque_entity *entity, const char *str_event_name, tarasque_specific_event event_data)
+void basilisk_entity_stack_event(basilisk_entity *entity, const char *str_event_name, basilisk_specific_event event_data)
 {
     if (!entity) {
         return;
     }
 
-    tarasque_engine_entity *full_entity = tarasque_engine_entity_get_containing_full_entity(entity);
-    tarasque_engine *handle = tarasque_engine_entity_get_host_engine_handle(full_entity);
+    basilisk_engine_entity *full_entity = basilisk_engine_entity_get_containing_full_entity(entity);
+    basilisk_engine *handle = basilisk_engine_entity_get_host_engine_handle(full_entity);
 
     if (event_data.is_detached) {
         event_stack_push(handle->events, handle->root_entity, str_event_name, event_data.data_size, event_data.data, handle->alloc);
@@ -410,29 +410,29 @@ void tarasque_entity_stack_event(tarasque_entity *entity, const char *str_event_
  * @param[in] entity Entity from which to search for the parent.
  * @param[in] str_parent_name Name of the potential parent. Can be NULL if you just want to search by type or get the first parent.
  * @param[in] entity_def Entity definition used to create the potential parent. Can be NULL if you just want to search by name or get the first parent.
- * @return tarasque_entity *
+ * @return basilisk_entity *
  */
-tarasque_entity *tarasque_entity_get_parent(tarasque_entity *entity, const char *str_parent_name, const tarasque_entity_definition *entity_def)
+basilisk_entity *basilisk_entity_get_parent(basilisk_entity *entity, const char *str_parent_name, const basilisk_entity_definition *entity_def)
 {
     if (!entity) {
         return NULL;
     }
 
-    tarasque_engine_entity *full_entity = tarasque_engine_entity_get_containing_full_entity(entity);
-    full_entity = tarasque_engine_entity_get_parent(full_entity);
+    basilisk_engine_entity *full_entity = basilisk_engine_entity_get_containing_full_entity(entity);
+    full_entity = basilisk_engine_entity_get_parent(full_entity);
 
     if ((entity_def == NULL) && (str_parent_name == NULL)) {
-        return tarasque_engine_entity_get_specific_data(full_entity);
+        return basilisk_engine_entity_get_specific_data(full_entity);
     }
 
     while ((full_entity != NULL)
-            && (((entity_def == NULL) || (!tarasque_engine_entity_has_definition(full_entity, *entity_def)))
-                    && ((str_parent_name == NULL) || (identifier_compare_to_cstring(tarasque_engine_entity_get_name(full_entity), str_parent_name) != 0))))
+            && (((entity_def == NULL) || (!basilisk_engine_entity_has_definition(full_entity, *entity_def)))
+                    && ((str_parent_name == NULL) || (identifier_compare_to_cstring(basilisk_engine_entity_get_name(full_entity), str_parent_name) != 0))))
     {
-        full_entity = tarasque_engine_entity_get_parent(full_entity);
+        full_entity = basilisk_engine_entity_get_parent(full_entity);
     }
 
-    return tarasque_engine_entity_get_specific_data(full_entity);
+    return basilisk_engine_entity_get_specific_data(full_entity);
 }
 
 /**
@@ -442,30 +442,30 @@ tarasque_entity *tarasque_entity_get_parent(tarasque_entity *entity, const char 
  * @param[in] entity Entity from which to search for the child.
  * @param[in] path Path to the potential child entity.
  * @param[in] entity_def Entity definition used to create the potential parent. Can be NULL if you just want to search by name..
- * @return tarasque_entity *
+ * @return basilisk_entity *
  */
-tarasque_entity *tarasque_entity_get_child(tarasque_entity *entity, const char *str_path, const tarasque_entity_definition *entity_def)
+basilisk_entity *basilisk_entity_get_child(basilisk_entity *entity, const char *str_path, const basilisk_entity_definition *entity_def)
 {
     if (!entity || !str_path) {
         return NULL;
     }
 
-    tarasque_engine_entity *full_entity = tarasque_engine_entity_get_containing_full_entity(entity);
-    tarasque_engine *handle = tarasque_engine_entity_get_host_engine_handle(full_entity);
-    tarasque_engine_entity *found_entity = NULL;
+    basilisk_engine_entity *full_entity = basilisk_engine_entity_get_containing_full_entity(entity);
+    basilisk_engine *handle = basilisk_engine_entity_get_host_engine_handle(full_entity);
+    basilisk_engine_entity *found_entity = NULL;
     path *child_path = NULL;
 
     if (handle) {
         child_path = path_from_cstring(str_path, handle->alloc);
-        found_entity = tarasque_engine_entity_get_child(full_entity, child_path);
+        found_entity = basilisk_engine_entity_get_child(full_entity, child_path);
         path_destroy(&child_path, handle->alloc);
     }
 
-    if (entity_def && !tarasque_engine_entity_has_definition(found_entity, *entity_def)) {
+    if (entity_def && !basilisk_engine_entity_has_definition(found_entity, *entity_def)) {
         return NULL;
     }
 
-    return tarasque_engine_entity_get_specific_data(found_entity);
+    return basilisk_engine_entity_get_specific_data(found_entity);
 }
 
 /**
@@ -475,30 +475,30 @@ tarasque_entity *tarasque_entity_get_child(tarasque_entity *entity, const char *
  * @param entity_def
  * @return
  */
-bool tarasque_entity_is(tarasque_entity *entity, tarasque_entity_definition entity_def)
+bool basilisk_entity_is(basilisk_entity *entity, basilisk_entity_definition entity_def)
 {
-    tarasque_engine_entity *full_entity = tarasque_engine_entity_get_containing_full_entity(entity);
-    return tarasque_engine_entity_has_definition(full_entity, entity_def);
+    basilisk_engine_entity *full_entity = basilisk_engine_entity_get_containing_full_entity(entity);
+    return basilisk_engine_entity_has_definition(full_entity, entity_def);
 }
 
 // -------------------------------------------------------------------------------------------------
 
-#undef tarasque_engine_declare_resource
+#undef basilisk_engine_declare_resource
 
 /**
- * @brief Declares a resource into the engine to be used later. Trying to get (with `tarasque_entity_fetch_resource()`)
+ * @brief Declares a resource into the engine to be used later. Trying to get (with `basilisk_entity_fetch_resource()`)
  * an undeclared resource will fail regardless of its existence.
- * In nominal, development mode (with the compilation switch TARASQUE_RELEASE reset), this function will search for the
+ * In nominal, development mode (with the compilation switch BASILISK_RELEASE reset), this function will search for the
  * specified resource file and append it to a storage file named after the storage name provided.
- * With TARASQUE_RELEASE set, the function will only check that the resource is present in an already existing storage file
+ * With BASILISK_RELEASE set, the function will only check that the resource is present in an already existing storage file
  * of the provided name.
- * If all went right, the resource will be ready to be used by entity requesting it with `tarasque_entity_fetch_resource()`.
+ * If all went right, the resource will be ready to be used by entity requesting it with `basilisk_entity_fetch_resource()`.
  *
  * @param[inout] handle Handle to an engine instance.
  * @param[in] str_storage_name Name of the storage retaining the resource data.
  * @param[in] str_file_path Path to a resource file to declare.
  */
-void tarasque_engine_declare_resource(tarasque_engine *handle, const char *str_storage_name, const char *str_file_path)
+void basilisk_engine_declare_resource(basilisk_engine *handle, const char *str_storage_name, const char *str_file_path)
 {
     const char *str_storage_path = str_storage_name; // for lisibility and intent
 
@@ -513,7 +513,7 @@ void tarasque_engine_declare_resource(tarasque_engine *handle, const char *str_s
     }
 }
 
-#undef tarasque_entity_fetch_resource
+#undef basilisk_entity_fetch_resource
 
 /**
  * @brief Returns the data from a resource present in a storage. The entity will be registered as using this storage, and if it is the first
@@ -529,7 +529,7 @@ void tarasque_engine_declare_resource(tarasque_engine *handle, const char *str_s
  * @param[out] out_size Outgoing number of bytes the function returned.
  * @return void *
  */
-void *tarasque_entity_fetch_resource(tarasque_entity *entity, const char *str_storage_name, const char *str_file_path, unsigned long *out_size)
+void *basilisk_entity_fetch_resource(basilisk_entity *entity, const char *str_storage_name, const char *str_file_path, unsigned long *out_size)
 {
     const char *str_storage_path = str_storage_name; // for lisibility and intent
 
@@ -537,8 +537,8 @@ void *tarasque_entity_fetch_resource(tarasque_entity *entity, const char *str_st
         return NULL;
     }
 
-    tarasque_engine_entity *full_entity = tarasque_engine_entity_get_containing_full_entity(entity);
-    tarasque_engine *handle = tarasque_engine_entity_get_host_engine_handle(full_entity);
+    basilisk_engine_entity *full_entity = basilisk_engine_entity_get_containing_full_entity(entity);
+    basilisk_engine *handle = basilisk_engine_entity_get_host_engine_handle(full_entity);
 
     if (!handle) {
         return NULL;
@@ -560,21 +560,21 @@ void *tarasque_entity_fetch_resource(tarasque_entity *entity, const char *str_st
  * @param[inout] handle Engine handle.
  * @param[inout] target Entity to remove along its children.
  */
-static void tarasque_engine_annihilate_entity_and_chilren(tarasque_engine *handle, tarasque_engine_entity *target)
+static void basilisk_engine_annihilate_entity_and_chilren(basilisk_engine *handle, basilisk_engine_entity *target)
 {
-    tarasque_engine_entity_range *all_children = NULL;
+    basilisk_engine_entity_range *all_children = NULL;
 
     if (!handle) {
         return;
     }
 
-    all_children = tarasque_engine_entity_get_children(target, handle->alloc);
+    all_children = basilisk_engine_entity_get_children(target, handle->alloc);
     for (i64 i = (i64) all_children->length - 1 ; i >= 0 ; i--) {
-        tarasque_engine_annihilate_entity(handle, all_children->data[i]);
+        basilisk_engine_annihilate_entity(handle, all_children->data[i]);
     }
     range_destroy_dynamic(handle->alloc, &RANGE_TO_ANY(all_children));
 
-    tarasque_engine_annihilate_entity(handle, target);
+    basilisk_engine_annihilate_entity(handle, target);
 }
 
 /**
@@ -584,20 +584,20 @@ static void tarasque_engine_annihilate_entity_and_chilren(tarasque_engine *handl
  * @param[inout] handle Engine handle.
  * @param[inout] target Entity to remove.
  */
-static void tarasque_engine_annihilate_entity(tarasque_engine *handle, tarasque_engine_entity *target)
+static void basilisk_engine_annihilate_entity(basilisk_engine *handle, basilisk_engine_entity *target)
 {
     if (!handle) {
         return;
     }
 
-    tarasque_engine_entity_deparent(target);
+    basilisk_engine_entity_deparent(target);
 
-    tarasque_engine_entity_deinit(target);
+    basilisk_engine_entity_deinit(target);
     resource_manager_remove_supplicant(handle->res_manager, target, handle->alloc);
     event_stack_remove_events_of(handle->events, target, handle->alloc);
     command_queue_remove_commands_of(handle->commands, target, handle->alloc);
     event_broker_unsubscribe_from_all(handle->pub_sub, target, handle->alloc);
-    tarasque_engine_entity_destroy(&target, handle->alloc);
+    basilisk_engine_entity_destroy(&target, handle->alloc);
 }
 
 
@@ -609,9 +609,9 @@ static void tarasque_engine_annihilate_entity(tarasque_engine *handle, tarasque_
  * @param[inout] handle Engine handle.
  * @param[inout] cmd Command to process.
  */
-static void tarasque_engine_process_command(tarasque_engine *handle, command cmd)
+static void basilisk_engine_process_command(basilisk_engine *handle, command cmd)
 {
-    tarasque_engine_entity *subject = NULL;
+    basilisk_engine_entity *subject = NULL;
 
     if (!handle) {
         return;
@@ -624,10 +624,10 @@ static void tarasque_engine_process_command(tarasque_engine *handle, command cmd
 
     switch (cmd.flavor) {
     case COMMAND_REMOVE_ENTITY:
-        tarasque_engine_process_command_remove_entity(handle, subject, &(cmd.specific.remove_entity));
+        basilisk_engine_process_command_remove_entity(handle, subject, &(cmd.specific.remove_entity));
         break;
     case COMMAND_SUBSCRIBE_TO_EVENT:
-        tarasque_engine_process_command_subscribe_to_event(handle, &(cmd.specific.subscribe_to_event));
+        basilisk_engine_process_command_subscribe_to_event(handle, &(cmd.specific.subscribe_to_event));
         break;
     default:
         break;
@@ -643,7 +643,7 @@ static void tarasque_engine_process_command(tarasque_engine *handle, command cmd
  * @param[in] subject Entity that sent the command.
  * @param[in] cmd Command containing the removal data.
  */
-static void tarasque_engine_process_command_remove_entity(tarasque_engine *handle, tarasque_engine_entity *subject, command_remove_entity *cmd)
+static void basilisk_engine_process_command_remove_entity(basilisk_engine *handle, basilisk_engine_entity *subject, command_remove_entity *cmd)
 {
     if (!handle || !cmd) {
         return;
@@ -654,8 +654,8 @@ static void tarasque_engine_process_command_remove_entity(tarasque_engine *handl
         return;
     }
 
-    logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Removed entity \"%s\".\n", tarasque_engine_entity_get_name(subject)->data);
-    tarasque_engine_annihilate_entity_and_chilren(handle, cmd->removed);
+    logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Removed entity \"%s\".\n", basilisk_engine_entity_get_name(subject)->data);
+    basilisk_engine_annihilate_entity_and_chilren(handle, cmd->removed);
     handle->update_active_entities = true;
 }
 
@@ -666,14 +666,14 @@ static void tarasque_engine_process_command_remove_entity(tarasque_engine *handl
  * @param[in] subject Entity that sent the command.
  * @param[in] cmd Command containing the subscribtion data.
  */
-static void tarasque_engine_process_command_subscribe_to_event(tarasque_engine *handle, command_subscribe_to_event *cmd)
+static void basilisk_engine_process_command_subscribe_to_event(basilisk_engine *handle, command_subscribe_to_event *cmd)
 {
     if (!handle) {
         return;
     }
 
     event_broker_subscribe(handle->pub_sub, cmd->subscribed, cmd->target_event_name, cmd->subscription_data, handle->alloc);
-    logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Entity \"%s\" subscribed callback %#010x to event \"%s\".\n", tarasque_engine_entity_get_name(cmd->subscribed)->data, cmd->subscription_data.callback, cmd->target_event_name->data);
+    logger_log(handle->logger, LOGGER_SEVERITY_INFO, "Entity \"%s\" subscribed callback %#010x to event \"%s\".\n", basilisk_engine_entity_get_name(cmd->subscribed)->data, cmd->subscription_data.callback, cmd->target_event_name->data);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -684,7 +684,7 @@ static void tarasque_engine_process_command_subscribe_to_event(tarasque_engine *
  * @param[inout] handle Engine handle.
  * @param[inout] processed_event Event sent to entities.
  */
-static void tarasque_engine_process_event(tarasque_engine *handle, event processed_event)
+static void basilisk_engine_process_event(basilisk_engine *handle, event processed_event)
 {
     if (!handle) {
         return;
@@ -704,16 +704,16 @@ static void tarasque_engine_process_event(tarasque_engine *handle, event process
  * @param[inout] handle Engine handle.
  * @param[in] elapsed_time milliseconds elapsed since the last time this function was executed.
  */
-static void tarasque_engine_frame_step_entities(tarasque_engine *handle, f32 elapsed_ms)
+static void basilisk_engine_frame_step_entities(basilisk_engine *handle, f32 elapsed_ms)
 {
-    tarasque_engine_entity_range *all_entities = NULL;
+    basilisk_engine_entity_range *all_entities = NULL;
 
     if (!handle ||!handle->active_entities) {
         return;
     }
 
     for (size_t i = 0u ; i < handle->active_entities->length ; i++) {
-        tarasque_engine_entity_step_frame(handle->active_entities->data[i], elapsed_ms);
+        basilisk_engine_entity_step_frame(handle->active_entities->data[i], elapsed_ms);
     }
 }
 
@@ -723,7 +723,7 @@ static void tarasque_engine_frame_step_entities(tarasque_engine *handle, f32 ela
  *
  * @param[in] handle Traget engine instance.
  */
-static void tarasque_engine_update_active_entities(tarasque_engine *handle)
+static void basilisk_engine_update_active_entities(basilisk_engine *handle)
 {
     if (!handle || !handle->update_active_entities) {
         return;
@@ -733,5 +733,5 @@ static void tarasque_engine_update_active_entities(tarasque_engine *handle)
         range_destroy_dynamic(handle->alloc, &RANGE_TO_ANY(handle->active_entities));
     }
 
-    handle->active_entities = tarasque_engine_entity_get_children(handle->root_entity, handle->alloc);
+    handle->active_entities = basilisk_engine_entity_get_children(handle->root_entity, handle->alloc);
 }

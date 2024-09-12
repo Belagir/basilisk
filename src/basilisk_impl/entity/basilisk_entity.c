@@ -11,44 +11,44 @@
 #include <ustd/sorting.h>
 #include <stdio.h>
 
-#include <tarasque.h>
+#include <basilisk.h>
 
-#include "tarasque_entity.h"
+#include "basilisk_entity.h"
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @typedef tarasque_entity_storage
+ * @typedef basilisk_entity_storage
  * @brief Shorthand typedef for a byte array with a more explicit syntax.
  */
-typedef byte tarasque_entity_storage[];
+typedef byte basilisk_entity_storage[];
 
 /**
  * @brief Entity data structure aggregating user data with engine-related data.
  */
-typedef struct tarasque_engine_entity {
+typedef struct basilisk_engine_entity {
     /** Name of the entity. */
     identifier *id;
     /** Non-owned reference to an eventual parent entity. */
-    tarasque_engine_entity *parent;
+    basilisk_engine_entity *parent;
     /** Array of all of the entity's children. */
-    tarasque_engine_entity_range *children;
+    basilisk_engine_entity_range *children;
     /** Engine owning the entity, used to redirect user's actions back to the whole engine. */
-    tarasque_engine *host_handle;
+    basilisk_engine *host_handle;
 
-    tarasque_entity_definition self_definition;
+    basilisk_entity_definition self_definition;
 
     /** The user's data. */
-    tarasque_entity_storage data;
-} tarasque_engine_entity;
+    basilisk_entity_storage data;
+} basilisk_engine_entity;
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-static bool tarasque_entity_definition_unit_is_same_as(tarasque_entity_definition def_unit, tarasque_entity_definition broad_def);
+static bool basilisk_entity_definition_unit_is_same_as(basilisk_entity_definition def_unit, basilisk_entity_definition broad_def);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -63,19 +63,19 @@ static bool tarasque_entity_definition_unit_is_same_as(tarasque_entity_definitio
  * @param[inout] alloc Allocator used for the creation of the entity.
  * @return entity *
  */
-tarasque_engine_entity *tarasque_engine_entity_create(const identifier *id, tarasque_specific_entity user_data, tarasque_engine *handle, allocator alloc)
+basilisk_engine_entity *basilisk_engine_entity_create(const identifier *id, basilisk_specific_entity user_data, basilisk_engine *handle, allocator alloc)
 {
-    tarasque_engine_entity *new_entity = NULL;
-    const tarasque_entity_definition *subtyped_definition = NULL;
+    basilisk_engine_entity *new_entity = NULL;
+    const basilisk_entity_definition *subtyped_definition = NULL;
 
     new_entity = alloc.malloc(alloc, sizeof(*new_entity) + user_data.entity_def.data_size);
 
     if (new_entity) {
         // core informations
-        *new_entity = (tarasque_engine_entity) {
+        *new_entity = (basilisk_engine_entity) {
                 .id = range_create_dynamic_from_copy_of(alloc, RANGE_TO_ANY(id)),
                 .parent = NULL,
-                .children = range_create_dynamic(alloc, sizeof(*new_entity->children->data), TARASQUE_COLLECTIONS_START_LENGTH),
+                .children = range_create_dynamic(alloc, sizeof(*new_entity->children->data), BASILISK_COLLECTIONS_START_LENGTH),
                 .host_handle = handle,
 
                 .self_definition = {
@@ -98,12 +98,12 @@ tarasque_engine_entity *tarasque_engine_entity_create(const identifier *id, tara
 
 /**
  * @brief Destroys an entity by releasing its directly-owned memory, and nullifies the pointer passed to it.
- * Calling this function might leave children or a parent with dangling pointers : use with tarasque_engine_entity_deparent() and tarasque_engine_entity_destroy_children().
+ * Calling this function might leave children or a parent with dangling pointers : use with basilisk_engine_entity_deparent() and basilisk_engine_entity_destroy_children().
  *
  * @param[inout] target Entity to destroy.
  * @param[inout] alloc Allocator used to release memory.
  */
-void tarasque_engine_entity_destroy(tarasque_engine_entity **target, allocator alloc)
+void basilisk_engine_entity_destroy(basilisk_engine_entity **target, allocator alloc)
 {
     if (!target || !*target) {
         return;
@@ -121,25 +121,25 @@ void tarasque_engine_entity_destroy(tarasque_engine_entity **target, allocator a
 /**
  * @brief Returns the full entity embedding the user data passed in argument.
  *
- * @param[in] entity user data trusted to be the data field of a tarasque_engine_entity.
- * @return tarasque_engine_entity *
+ * @param[in] entity user data trusted to be the data field of a basilisk_engine_entity.
+ * @return basilisk_engine_entity *
  */
-tarasque_engine_entity *tarasque_engine_entity_get_containing_full_entity(tarasque_entity *entity)
+basilisk_engine_entity *basilisk_engine_entity_get_containing_full_entity(basilisk_entity *entity)
 {
     if (!entity) {
         return NULL;
     }
 
-    return CONTAINER_OF(entity, tarasque_engine_entity, data);
+    return CONTAINER_OF(entity, basilisk_engine_entity, data);
 }
 
 /**
  * @brief Returns a pointer to the user data field of an entity.
  *
  * @param[in] target Full entity.
- * @return tarasque_entity *
+ * @return basilisk_entity *
  */
-tarasque_entity *tarasque_engine_entity_get_specific_data(tarasque_engine_entity *target)
+basilisk_entity *basilisk_engine_entity_get_specific_data(basilisk_engine_entity *target)
 {
     if (!target) {
         return NULL;
@@ -152,9 +152,9 @@ tarasque_entity *tarasque_engine_entity_get_specific_data(tarasque_engine_entity
  * @brief Returns a pointer to the engine instance containing the entity.
  *
  * @param[in] target Full entity.
- * @return tarasque_engine *
+ * @return basilisk_engine *
  */
-tarasque_engine *tarasque_engine_entity_get_host_engine_handle(tarasque_engine_entity *target)
+basilisk_engine *basilisk_engine_entity_get_host_engine_handle(basilisk_engine_entity *target)
 {
     if (!target) {
         return NULL;
@@ -169,7 +169,7 @@ tarasque_engine *tarasque_engine_entity_get_host_engine_handle(tarasque_engine_e
  * @param[in] target Target entity.
  * @return const identifier *
  */
-const identifier *tarasque_engine_entity_get_name(const tarasque_engine_entity *target)
+const identifier *basilisk_engine_entity_get_name(const basilisk_engine_entity *target)
 {
     if (!target) {
         return NULL;
@@ -182,9 +182,9 @@ const identifier *tarasque_engine_entity_get_name(const tarasque_engine_entity *
  * @brief Returns the direct parent of the entity.
  *
  * @param[in] target Target entity.
- * @return tarasque_engine_entity *
+ * @return basilisk_engine_entity *
  */
-tarasque_engine_entity *tarasque_engine_entity_get_parent(tarasque_engine_entity *target)
+basilisk_engine_entity *basilisk_engine_entity_get_parent(basilisk_engine_entity *target)
 {
     if (!target) {
         return NULL;
@@ -200,7 +200,7 @@ tarasque_engine_entity *tarasque_engine_entity_get_parent(tarasque_engine_entity
  * @param entity_def
  * @return
  */
-bool tarasque_engine_entity_has_definition(tarasque_engine_entity *entity, tarasque_entity_definition entity_def)
+bool basilisk_engine_entity_has_definition(basilisk_engine_entity *entity, basilisk_entity_definition entity_def)
 {
     bool has_def = false;
     size_t pos = 0u;
@@ -209,7 +209,7 @@ bool tarasque_engine_entity_has_definition(tarasque_engine_entity *entity, taras
         return false;
     }
 
-    has_def = tarasque_entity_definition_unit_is_same_as(entity->self_definition, entity_def);
+    has_def = basilisk_entity_definition_unit_is_same_as(entity->self_definition, entity_def);
 
     return has_def;
 }
@@ -223,7 +223,7 @@ bool tarasque_engine_entity_has_definition(tarasque_engine_entity *entity, taras
  * @param[inout] new_child Entity added as child.
  * @param[inout] alloc Allocator used for the children array insertion.
  */
-void tarasque_engine_entity_add_child(tarasque_engine_entity *target, tarasque_engine_entity *new_child, allocator alloc)
+void basilisk_engine_entity_add_child(basilisk_engine_entity *target, basilisk_engine_entity *new_child, allocator alloc)
 {
     if (!target || !new_child) {
         return;
@@ -240,7 +240,7 @@ void tarasque_engine_entity_add_child(tarasque_engine_entity *target, tarasque_e
  *
  * @param[inout] target Entity to de-parent.
  */
-void tarasque_engine_entity_deparent(tarasque_engine_entity *target)
+void basilisk_engine_entity_deparent(basilisk_engine_entity *target)
 {
     if (!target || !target->parent) {
         return;
@@ -257,17 +257,17 @@ void tarasque_engine_entity_deparent(tarasque_engine_entity *target)
  * @param[inout] target Entity the children are destroyed from.
  * @param[inout] alloc Allocator used to release the memory of the children entities.
  */
-void tarasque_engine_entity_destroy_children(tarasque_engine_entity *target, allocator alloc)
+void basilisk_engine_entity_destroy_children(basilisk_engine_entity *target, allocator alloc)
 {
-    tarasque_engine_entity_range *all_children = NULL;
+    basilisk_engine_entity_range *all_children = NULL;
 
     if (!target) {
         return;
     }
 
-    all_children = tarasque_engine_entity_get_children(target, alloc);
+    all_children = basilisk_engine_entity_get_children(target, alloc);
     for (int i = (int) all_children->length - 1 ; i >= 0 ; i--) {
-        tarasque_engine_entity_destroy(all_children->data + i, alloc);
+        basilisk_engine_entity_destroy(all_children->data + i, alloc);
     }
     range_destroy_dynamic(alloc, &RANGE_TO_ANY(all_children));
 
@@ -279,11 +279,11 @@ void tarasque_engine_entity_destroy_children(tarasque_engine_entity *target, all
  *
  * @param[inout] target Supposed parent of the searched entity.
  * @param[inout] id_path path of indetifiers leading to the searched entity.
- * @return tarasque_engine_entity*
+ * @return basilisk_engine_entity*
  */
-tarasque_engine_entity *tarasque_engine_entity_get_child(tarasque_engine_entity *target, const path *id_path)
+basilisk_engine_entity *basilisk_engine_entity_get_child(basilisk_engine_entity *target, const path *id_path)
 {
-    tarasque_engine_entity *visited_entity = NULL;
+    basilisk_engine_entity *visited_entity = NULL;
     size_t pos_path = 0u;
 
     if (!target) {
@@ -294,7 +294,7 @@ tarasque_engine_entity *tarasque_engine_entity_get_child(tarasque_engine_entity 
 
     visited_entity = target;
     while (visited_entity && (pos_path < id_path->length)) {
-        visited_entity = tarasque_engine_entity_get_direct_child(visited_entity, id_path->data[pos_path]);
+        visited_entity = basilisk_engine_entity_get_direct_child(visited_entity, id_path->data[pos_path]);
         pos_path += (size_t) (visited_entity != NULL);
     }
 
@@ -306,9 +306,9 @@ tarasque_engine_entity *tarasque_engine_entity_get_child(tarasque_engine_entity 
  *
  * @param[in] target Target parent entity.
  * @param[in] id_path Name of the searched child entity.
- * @return tarasque_engine_entity *
+ * @return basilisk_engine_entity *
  */
-tarasque_engine_entity *tarasque_engine_entity_get_direct_child(tarasque_engine_entity *target, const identifier *id)
+basilisk_engine_entity *basilisk_engine_entity_get_direct_child(basilisk_engine_entity *target, const identifier *id)
 {
     bool found_child = false;
     size_t pos_child = 0u;
@@ -334,12 +334,12 @@ tarasque_engine_entity *tarasque_engine_entity_get_direct_child(tarasque_engine_
  *
  * @param[in] target Entity from which to extract children.
  * @param[inout] alloc Allocator used to create the returned range.
- * @return tarasque_engine_entity_range*
+ * @return basilisk_engine_entity_range*
  */
-tarasque_engine_entity_range *tarasque_engine_entity_get_children(tarasque_engine_entity *target, allocator alloc)
+basilisk_engine_entity_range *basilisk_engine_entity_get_children(basilisk_engine_entity *target, allocator alloc)
 {
     size_t child_pos = 0u;
-    tarasque_engine_entity_range *entities = NULL;
+    basilisk_engine_entity_range *entities = NULL;
 
     if (!target) {
         return NULL;
@@ -362,7 +362,7 @@ tarasque_engine_entity_range *tarasque_engine_entity_get_children(tarasque_engin
  * @param[inout] target Target entity.
  * @param[in] elapsed_ms Number of elapsed milliseconds, hopefully since the last time the callback was called.
  */
-void tarasque_engine_entity_step_frame(tarasque_engine_entity *target, f32 elapsed_ms)
+void basilisk_engine_entity_step_frame(basilisk_engine_entity *target, f32 elapsed_ms)
 {
     if (!target) {
         return;
@@ -380,7 +380,7 @@ void tarasque_engine_entity_step_frame(tarasque_engine_entity *target, f32 elaps
  * @param[in] callback Event callback.
  * @param[inout] event_data Event data passed to the callback.
  */
-void tarasque_engine_entity_send_event(tarasque_engine_entity *target, tarasque_specific_event_subscription subscription_data, void *event_data)
+void basilisk_engine_entity_send_event(basilisk_engine_entity *target, basilisk_specific_event_subscription subscription_data, void *event_data)
 {
     if (!target || !subscription_data.callback) {
         return;
@@ -394,7 +394,7 @@ void tarasque_engine_entity_send_event(tarasque_engine_entity *target, tarasque_
  *
  * @param[inout] target Target entity.
  */
-void tarasque_engine_entity_init(tarasque_engine_entity *target)
+void basilisk_engine_entity_init(basilisk_engine_entity *target)
 {
     if (!target) {
         return;
@@ -410,7 +410,7 @@ void tarasque_engine_entity_init(tarasque_engine_entity *target)
  *
  * @param[inout] target Target entity.
  */
-void tarasque_engine_entity_deinit(tarasque_engine_entity *target)
+void basilisk_engine_entity_deinit(basilisk_engine_entity *target)
 {
     if (!target) {
         return;
@@ -425,7 +425,7 @@ void tarasque_engine_entity_deinit(tarasque_engine_entity *target)
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-static bool tarasque_entity_definition_unit_is_same_as(tarasque_entity_definition def_unit, tarasque_entity_definition broad_def)
+static bool basilisk_entity_definition_unit_is_same_as(basilisk_entity_definition def_unit, basilisk_entity_definition broad_def)
 {
     return   (def_unit.data_size == broad_def.data_size)
             && (def_unit.on_init   == broad_def.on_init)

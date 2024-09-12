@@ -11,8 +11,8 @@
 #ifndef __COMMAND_H__
 #define __COMMAND_H__
 
-#include "../tarasque_common.h"
-#include "../entity/tarasque_entity.h"
+#include "../basilisk_common.h"
+#include "../entity/basilisk_entity.h"
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -41,7 +41,7 @@ typedef enum command_flavor {
  */
 typedef struct command_remove_entity {
     /** Entity to be removed. */
-    tarasque_engine_entity *removed;
+    basilisk_engine_entity *removed;
 } command_remove_entity;
 
 // -------------------------------------------------------------------------------------------------
@@ -53,9 +53,9 @@ typedef struct command_subscribe_to_event {
     /** Name of the event subscribed. */
     identifier *target_event_name;
     /** Non-owned reference to the subscriber entity. */
-    tarasque_engine_entity *subscribed;
+    basilisk_engine_entity *subscribed;
     /** Registered callback information. */
-    tarasque_specific_event_subscription subscription_data;
+    basilisk_specific_event_subscription subscription_data;
 } command_subscribe_to_event;
 
 // -------------------------------------------------------------------------------------------------
@@ -67,7 +67,7 @@ typedef struct command {
     /** Discrimating flag indicating the nature of the `specific` field. */
     command_flavor flavor;
     /** Entity that sent the command. Might be null. */
-    tarasque_engine_entity *source;
+    basilisk_engine_entity *source;
 
     /** Specific section of the command. */
     union {
@@ -83,9 +83,9 @@ typedef struct command {
 // -------------------------------------------------------------------------------------------------
 
 /* Creates a command to remove an entity. */
-command command_create_remove_entity(tarasque_engine_entity *source, allocator alloc);
+command command_create_remove_entity(basilisk_engine_entity *source, allocator alloc);
 /* Creates a command to subscribe an entity and a callback to an event. */
-command command_create_subscribe_to_event(tarasque_engine_entity *source, const char *event_name, tarasque_specific_event_subscription subscription_data, allocator alloc);
+command command_create_subscribe_to_event(basilisk_engine_entity *source, const char *event_name, basilisk_specific_event_subscription subscription_data, allocator alloc);
 
 // -------------------------------------------------------------------------------------------------
 
@@ -113,6 +113,6 @@ size_t command_queue_length(const command_queue *queue);
 // -------------------------------------------------------------------------------------------------
 
 /* Removes all commands tied to an entity from the queue. */
-void command_queue_remove_commands_of(command_queue *queue, tarasque_engine_entity *target, allocator alloc);
+void command_queue_remove_commands_of(command_queue *queue, basilisk_engine_entity *target, allocator alloc);
 
 #endif
