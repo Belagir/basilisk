@@ -1,6 +1,8 @@
 
 # Basilisk game engine -- a C system for barebone gamedev
 
+> This library is in development and everything should be taken with a grain of salt.
+
 This game engine is a low-dependency, highly modular game engine for C game development. It features a tree-oriented game structure, global events, and static resource managment, and an interface to easily add packages of entities to create a custom game environment !
 
 The engine does not comes, strictly speaking, with a specific graphics backend directly integrated : the engine itself is only made to manage abstract data in a way that makes thinking about the structure of the game simple. Althrough for now, one "backend" is available as a package of entities (called a "graft"), a simple SDL2 rendering toolkit.
