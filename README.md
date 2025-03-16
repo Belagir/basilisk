@@ -70,4 +70,5 @@ This produces an archive `libbasilisk.a` located in the `basilisk/bin/` director
 
 In your favorite toolchain, add :
  - `-Ibaslisk/inc` to the compiler's arguments ;
- - `-Lbasilisk/bin -lbasilisk` to the linker's arguments.
+ - `-Lbasilisk/bin -lbasilisk` to the linker's arguments ;
+ - `` `sdl2-config --cflags --libs` `` to the linker's arguments.
