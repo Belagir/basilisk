@@ -23,7 +23,7 @@
 /**
  * @brief Private data definition of a collision manager entity.
  *
- * @see BE_DEF_collision_manager_2D, BE_STATIC_collision_manager_2D, BE_shape_2D_collider
+ * @see BE_DEF_collision_manager_2D, BE_shape_2D_collider
  */
 typedef struct BE_collision_manager_2D {
     RANGE(BE_shape_2D_collider *) *registered_collisions;
@@ -59,11 +59,13 @@ static collision_2D_info collision_2D_info_reflect(collision_2D_info info);
  * @param[inout] collision_manager target collision manager
  * @param[in] col added collider
  */
-void BE_collision_manager_2D_register_shape(BE_collision_manager_2D *collision_manager, BE_shape_2D_collider *col)
+void BE_collision_manager_2D_register_shape(basilisk_entity *collision_manager_entity, BE_shape_2D_collider *col)
 {
-    if (!collision_manager || !col) {
+    if (!collision_manager_entity || !col || !basilisk_entity_is(collision_manager_entity, BE_DEF_collision_manager_2D)) {
         return;
     }
+
+    struct BE_collision_manager_2D *collision_manager = (struct BE_collision_manager_2D *) collision_manager_entity;
 
     collision_manager->registered_collisions = range_ensure_capacity(make_system_allocator(), RANGE_TO_ANY(collision_manager->registered_collisions), 1);
     sorted_range_insert_in(RANGE_TO_ANY(collision_manager->registered_collisions), &raw_pointer_compare, &col);
@@ -75,11 +77,13 @@ void BE_collision_manager_2D_register_shape(BE_collision_manager_2D *collision_m
  * @param[inout] collision_manager target collision manager
  * @param[in] col removed collider
  */
-void BE_collision_manager_2D_unregister_shape(BE_collision_manager_2D *collision_manager, BE_shape_2D_collider *col)
+void BE_collision_manager_2D_unregister_shape(basilisk_entity *collision_manager_entity, BE_shape_2D_collider *col)
 {
-    if (!collision_manager || !col) {
+    if (!collision_manager_entity || !col || !basilisk_entity_is(collision_manager_entity, BE_DEF_collision_manager_2D)) {
         return;
     }
+
+    struct BE_collision_manager_2D *collision_manager = (struct BE_collision_manager_2D *) collision_manager_entity;
 
     sorted_range_remove_from(RANGE_TO_ANY(collision_manager->registered_collisions), &raw_pointer_compare, &col);
 }
@@ -159,25 +163,12 @@ static collision_2D_info collision_2D_info_reflect(collision_2D_info info)
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief Returns a NULL object, because the BE_collision_manager_2D entity does not need a memory object to be initialised.
- * This function is provided for coherence with other entities and to future proof against possible extentions to this entity.
- *
- * @see BE_DEF_collision_manager_2D, BE_collision_manager_2D, BE_shape_2D_collider
- *
- * @return basilisk_entity *
- */
-basilisk_entity *BE_STATIC_collision_manager_2D(void)
-{
-    return NULL;
-}
-
-/**
  * @brief Defines the properties of a BE_collision_manager_2D entity.
  *
  * This entity provides a way to listen for collision between children entities.
  * The collision engine is not finished and supports circles and axis-aligned rectangles, and contains bugs.
  *
- * @see BE_collision_manager_2D, BE_STATIC_collision_manager_2D, BE_shape_2D_collider
+ * @see BE_collision_manager_2D, BE_shape_2D_collider
  *
  */
 const basilisk_entity_definition BE_DEF_collision_manager_2D = {
@@ -187,3 +178,11 @@ const basilisk_entity_definition BE_DEF_collision_manager_2D = {
         .on_frame = &BE_collision_manager_2D_frame,
         .on_deinit = &BE_collision_manager_2D_deinit,
 };
+
+struct basilisk_specific_entity BE_CREATE_collision_manager_2D(void)
+{
+    return (struct basilisk_specific_entity) {
+            .entity_def = BE_DEF_collision_manager_2D,
+            .data = NULL,
+    };
+}

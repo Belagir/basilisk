@@ -31,7 +31,7 @@ static void BE_event_relay_sdl_on_frame(basilisk_entity *self_data, float elapse
 /**
  * @brief Private data layout of an "sdl event relay" entity.
  *
- * @see BE_STATIC_event_relay_sdl, BE_DEF_event_relay_sdl
+ * @see BE_DEF_event_relay_sdl
  */
 typedef struct BE_event_relay_sdl {
     /** Internal buffer to re-order the polled events. Overriden each frame. */
@@ -79,19 +79,6 @@ static void BE_event_relay_sdl_on_frame(basilisk_entity *self_data, float elapse
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-/**
- * @brief Returns a NULL object, because the BE_event_relay_sdl entity does not need an external memory object to be initialised.
- * This function is provided for coherence with other entities and to future proof against possible extentions to this entity.
- *
- * @see BE_event_relay_sdl, BE_DEF_event_relay_sdl
- *
- * @return basilisk_entity *
- */
-basilisk_entity *BE_STATIC_event_relay_sdl(void)
-{
-    return NULL;
-}
-
 // -------------------------------------------------------------------------------------------------
 
 /**
@@ -104,7 +91,7 @@ basilisk_entity *BE_STATIC_event_relay_sdl(void)
  *  - "sdl event" is associated to a pointer to a SDL_Event object. It is one of the SDL events the entity polled on last frame.
  *  - "sdl event quit" is not associated to any data. It just carries the information that the users wants to quit the window.
  *
- * @see BE_STATIC_event_relay_sdl, BE_event_relay_sdl
+ * @see BE_event_relay_sdl
  *
  */
 const basilisk_entity_definition BE_DEF_event_relay_sdl = {
@@ -112,3 +99,10 @@ const basilisk_entity_definition BE_DEF_event_relay_sdl = {
         .on_frame = &BE_event_relay_sdl_on_frame,
 };
 
+struct basilisk_specific_entity BE_CREATE_event_relay_sdl(void)
+{
+    return (struct basilisk_specific_entity) {
+            .entity_def = BE_DEF_event_relay_sdl,
+            .data = nullptr,
+    };
+}

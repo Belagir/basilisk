@@ -70,7 +70,7 @@ typedef struct shape_2D_rect {
 extern const basilisk_entity_definition BE_DEF_context_sdl;
 
 /* Returns statically-allocated SDL Context entity data, used to give the engine data to copy for instanciation. */
-basilisk_entity *BE_STATIC_context_sdl(void);
+struct basilisk_specific_entity BE_CREATE_context_sdl(void);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -78,16 +78,12 @@ basilisk_entity *BE_STATIC_context_sdl(void);
 // ---- SDL EVENT RELAY ENTITY ----
 // Sends back SDL events (polled `SDL_Event` objects) through the engine.
 
-/* Opaque type to an event relay entity instance. */
-typedef struct BE_event_relay_sdl BE_event_relay_sdl;
-
-// -------------------------------------------------------------------------------------------------
 
 /* Entity definition of a SDL event relay, sending back events polled from the SDL library on the event stack. */
 extern const basilisk_entity_definition BE_DEF_event_relay_sdl;
 
 /* Returns statically-allocated SDL event relay entity data, used to give the engine data to copy for instanciation. */
-basilisk_entity *BE_STATIC_event_relay_sdl(void);
+struct basilisk_specific_entity BE_CREATE_event_relay_sdl(void);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -96,7 +92,7 @@ basilisk_entity *BE_STATIC_event_relay_sdl(void);
 // Wraps around a SDL window.
 
 /* Opaque type to a sdl window entity instance. */
-typedef struct BE_window_sdl BE_window_sdl;
+// typedef struct BE_window_sdl BE_window_sdl;
 
 // -------------------------------------------------------------------------------------------------
 
@@ -104,12 +100,12 @@ typedef struct BE_window_sdl BE_window_sdl;
 extern const basilisk_entity_definition BE_DEF_window_sdl;
 
 /* Returns statically-allocated SDL window entity data, used to give the engine data to copy for instanciation. */
-basilisk_entity *BE_STATIC_window_sdl(const char *title, size_t w, size_t h, size_t x, size_t y, SDL_WindowFlags flags);
+struct basilisk_specific_entity BE_CREATE_window_sdl(const char *title, size_t w, size_t h, size_t x, size_t y, SDL_WindowFlags flags);
 
 // -------------------------------------------------------------------------------------------------
 
 /* Returns the SDL handle to the window managed by this entity. */
-SDL_Window *BE_window_sdl_get_window(BE_window_sdl *window_entity);
+SDL_Window *BE_window_sdl_get_window(basilisk_entity *window_entity);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -126,16 +122,11 @@ typedef struct BE_render_manager_sdl_event_draw {
     // TODO : add information about the rendering target : pointer to texture
 } BE_render_manager_sdl_event_draw;
 
-/* Opaque type to a render manager entity instance. */
-typedef struct BE_render_manager_sdl BE_render_manager_sdl;
-
-// -------------------------------------------------------------------------------------------------
-
 /* Entity definition of a SDL render manager, that sends draw events through the game tree to draw content onto a window. */
 extern const basilisk_entity_definition BE_DEF_render_manager_sdl;
 
 /* Returns statically-allocated SDL render manager entity data, used to give the engine data to copy for instanciation. */
-basilisk_entity *BE_STATIC_render_manager_sdl(SDL_Color clear_color, size_t w, size_t h, SDL_RendererFlags flags);
+struct basilisk_specific_entity BE_CREATE_render_manager_sdl(SDL_Color clear_color, size_t w, size_t h, SDL_RendererFlags flags);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -288,24 +279,19 @@ void BE_shape_2D_collider_exec_callback(BE_shape_2D_collider *hit, BE_shape_2D_c
 // ---- 2D COLLISION MANAGER ENTITY ----
 // Collision-detection wrapper around the GJK algorithm shape colliders can register to.
 
-/* Opaque type to a collision manager instance. */
-typedef struct BE_collision_manager_2D BE_collision_manager_2D;
-
-// -------------------------------------------------------------------------------------------------
-
 /* Entity definition for a collision manager. */
 extern const basilisk_entity_definition BE_DEF_collision_manager_2D;
 
 /* Returns statically-allocated collision manager data, used to give the engine data to copy for instanciation. */
-basilisk_entity *BE_STATIC_collision_manager_2D(void);
+struct basilisk_specific_entity BE_CREATE_collision_manager_2D(void);
 
 // -------------------------------------------------------------------------------------------------
 
 /* Adds a shape collider in the manager so it can detect collisions between it and others. */
-void BE_collision_manager_2D_register_shape(BE_collision_manager_2D *collision_manager, BE_shape_2D_collider *col);
+void BE_collision_manager_2D_register_shape(basilisk_entity *collision_manager, BE_shape_2D_collider *col);
 
 /* Removes a shape collider from the manager. */
-void BE_collision_manager_2D_unregister_shape(BE_collision_manager_2D *collision_manager, BE_shape_2D_collider *col);
+void BE_collision_manager_2D_unregister_shape(basilisk_entity *collision_manager, BE_shape_2D_collider *col);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------

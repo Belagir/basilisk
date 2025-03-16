@@ -60,18 +60,6 @@ static void BE_context_sdl_deinit(basilisk_entity *self_data)
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-/**
- * @brief Returns a NULL object, because the BE_context_sdl entity does not need a memory object to be initialised.
- * This function is provided for coherence with other entities and to future proof against possible extentions to this entity.
- *
- * @see BE_DEF_context_sdl
- *
- * @return basilisk_entity *
- */
-basilisk_entity *BE_STATIC_context_sdl(void)
-{
-    return NULL;
-}
 
 // -------------------------------------------------------------------------------------------------
 
@@ -82,11 +70,16 @@ basilisk_entity *BE_STATIC_context_sdl(void)
  * function (because they call `SDL_InitSubSystem()`) but putting those as a child of a SDL Context entity leads to a more
  * comprehensible hierarchy.
  *
- * @see BE_STATIC_context_sdl
- *
  */
 const basilisk_entity_definition BE_DEF_context_sdl = {
         .on_init = &BE_context_sdl_init,
         .on_deinit = &BE_context_sdl_deinit,
 };
 
+struct basilisk_specific_entity BE_CREATE_context_sdl(void)
+{
+    return (struct basilisk_specific_entity) {
+            .entity_def = BE_DEF_context_sdl,
+            .data = nullptr,
+    };
+}

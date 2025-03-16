@@ -18,7 +18,7 @@
 /**
  * @brief Private data needed by a "SDL window" entity to work. It retains the initialisation values and a handle to the actual SDL Window.
  *
- * @see BE_STATIC_window_sdl, BE_DEF_window_sdl
+ * @see BE_DEF_window_sdl
  */
 typedef struct BE_window_sdl {
     /** Title of the window used on window creation. */
@@ -107,21 +107,37 @@ static void BE_window_sdl_quit(basilisk_entity *self_data, void *event_data)
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief Returns a statically allocated BE_window_sdl object constructed from the given properties.
- * Successive calls to this function will always yield the same object, with some eventual differing content (depending on the given arguments).
- * Use this to build new BE_window_sdl instances with a call to `basilisk_entity_add_child()` that will copy the data inside the returned object.
+ * @brief Returns the pointer to the SDL Window that the entity is managing.
  *
- * @see BE_window_sdl, BE_DEF_window_sdl
- *
- * @param[in] title static null-terminated string to be the title of the window
- * @param[in] w width, in pixels, of the window
- * @param[in] h height, in pixels, of the window
- * @param[in] x horizontal position, in pixels, of the window on the screen ; might be a SDL-specific value like SDL_WINDOWPOS_CENTERED
- * @param[in] y vertical position, in pixels, of the window on the screen ; might be a SDL-specific value like SDL_WINDOWPOS_CENTERED
- * @param[in] flags SDL-specific window flags
- * @return basilisk_entity *
+ * @param[in] window_data pointer to some SDL Window entity
+ * @return SDL_Window *
  */
-basilisk_entity *BE_STATIC_window_sdl(const char *title, size_t w, size_t h, size_t x, size_t y, SDL_WindowFlags flags)
+SDL_Window *BE_window_sdl_get_window(basilisk_entity *window_entity)
+{
+    if (!window_entity || !basilisk_entity_is(window_entity, BE_DEF_window_sdl)) {
+        return NULL;
+    }
+
+    return ((struct BE_window_sdl *) window_entity)->window;
+}
+
+// -------------------------------------------------------------------------------------------------
+
+/**
+ * @brief Defines an entity to manage a handle of SDL Window that will match the lifetime of the entity.
+ *
+ * @see BE_window_sdl
+ *
+ * It might be a child of a BE_sdl_context entity.
+ */
+const basilisk_entity_definition BE_DEF_window_sdl = {
+        .data_size = sizeof(BE_window_sdl),
+
+        .on_init = &BE_window_sdl_init,
+        .on_deinit = &BE_window_sdl_deinit,
+};
+
+struct basilisk_specific_entity BE_CREATE_window_sdl(const char *title, size_t w, size_t h, size_t x, size_t y, SDL_WindowFlags flags)
 {
     static BE_window_sdl buffer = { 0u };
 
@@ -133,36 +149,8 @@ basilisk_entity *BE_STATIC_window_sdl(const char *title, size_t w, size_t h, siz
             .flags = flags,
     };
 
-    return &buffer;
+    return (struct basilisk_specific_entity) {
+            .entity_def = BE_DEF_window_sdl,
+            .data = &buffer
+    };
 }
-
-/**
- * @brief Returns the pointer to the SDL Window that the entity is managing.
- *
- * @param[in] window_data pointer to some SDL Window entity
- * @return SDL_Window *
- */
-SDL_Window *BE_window_sdl_get_window(BE_window_sdl *window_entity)
-{
-    if (!window_entity) {
-        return NULL;
-    }
-
-    return window_entity->window;
-}
-
-// -------------------------------------------------------------------------------------------------
-
-/**
- * @brief Defines an entity to manage a handle of SDL Window that will match the lifetime of the entity.
- *
- * @see BE_STATIC_window_sdl, BE_window_sdl
- *
- * It might be a child of a BE_sdl_context entity.
- */
-const basilisk_entity_definition BE_DEF_window_sdl = {
-        .data_size = sizeof(BE_window_sdl),
-
-        .on_init = &BE_window_sdl_init,
-        .on_deinit = &BE_window_sdl_deinit,
-};

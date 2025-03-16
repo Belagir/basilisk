@@ -18,7 +18,7 @@
 /**
  * @brief Private data layout of a "render manager" base entity.
  *
- * @see BE_STATIC_render_manager_sdl, BE_DEF_render_manager_sdl, BE_window_sdl
+ * @see BE_DEF_render_manager_sdl, BE_window_sdl
  */
 typedef struct BE_render_manager_sdl {
     /** Color used to clear the screen each frame before each drawing operation. */
@@ -63,7 +63,7 @@ static void BE_render_manager_sdl_post_draw(basilisk_entity *self_data, void *ev
  * Initialises the data of a render manager, creating a renderer and buffer to organize draw operations.
  * The renderer is bound to a parent BE_window_sdl entity. If no such entity is found, the renderer will not be created.
  *
- * @see BE_render_manager_sdl, BE_DEF_render_manager_sdl, BE_STATIC_render_manager_sdl
+ * @see BE_render_manager_sdl, BE_DEF_render_manager_sdl
  *
  * @param[inout] self_data pointer to a BE_render_manager_sdl object
  */
@@ -91,7 +91,7 @@ static void BE_render_manager_sdl_init(basilisk_entity *self_data)
  * @brief Deinitialisation callback for a BE_render_manager_sdl entity.
  * Releases the resources created by a render manager entity. This will destroy the renderer and the internal buffer.
  *
- * @see BE_render_manager_sdl, BE_DEF_render_manager_sdl, BE_STATIC_render_manager_sdl
+ * @see BE_render_manager_sdl, BE_DEF_render_manager_sdl
  *
  * @param[inout] self_data pointer to a BE_render_manager_sdl object
  */
@@ -185,19 +185,26 @@ static void BE_render_manager_sdl_post_draw(basilisk_entity *self_data, void *ev
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief Returns a statically allocated BE_render_manager_sdl object constructed from the given configuration.
- * Successive calls to this function will always yield the same object, with some eventual differing content (depending on the given arguments).
- * Use this to build new BE_render_manager_sdl entity instances with a call to `basilisk_entity_add_child()` that will copy the data inside the returned object.
+ * @brief Defines the properties of a BE_render_manager_sdl entity.
  *
- * @see BE_render_manager_sdl, BE_DEF_render_manager_sdl, BE_window_sdl
+ * This entity exists to organize drawing operation in a single time unit. To achieve that, the entity will send three events on each frame : "sdl renderer pre draw", "sdl renderer draw" and "sdl renderer post draw". Those three events are guaranteed to be resolved in this specific order, and entities that want to call SDL drawing functions can do so when receiving a "sdl renderer draw" event, which is associated to the `BE_render_manager_sdl_event_draw` data structure.
  *
- * @param[in] clear_color default color of the renderer background
- * @param[in] w width, in pixels, of the renderer's buffer ; a value of 0 will make it match the size of the parent window
- * @param[in] h height, in pixels,  of the renderer's buffer ; a value of 0 will make it match the size of the parent window
- * @param[in] flags SDL-specific renderer flags
- * @return basilisk_entity *
+ * This entity might send three events :
+ * - "sdl renderer pre draw", not associated to any data, to notify that drawing operations will happen next ;
+ * - "sdl renderer draw", associated to a BE_render_manager_sdl_event_draw object, to quiery draw operations to be done ;
+ * - "sdl renderer post draw", not associated to any data, to notify that drawing operations ended.
+ *
+ * @see BE_render_manager_sdl, BE_window_sdl, BE_render_manager_sdl_event_draw
+ *
  */
-basilisk_entity *BE_STATIC_render_manager_sdl(SDL_Color clear_color, size_t w, size_t h, SDL_RendererFlags flags)
+const basilisk_entity_definition BE_DEF_render_manager_sdl = {
+        .data_size = sizeof(BE_render_manager_sdl),
+        .on_init = &BE_render_manager_sdl_init,
+        .on_frame = &BE_render_manager_sdl_on_frame,
+        .on_deinit = &BE_render_manager_sdl_deinit,
+};
+
+struct basilisk_specific_entity BE_CREATE_render_manager_sdl(SDL_Color clear_color, size_t w, size_t h, SDL_RendererFlags flags)
 {
     static BE_render_manager_sdl buffer = { 0u };
 
@@ -208,27 +215,8 @@ basilisk_entity *BE_STATIC_render_manager_sdl(SDL_Color clear_color, size_t w, s
             .flags = flags,
     };
 
-    return &buffer;
+    return (struct basilisk_specific_entity) {
+            .entity_def = BE_DEF_render_manager_sdl,
+            .data = &buffer,
+    };
 }
-
-// -------------------------------------------------------------------------------------------------
-
-/**
- * @brief Defines the properties of a BE_render_manager_sdl entity.
- *
- * This entity exists to organize drawing operation in a single time unit. To achieve that, the entity will send three events on each frame : "sdl renderer pre draw", "sdl renderer draw" and "sdl renderer post draw". Those three events are guaranteed to be resolved in this specific order, and entities that want to call SDL drawing functions can do so when receiving a "sdl renderer draw" event, which is associated to the `BE_render_manager_sdl_event_draw` data structure.
- *
- * This entity might send three events :
- * - "sdl renderer pre draw", not associated to any data, to notify that drawing operations will happen next ;
- * - "sdl renderer draw", associated to a BE_render_manager_sdl_event_draw object, to quiery draw operations to be done ;
- * - "sdl renderer post draw", not associated to any data, to notify that drawing operations ended.
- *
- * @see BE_render_manager_sdl, BE_STATIC_render_manager_sdl, BE_window_sdl, BE_render_manager_sdl_event_draw
- *
- */
-const basilisk_entity_definition BE_DEF_render_manager_sdl = {
-        .data_size = sizeof(BE_render_manager_sdl),
-        .on_init = &BE_render_manager_sdl_init,
-        .on_frame = &BE_render_manager_sdl_on_frame,
-        .on_deinit = &BE_render_manager_sdl_deinit,
-};

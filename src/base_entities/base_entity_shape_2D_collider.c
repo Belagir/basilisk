@@ -22,7 +22,7 @@ typedef struct BE_shape_2D_collider {
     /** Pointer to a parent shape entity to provide a collision box. */
     BE_shape_2D *monitored;
     /** Pointer to a parent collision manager entity to register to. */
-    BE_collision_manager_2D *manager;
+    basilisk_entity *manager;
 
     /** Callback data describing the behavior on a detected collision. */
     BE_shape_2D_collider_callback_info callback_info;
