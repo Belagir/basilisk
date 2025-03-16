@@ -18,7 +18,7 @@
 /**
  * @brief Private data layout of a "render manager" base entity.
  *
- * @see BE_DEF_render_manager_sdl, BE_window_sdl
+ * @see ENTITY_DEF_RENDER_MANAGER_SDL, BE_window_sdl
  */
 typedef struct BE_render_manager_sdl {
     /** Color used to clear the screen each frame before each drawing operation. */
@@ -63,7 +63,7 @@ static void BE_render_manager_sdl_post_draw(basilisk_entity *self_data, void *ev
  * Initialises the data of a render manager, creating a renderer and buffer to organize draw operations.
  * The renderer is bound to a parent BE_window_sdl entity. If no such entity is found, the renderer will not be created.
  *
- * @see BE_render_manager_sdl, BE_DEF_render_manager_sdl
+ * @see BE_render_manager_sdl, ENTITY_DEF_RENDER_MANAGER_SDL
  *
  * @param[inout] self_data pointer to a BE_render_manager_sdl object
  */
@@ -75,7 +75,7 @@ static void BE_render_manager_sdl_init(basilisk_entity *self_data)
 
     BE_render_manager_sdl *init_data = (BE_render_manager_sdl *) self_data;
 
-    SDL_Window *parent_window = BE_window_sdl_get_window(basilisk_entity_get_parent(self_data, NULL, &BE_DEF_window_sdl));
+    SDL_Window *parent_window = BE_window_sdl_get_window(basilisk_entity_get_parent(self_data, NULL, &ENTITY_DEF_WINDOW_SDL));
 
     init_data->renderer = SDL_CreateRenderer(parent_window, -1, init_data->flags);
 
@@ -91,7 +91,7 @@ static void BE_render_manager_sdl_init(basilisk_entity *self_data)
  * @brief Deinitialisation callback for a BE_render_manager_sdl entity.
  * Releases the resources created by a render manager entity. This will destroy the renderer and the internal buffer.
  *
- * @see BE_render_manager_sdl, BE_DEF_render_manager_sdl
+ * @see BE_render_manager_sdl, ENTITY_DEF_RENDER_MANAGER_SDL
  *
  * @param[inout] self_data pointer to a BE_render_manager_sdl object
  */
@@ -197,14 +197,14 @@ static void BE_render_manager_sdl_post_draw(basilisk_entity *self_data, void *ev
  * @see BE_render_manager_sdl, BE_window_sdl, BE_render_manager_sdl_event_draw
  *
  */
-const basilisk_entity_definition BE_DEF_render_manager_sdl = {
+const basilisk_entity_definition ENTITY_DEF_RENDER_MANAGER_SDL = {
         .data_size = sizeof(BE_render_manager_sdl),
         .on_init = &BE_render_manager_sdl_init,
         .on_frame = &BE_render_manager_sdl_on_frame,
         .on_deinit = &BE_render_manager_sdl_deinit,
 };
 
-struct basilisk_specific_entity BE_CREATE_render_manager_sdl(SDL_Color clear_color, size_t w, size_t h, SDL_RendererFlags flags)
+struct basilisk_specific_entity create_render_manager_sdl(SDL_Color clear_color, size_t w, size_t h, SDL_RendererFlags flags)
 {
     static BE_render_manager_sdl buffer = { 0u };
 
@@ -216,7 +216,7 @@ struct basilisk_specific_entity BE_CREATE_render_manager_sdl(SDL_Color clear_col
     };
 
     return (struct basilisk_specific_entity) {
-            .entity_def = BE_DEF_render_manager_sdl,
+            .entity_def = ENTITY_DEF_RENDER_MANAGER_SDL,
             .data = &buffer,
     };
 }

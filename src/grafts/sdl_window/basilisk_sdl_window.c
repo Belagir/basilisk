@@ -38,22 +38,22 @@ static void graft_sdl_window_callback(basilisk_entity *entity, void *graft_args)
 
     const graft_sdl_window_args sdl_win_args = *(const graft_sdl_window_args *) graft_args;
 
-    context = basilisk_entity_add_child(entity, "Context", BE_CREATE_context_sdl());
+    context = basilisk_entity_add_child(entity, "Context", create_context_sdl());
 
-    window = basilisk_entity_add_child(context, "Window", BE_CREATE_window_sdl(
+    window = basilisk_entity_add_child(context, "Window", create_window_sdl(
             sdl_win_args.for_window.title,
             sdl_win_args.for_window.w, sdl_win_args.for_window.h,
             sdl_win_args.for_window.x, sdl_win_args.for_window.y,
             sdl_win_args.for_window.flags));
 
-    event_relay = basilisk_entity_add_child(window, "Event Relay", BE_CREATE_event_relay_sdl());
+    event_relay = basilisk_entity_add_child(window, "Event Relay", create_event_relay_sdl());
 
-    render_manager = basilisk_entity_add_child(window, "Render Manager", BE_CREATE_render_manager_sdl(
+    render_manager = basilisk_entity_add_child(window, "Render Manager", create_render_manager_sdl(
             sdl_win_args.for_renderer.clear_color,
             sdl_win_args.for_renderer.w, sdl_win_args.for_renderer.h,
             sdl_win_args.for_renderer.flags));
 
-    collision_manager = basilisk_entity_add_child(render_manager, "Collision Manager", BE_CREATE_collision_manager_2D());
+    collision_manager = basilisk_entity_add_child(render_manager, "Collision Manager", create_collision_manager_2D());
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -52,7 +52,7 @@ static void BE_shape_2D_init(basilisk_entity *self_data)
         return;
     }
 
-    shape->body = basilisk_entity_get_parent(self_data, NULL, &BE_DEF_body_2D);
+    shape->body = basilisk_entity_get_parent(self_data, NULL, &ENTITY_DEF_BODY_2D);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -85,7 +85,7 @@ basilisk_entity *BE_STATIC_shape_2D_circle(shape_2D_circle circle)
  * Successive calls to this function will always yield the same object, with some eventual differing content (depending on the given arguments).
  * Use this to build new BE_shape_2D rectangle instances with a call to `basilisk_entity_add_child()` that will copy the data inside the returned object.
  *
- * @see BE_shape_2D, BE_DEF_shape_2D
+ * @see BE_shape_2D, ENTITY_DEF_SHAPE_2D
  *
  * @param[in] rect Properties of the new rectangular shape.
  * @return basilisk_entity *
@@ -177,7 +177,7 @@ BE_body_2D *BE_shape_2D_get_body(BE_shape_2D *shape)
  * @see BE_shape_2D, BE_STATIC_shape_2D, BE_shape_2D_collider, BE_shape_2D_visual
  *
  */
-const basilisk_entity_definition BE_DEF_shape_2D = {
+const basilisk_entity_definition ENTITY_DEF_SHAPE_2D = {
         .data_size = sizeof(BE_shape_2D),
         .on_init = &BE_shape_2D_init,
 };

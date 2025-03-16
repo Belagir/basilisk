@@ -31,7 +31,7 @@ static void BE_event_relay_sdl_on_frame(basilisk_entity *self_data, float elapse
 /**
  * @brief Private data layout of an "sdl event relay" entity.
  *
- * @see BE_DEF_event_relay_sdl
+ * @see ENTITY_DEF_EVENT_RELAY_SDL
  */
 typedef struct BE_event_relay_sdl {
     /** Internal buffer to re-order the polled events. Overriden each frame. */
@@ -94,15 +94,15 @@ static void BE_event_relay_sdl_on_frame(basilisk_entity *self_data, float elapse
  * @see BE_event_relay_sdl
  *
  */
-const basilisk_entity_definition BE_DEF_event_relay_sdl = {
+const basilisk_entity_definition ENTITY_DEF_EVENT_RELAY_SDL = {
         .data_size = sizeof(BE_event_relay_sdl),
         .on_frame = &BE_event_relay_sdl_on_frame,
 };
 
-struct basilisk_specific_entity BE_CREATE_event_relay_sdl(void)
+struct basilisk_specific_entity create_event_relay_sdl(void)
 {
     return (struct basilisk_specific_entity) {
-            .entity_def = BE_DEF_event_relay_sdl,
+            .entity_def = ENTITY_DEF_EVENT_RELAY_SDL,
             .data = nullptr,
     };
 }

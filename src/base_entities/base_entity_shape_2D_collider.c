@@ -51,10 +51,10 @@ static void BE_shape_2D_collider_init(basilisk_entity *self_data)
 {
     BE_shape_2D_collider *collider = (BE_shape_2D_collider *) self_data;
 
-    collider->monitored = basilisk_entity_get_parent(collider, NULL, &BE_DEF_shape_2D);
+    collider->monitored = basilisk_entity_get_parent(collider, NULL, &ENTITY_DEF_SHAPE_2D);
 
     if (collider->monitored) {
-        collider->manager = basilisk_entity_get_parent(collider, NULL, &BE_DEF_collision_manager_2D);
+        collider->manager = basilisk_entity_get_parent(collider, NULL, &ENTITY_DEF_COLLISION_MANAGER_2D);
         BE_collision_manager_2D_register_shape(collider->manager, collider);
     }
 }
@@ -165,7 +165,7 @@ void BE_shape_2D_collider_exec_callback(BE_shape_2D_collider *hit, BE_shape_2D_c
  * @brief Returns a NULL object, because the BE_shape_2D_collider entity does not need a memory object to be initialised.
  * This function is provided for coherence with other entities and to future proof against possible extentions to this entity.
  *
- * @see BE_DEF_shape_2D_collider, BE_shape_2D_collider
+ * @see ENTITY_DEF_SHAPE_2D_COLLIDER, BE_shape_2D_collider
  *
  * @return basilisk_entity *
  */
@@ -188,7 +188,7 @@ basilisk_entity *BE_STATIC_shape_2D_collider(void)
  * @see BE_STATIC_shape_2D_collider, BE_shape_2D_collider
  *
  */
-const basilisk_entity_definition BE_DEF_shape_2D_collider = {
+const basilisk_entity_definition ENTITY_DEF_SHAPE_2D_COLLIDER = {
         .data_size = sizeof(BE_shape_2D_collider),
 
         .on_init = &BE_shape_2D_collider_init, // register to a parent collision manager

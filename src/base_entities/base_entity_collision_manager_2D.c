@@ -23,7 +23,7 @@
 /**
  * @brief Private data definition of a collision manager entity.
  *
- * @see BE_DEF_collision_manager_2D, BE_shape_2D_collider
+ * @see ENTITY_DEF_COLLISION_MANAGER_2D, BE_shape_2D_collider
  */
 typedef struct BE_collision_manager_2D {
     RANGE(BE_shape_2D_collider *) *registered_collisions;
@@ -61,7 +61,7 @@ static collision_2D_info collision_2D_info_reflect(collision_2D_info info);
  */
 void BE_collision_manager_2D_register_shape(basilisk_entity *collision_manager_entity, BE_shape_2D_collider *col)
 {
-    if (!collision_manager_entity || !col || !basilisk_entity_is(collision_manager_entity, BE_DEF_collision_manager_2D)) {
+    if (!collision_manager_entity || !col || !basilisk_entity_is(collision_manager_entity, ENTITY_DEF_COLLISION_MANAGER_2D)) {
         return;
     }
 
@@ -79,7 +79,7 @@ void BE_collision_manager_2D_register_shape(basilisk_entity *collision_manager_e
  */
 void BE_collision_manager_2D_unregister_shape(basilisk_entity *collision_manager_entity, BE_shape_2D_collider *col)
 {
-    if (!collision_manager_entity || !col || !basilisk_entity_is(collision_manager_entity, BE_DEF_collision_manager_2D)) {
+    if (!collision_manager_entity || !col || !basilisk_entity_is(collision_manager_entity, ENTITY_DEF_COLLISION_MANAGER_2D)) {
         return;
     }
 
@@ -171,7 +171,7 @@ static collision_2D_info collision_2D_info_reflect(collision_2D_info info)
  * @see BE_collision_manager_2D, BE_shape_2D_collider
  *
  */
-const basilisk_entity_definition BE_DEF_collision_manager_2D = {
+const basilisk_entity_definition ENTITY_DEF_COLLISION_MANAGER_2D = {
         .data_size = sizeof(BE_collision_manager_2D),
 
         .on_init = &BE_collision_manager_2D_init,
@@ -179,10 +179,10 @@ const basilisk_entity_definition BE_DEF_collision_manager_2D = {
         .on_deinit = &BE_collision_manager_2D_deinit,
 };
 
-struct basilisk_specific_entity BE_CREATE_collision_manager_2D(void)
+struct basilisk_specific_entity create_collision_manager_2D(void)
 {
     return (struct basilisk_specific_entity) {
-            .entity_def = BE_DEF_collision_manager_2D,
+            .entity_def = ENTITY_DEF_COLLISION_MANAGER_2D,
             .data = NULL,
     };
 }

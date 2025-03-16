@@ -17,7 +17,7 @@
 /**
  * @brief Private data layout of a "2D texture" entity.
  *
- * @see BE_STATIC_texture_2D, BE_DEF_texture_2D
+ * @see BE_STATIC_texture_2D, ENTITY_DEF_TEXTURE_2D
  */
 typedef struct BE_texture_2D {
     /** Position information of the texture entity. */
@@ -56,7 +56,7 @@ static void BE_texture_2D_init(basilisk_entity *self_data)
 
     BE_texture_2D *texture_data = (BE_texture_2D *) self_data;
 
-    texture_data->body = basilisk_entity_get_parent(self_data, NULL, &BE_DEF_body_2D);
+    texture_data->body = basilisk_entity_get_parent(self_data, NULL, &ENTITY_DEF_BODY_2D);
 
     basilisk_entity_queue_subscribe_to_event(self_data, "sdl renderer draw", (basilisk_specific_event_subscription) { .index = texture_data->draw_index, .callback = &BE_texture_2D_on_draw });
 }
@@ -112,7 +112,7 @@ static void BE_texture_2D_on_draw(basilisk_entity *self_data, void *event_data)
  * Successive calls to this function will always yield the same object, with some eventual differing content (depending on the given arguments).
  * Use this to build new BE_texture_2D instances with a call to `basilisk_entity_add_child()` that will copy the data inside the returned object.
  *
- * @see BE_texture_2D, BE_DEF_texture_2D
+ * @see BE_texture_2D, ENTITY_DEF_TEXTURE_2D
  *
  * @param[in] properties starting local position of the body
  * @return basilisk_entity*
@@ -141,7 +141,7 @@ basilisk_entity *BE_STATIC_texture_2D(SDL_Texture *texture, i32 draw_index)
  *
  * @see BE_STATIC_texture_2D, BE_texture_2D
  */
-const basilisk_entity_definition BE_DEF_texture_2D = {
+const basilisk_entity_definition ENTITY_DEF_TEXTURE_2D = {
         .data_size = sizeof(BE_texture_2D),
 
         .on_init = &BE_texture_2D_init,

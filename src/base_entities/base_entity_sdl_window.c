@@ -18,7 +18,7 @@
 /**
  * @brief Private data needed by a "SDL window" entity to work. It retains the initialisation values and a handle to the actual SDL Window.
  *
- * @see BE_DEF_window_sdl
+ * @see ENTITY_DEF_WINDOW_SDL
  */
 typedef struct BE_window_sdl {
     /** Title of the window used on window creation. */
@@ -114,7 +114,7 @@ static void BE_window_sdl_quit(basilisk_entity *self_data, void *event_data)
  */
 SDL_Window *BE_window_sdl_get_window(basilisk_entity *window_entity)
 {
-    if (!window_entity || !basilisk_entity_is(window_entity, BE_DEF_window_sdl)) {
+    if (!window_entity || !basilisk_entity_is(window_entity, ENTITY_DEF_WINDOW_SDL)) {
         return NULL;
     }
 
@@ -130,14 +130,14 @@ SDL_Window *BE_window_sdl_get_window(basilisk_entity *window_entity)
  *
  * It might be a child of a BE_sdl_context entity.
  */
-const basilisk_entity_definition BE_DEF_window_sdl = {
+const basilisk_entity_definition ENTITY_DEF_WINDOW_SDL = {
         .data_size = sizeof(BE_window_sdl),
 
         .on_init = &BE_window_sdl_init,
         .on_deinit = &BE_window_sdl_deinit,
 };
 
-struct basilisk_specific_entity BE_CREATE_window_sdl(const char *title, size_t w, size_t h, size_t x, size_t y, SDL_WindowFlags flags)
+struct basilisk_specific_entity create_window_sdl(const char *title, size_t w, size_t h, size_t x, size_t y, SDL_WindowFlags flags)
 {
     static BE_window_sdl buffer = { 0u };
 
@@ -150,7 +150,7 @@ struct basilisk_specific_entity BE_CREATE_window_sdl(const char *title, size_t w
     };
 
     return (struct basilisk_specific_entity) {
-            .entity_def = BE_DEF_window_sdl,
+            .entity_def = ENTITY_DEF_WINDOW_SDL,
             .data = &buffer
     };
 }

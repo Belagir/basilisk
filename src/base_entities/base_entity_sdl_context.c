@@ -71,15 +71,15 @@ static void BE_context_sdl_deinit(basilisk_entity *self_data)
  * comprehensible hierarchy.
  *
  */
-const basilisk_entity_definition BE_DEF_context_sdl = {
+const basilisk_entity_definition ENTITY_DEF_CONTEXT_SDL = {
         .on_init = &BE_context_sdl_init,
         .on_deinit = &BE_context_sdl_deinit,
 };
 
-struct basilisk_specific_entity BE_CREATE_context_sdl(void)
+struct basilisk_specific_entity create_context_sdl(void)
 {
     return (struct basilisk_specific_entity) {
-            .entity_def = BE_DEF_context_sdl,
+            .entity_def = ENTITY_DEF_CONTEXT_SDL,
             .data = nullptr,
     };
 }

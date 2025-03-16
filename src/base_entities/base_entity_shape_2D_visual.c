@@ -17,7 +17,7 @@
 /**
  * @brief Private layout of a shape visual entity.
  *
- * @see BE_DEF_shape_2D_visual, BE_STATIC_shape_2D_visual, BE_shape_2D
+ * @see ENTITY_DEF_SHAPE_2D_VISUAL, BE_STATIC_shape_2D_visual, BE_shape_2D
  *
  */
 typedef struct BE_shape_2D_visual {
@@ -91,15 +91,15 @@ static void BE_shape_2D_visual_render_draw_circle(SDL_Renderer *renderer, vector
 
 /**
  * @brief Initialises a BE_shape_2D_visual entity.
- * The function will try to find a parent `BE_DEF_shape_2D` to hook to and pull shape / position information from.
+ * The function will try to find a parent `ENTITY_DEF_SHAPE_2D` to hook to and pull shape / position information from.
  *
- * @param[inout] self_data pointer to a BE_DEF_shape_2D object
+ * @param[inout] self_data pointer to a ENTITY_DEF_SHAPE_2D object
  */
 static void BE_shape_2D_visual_on_init(basilisk_entity *self_data)
 {
     BE_shape_2D_visual *visual = (BE_shape_2D_visual *) self_data;
 
-    visual->visualized = basilisk_entity_get_parent(visual, NULL, &BE_DEF_shape_2D);
+    visual->visualized = basilisk_entity_get_parent(visual, NULL, &ENTITY_DEF_SHAPE_2D);
 
     if (visual->visualized) {
         basilisk_entity_queue_subscribe_to_event(visual, "sdl renderer draw",
@@ -111,7 +111,7 @@ static void BE_shape_2D_visual_on_init(basilisk_entity *self_data)
  * @brief Draws a BE_shape_2D_visual entity using the informations contained in a `BE_render_manager_sdl_event_draw` object.
  * The function will draw the parent shape entity it might have detected with `BE_shape_2D_visual_on_init()`.
  *
- * @param[inout] self_data pointer to a BE_DEF_shape_2D object
+ * @param[inout] self_data pointer to a entity_def_shape_2D object
  * @param[inout] event_data pointer to a BE_render_manager_sdl_event_draw` object
  */
 static void BE_shape_2D_visual_on_draw(basilisk_entity *self_data, void *event_data)
@@ -146,7 +146,7 @@ static void BE_shape_2D_visual_on_draw(basilisk_entity *self_data, void *event_d
  * Successive calls to this function will always yield the same object, with some eventual differing content (depending on the given arguments).
  * Use this to build new BE_shape_2D_visual instances with a call to `basilisk_entity_add_child()` that will copy the data inside the returned object.
  *
- * @see BE_shape_2D_visual, BE_DEF_shape_2D_visual, BE_shape_2D
+ * @see BE_shape_2D_visual, ENTITY_DEF_SHAPE_2D_VISUAL, BE_shape_2D
  *
  * @param[in] color color of the drawn shape
  * @param[in] draw_index drazw index of the drawn shape
@@ -178,7 +178,7 @@ basilisk_entity *BE_STATIC_shape_2D_visual(SDL_Color color, i32 draw_index)
  * @see BE_shape_2D_visual, BE_STATIC_shape_2D_visual, BE_shape_2D
  *
  */
-const basilisk_entity_definition BE_DEF_shape_2D_visual = {
+const basilisk_entity_definition ENTITY_DEF_SHAPE_2D_VISUAL = {
         .data_size = sizeof(BE_shape_2D_visual),
 
         .on_init = &BE_shape_2D_visual_on_init,
