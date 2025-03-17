@@ -342,13 +342,13 @@ void basilisk_entity_queue_remove(basilisk_entity *entity)
  * @param[in] entity Target entity from which the graft will take place.
  * @param[in] graft_data Data (copied) describing the graft and its arguments.
  */
-void basilisk_entity_graft(basilisk_entity *entity, basilisk_specific_graft graft_data)
+basilisk_entity *basilisk_entity_graft(basilisk_entity *entity, basilisk_specific_graft graft_data)
 {
     if (!entity || !graft_data.graft_procedure) {
-        return;
+        return nullptr;
     }
 
-    graft_data.graft_procedure(entity, graft_data.args);
+    return graft_data.graft_procedure(entity, graft_data.args);
 }
 
 /**

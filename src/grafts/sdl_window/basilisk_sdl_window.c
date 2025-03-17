@@ -18,13 +18,13 @@
 // -------------------------------------------------------------------------------------------------
 
 /* Executes the actual graft by adding commands to the engine. */
-static void graft_sdl_window_callback(basilisk_entity *entity, void *graft_args);
+static basilisk_entity *graft_sdl_window_callback(basilisk_entity *entity, void *graft_args);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-static void graft_sdl_window_callback(basilisk_entity *entity, void *graft_args)
+static basilisk_entity *graft_sdl_window_callback(basilisk_entity *entity, void *graft_args)
 {
     basilisk_entity *context = NULL;
     basilisk_entity *window = NULL;
@@ -33,7 +33,7 @@ static void graft_sdl_window_callback(basilisk_entity *entity, void *graft_args)
     basilisk_entity *collision_manager = NULL;
 
     if (!graft_args) {
-        return;
+        return nullptr;
     }
 
     const graft_sdl_window_args sdl_win_args = *(const graft_sdl_window_args *) graft_args;
@@ -54,6 +54,8 @@ static void graft_sdl_window_callback(basilisk_entity *entity, void *graft_args)
             sdl_win_args.for_renderer.flags));
 
     collision_manager = basilisk_entity_add_child(render_manager, "Collision Manager", create_collision_manager_2D());
+
+    return render_manager;
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -81,7 +81,7 @@ typedef struct basilisk_specific_graft {
     void *args;
 
     /** Procedure called to add the graft. */
-    void (*graft_procedure)(basilisk_entity *entity, void *graft_args);
+    basilisk_entity * (*graft_procedure)(basilisk_entity *entity, void *graft_args);
 } basilisk_specific_graft;
 
 /**
@@ -147,7 +147,7 @@ basilisk_entity *basilisk_entity_add_child(basilisk_entity *entity, const char *
 /* Adds a pending command to remove an entity from the game tree. */
 void basilisk_entity_queue_remove(basilisk_entity *entity);
 /* Realizes a graft in the game tree relative to an entity. */
-void basilisk_entity_graft(basilisk_entity *entity, basilisk_specific_graft graft_data);
+basilisk_entity *basilisk_entity_graft(basilisk_entity *entity, basilisk_specific_graft graft_data);
 
 // -------------------------------------------------------------------------------------------------
 // ENTITY SEARCHING
