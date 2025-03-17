@@ -125,8 +125,8 @@ static void BE_collision_manager_2D_deinit(basilisk_entity *self_data)
 static void BE_collision_manager_2D_frame(basilisk_entity *self_data, float elapsed_time)
 {
     BE_collision_manager_2D *col_manager = (BE_collision_manager_2D *) self_data;
-    basilisk_entity *shape_1 = NULL;
-    basilisk_entity *shape_2 = NULL;
+    basilisk_entity *shape_1 = nullptr;
+    basilisk_entity *shape_2 = nullptr;
     collision_2D_info collision_info = { 0u };
 
     for (size_t i = 0u ; i < col_manager->registered_collisions->length ; i++) {
@@ -183,6 +183,6 @@ struct basilisk_specific_entity create_collision_manager_2D(void)
 {
     return (struct basilisk_specific_entity) {
             .entity_def = ENTITY_DEF_COLLISION_MANAGER_2D,
-            .data = NULL,
+            .data = nullptr,
     };
 }

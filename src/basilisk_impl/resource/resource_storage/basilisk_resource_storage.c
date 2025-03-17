@@ -93,9 +93,9 @@ static bool storage_file_append(const char *storage_file_path, const char *res_p
 /**
  * @brief Creates a data storage object meant to load, store, service and release resources present in a single storage file.
  * In nominal (development -- with no compilation switch) mode, calling this function will not only create the object, but also
- * create or empty the given storage file. On failure to do this, the function will abort the object creation, and will return NULL.
+ * create or empty the given storage file. On failure to do this, the function will abort the object creation, and will return nullptr.
  * With BASILISK_RELEASE set, this function will just check that the given file can be opened in read mode. On failure, the
- * object will not be created and the function will return NULL.
+ * object will not be created and the function will return nullptr.
  *
  * Calling this function will not load the resources present in the storage file.
  *
@@ -105,11 +105,11 @@ static bool storage_file_append(const char *storage_file_path, const char *res_p
  */
 resource_storage *resource_storage_create(const char *str_storage_path, allocator alloc)
 {
-    resource_storage *new_storage = NULL;
-    FILE *storage_file = NULL;
+    resource_storage *new_storage = nullptr;
+    FILE *storage_file = nullptr;
 
     if (!str_storage_path) {
-        return NULL;
+        return nullptr;
     }
 
 #ifndef BASILISK_RELEASE
@@ -120,7 +120,7 @@ resource_storage *resource_storage_create(const char *str_storage_path, allocato
 #endif
 
     if (!storage_file) {
-        return NULL;
+        return nullptr;
     }
     fclose(storage_file);
 
@@ -157,7 +157,7 @@ void resource_storage_destroy(resource_storage **storage_data, allocator alloc)
     range_destroy_dynamic(alloc, &RANGE_TO_ANY((*storage_data)->items));
 
     alloc.free(alloc, *storage_data);
-    *storage_data = NULL;
+    *storage_data = nullptr;
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -175,7 +175,7 @@ void resource_storage_destroy(resource_storage **storage_data, allocator alloc)
  */
 bool resource_storage_check(resource_storage *storage_data, const char *str_path, allocator alloc)
 {
-    FILE *storage_file = NULL;
+    FILE *storage_file = nullptr;
     resource_item_header item_header = { 0u };
     u32 str_path_hash = 0u;
     bool found = false;
@@ -212,7 +212,7 @@ bool resource_storage_check(resource_storage *storage_data, const char *str_path
 
 /**
  * @brief Returns the resource data and size associated to a path in a storage object. If the storage has no supplicant
- * entity, the storage object had not have loaded its associated storage file yet, and will return NULL, regardless of
+ * entity, the storage object had not have loaded its associated storage file yet, and will return nullptr, regardless of
  * the resource existence.
  *
  * @param[inout] storage_data Target storage data the resource was declared to.
@@ -230,7 +230,7 @@ void *resource_storage_get(resource_storage *storage_data, const char *str_path,
     }
 
     if (!storage_data || !str_path) {
-        return NULL;
+        return nullptr;
     }
 
     str_path_hash = hash_jenkins_one_at_a_time((const byte *) str_path, c_string_length(str_path, false), 0u);
@@ -242,7 +242,7 @@ void *resource_storage_get(resource_storage *storage_data, const char *str_path,
         return storage_data->items->data[data_index].data;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 /**
@@ -262,7 +262,7 @@ void resource_storage_add_supplicant(resource_storage *storage_data, basilisk_en
         return;
     }
 
-    if (sorted_range_find_in(RANGE_TO_ANY(storage_data->supplicants), &raw_pointer_compare, &entity, NULL)) {
+    if (sorted_range_find_in(RANGE_TO_ANY(storage_data->supplicants), &raw_pointer_compare, &entity, nullptr)) {
         return;
     }
 
@@ -310,7 +310,7 @@ void resource_storage_remove_supplicant(resource_storage *storage_data, basilisk
  */
 static bool file_data_array_from(const char *str_path, file_data_array **dest, allocator alloc)
 {
-    FILE *file = NULL;
+    FILE *file = nullptr;
     struct stat file_info = { 0u };
 
     if (!str_path || !dest || !*dest) {
@@ -342,7 +342,7 @@ static bool file_data_array_from(const char *str_path, file_data_array **dest, a
  */
 static void resource_storage_load(resource_storage *storage, allocator alloc)
 {
-    FILE *storage_file = NULL;
+    FILE *storage_file = nullptr;
     resource_item_deserialized item = { 0u };
 
     if (!storage || storage->is_loaded) {
@@ -401,8 +401,8 @@ static void resource_storage_unload(resource_storage *storage, allocator alloc)
  */
 static bool storage_file_append(const char *storage_file_path, const char *res_path, allocator alloc)
 {
-    file_data_array *resource_file_data = NULL;
-    FILE *storage_file = NULL;
+    file_data_array *resource_file_data = nullptr;
+    FILE *storage_file = nullptr;
     u32 str_path_hash = 0u;
 
     if (!storage_file_path || !res_path) {

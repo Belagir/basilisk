@@ -75,7 +75,7 @@ static void BE_render_manager_sdl_init(basilisk_entity *self_data)
 
     BE_render_manager_sdl *init_data = (BE_render_manager_sdl *) self_data;
 
-    SDL_Window *parent_window = BE_window_sdl_get_window(basilisk_entity_get_parent(self_data, NULL, &ENTITY_DEF_WINDOW_SDL));
+    SDL_Window *parent_window = BE_window_sdl_get_window(basilisk_entity_get_parent(self_data, nullptr, &ENTITY_DEF_WINDOW_SDL));
 
     init_data->renderer = SDL_CreateRenderer(parent_window, -1, init_data->flags);
 
@@ -105,7 +105,7 @@ static void BE_render_manager_sdl_deinit(basilisk_entity *self_data)
 
     SDL_DestroyTexture(data->buffer);
     SDL_DestroyRenderer(data->renderer);
-    data->renderer = NULL;
+    data->renderer = nullptr;
 }
 
 /**
@@ -175,8 +175,8 @@ static void BE_render_manager_sdl_post_draw(basilisk_entity *self_data, void *ev
 
     SDL_RenderPresent(data->renderer);
 
-    SDL_SetRenderTarget(data->renderer, NULL);
-    SDL_RenderCopy(data->renderer, data->buffer, NULL, NULL);
+    SDL_SetRenderTarget(data->renderer, nullptr);
+    SDL_RenderCopy(data->renderer, data->buffer, nullptr, nullptr);
     SDL_RenderPresent(data->renderer);
 }
 

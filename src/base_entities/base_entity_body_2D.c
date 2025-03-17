@@ -24,7 +24,7 @@
  * @see BE_STATIC_body_2D, ENTITY_DEF_BODY_2D
  */
 struct BE_body_2D {
-    /** Parent 2D body this body is pulling its global position from, automatically pulled from the entity's parents. Could be NULL. Overriden on initialisation. */
+    /** Parent 2D body this body is pulling its global position from, automatically pulled from the entity's parents. Could be nullptr. Overriden on initialisation. */
     struct BE_body_2D *previous;
 
     /** Local position of the object in respect to its optional previous parent 2D body. */
@@ -68,7 +68,7 @@ static void BE_body_2D_init(basilisk_entity *self_data)
 
     struct BE_body_2D *self_body = (struct BE_body_2D *) self_data;
 
-    self_body->previous = basilisk_entity_get_parent(self_data, NULL, &ENTITY_DEF_BODY_2D);
+    self_body->previous = basilisk_entity_get_parent(self_data, nullptr, &ENTITY_DEF_BODY_2D);
     BE_body_2D_update(self_body);
 }
 

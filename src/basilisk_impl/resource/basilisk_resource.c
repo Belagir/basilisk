@@ -39,7 +39,7 @@ typedef struct resource_manager {
  */
 resource_manager *resource_manager_create(allocator alloc)
 {
-    resource_manager *new_res_manager = NULL;
+    resource_manager *new_res_manager = nullptr;
 
     new_res_manager = alloc.malloc(alloc, sizeof(*new_res_manager));
 
@@ -71,7 +71,7 @@ void resource_manager_destroy(resource_manager **res_manager, allocator alloc)
     range_destroy_dynamic(alloc, &RANGE_TO_ANY((*res_manager)->storages));
 
     alloc.free(alloc, *res_manager);
-    *res_manager = NULL;
+    *res_manager = nullptr;
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -91,7 +91,7 @@ bool resource_manager_touch(resource_manager *res_manager, const char *str_stora
 {
     size_t found_storage_index = 0u;
     u32 storage_name_hash = 0u;
-    resource_storage *new_storage = NULL;
+    resource_storage *new_storage = nullptr;
 
     if (!res_manager) {
         return false;
@@ -125,7 +125,7 @@ void *resource_manager_fetch(resource_manager *res_manager, const char *str_stor
     u32 storage_name_hash = 0u;
 
     if (!res_manager || !str_res_path || !str_storage_path) {
-        return NULL;
+        return nullptr;
     }
 
     storage_name_hash = hash_jenkins_one_at_a_time((const byte *) str_storage_path, c_string_length(str_storage_path, false), 0u);
@@ -134,7 +134,7 @@ void *resource_manager_fetch(resource_manager *res_manager, const char *str_stor
         return resource_storage_get(res_manager->storages->data[found_storage_index], str_res_path, out_size);
     }
 
-    return NULL;
+    return nullptr;
 }
 
 /**

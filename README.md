@@ -23,11 +23,11 @@ int main(void)
 
     // adds entity "hello" bellow the root
     struct basilisk_entity *first_entity = basilisk_entity_add_child(basilisk_engine_root_entity(engine), "hello",
-            (struct basilisk_specific_entity) { { 0u, &hello, &bye, NULL }, NULL });
+            (struct basilisk_specific_entity) { { 0u, &hello, &bye, nullptr }, nullptr });
 
     // adds entity "world" bellow "hello" (accessed with "hello/world")
     (void) basilisk_entity_add_child(first_entity, "world",
-            (struct basilisk_specific_entity) { { 0u, &world, &world, NULL }, NULL });
+            (struct basilisk_specific_entity) { { 0u, &world, &world, nullptr }, nullptr });
 
     // runs the engine until SIGINT
     basilisk_engine_run(engine, 60);

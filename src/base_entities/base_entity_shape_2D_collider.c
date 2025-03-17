@@ -51,10 +51,10 @@ static void BE_shape_2D_collider_init(basilisk_entity *self_data)
 {
     BE_shape_2D_collider *collider = (BE_shape_2D_collider *) self_data;
 
-    collider->monitored = basilisk_entity_get_parent(collider, NULL, &ENTITY_DEF_SHAPE_2D);
+    collider->monitored = basilisk_entity_get_parent(collider, nullptr, &ENTITY_DEF_SHAPE_2D);
 
     if (collider->monitored) {
-        collider->manager = basilisk_entity_get_parent(collider, NULL, &ENTITY_DEF_COLLISION_MANAGER_2D);
+        collider->manager = basilisk_entity_get_parent(collider, nullptr, &ENTITY_DEF_COLLISION_MANAGER_2D);
         collision_manager_2D_register_shape(collider->manager, collider);
     }
 }

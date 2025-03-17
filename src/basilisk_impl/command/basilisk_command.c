@@ -125,7 +125,7 @@ void command_destroy(command *cmd, allocator alloc)
  */
 command_queue *command_queue_create(allocator alloc)
 {
-    command_queue *new_queue = NULL;
+    command_queue *new_queue = nullptr;
 
     new_queue = alloc.malloc(alloc, sizeof(*new_queue));
 
@@ -156,7 +156,7 @@ void command_queue_destroy(command_queue **queue, allocator alloc)
 
     range_destroy_dynamic(alloc, &RANGE_TO_ANY((*queue)->queue_impl));
     alloc.free(alloc, *queue);
-    *queue = NULL;
+    *queue = nullptr;
 }
 
 // -------------------------------------------------------------------------------------------------

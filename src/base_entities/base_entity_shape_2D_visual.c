@@ -99,7 +99,7 @@ static void BE_shape_2D_visual_on_init(basilisk_entity *self_data)
 {
     BE_shape_2D_visual *visual = (BE_shape_2D_visual *) self_data;
 
-    visual->visualized = basilisk_entity_get_parent(visual, NULL, &ENTITY_DEF_SHAPE_2D);
+    visual->visualized = basilisk_entity_get_parent(visual, nullptr, &ENTITY_DEF_SHAPE_2D);
 
     if (visual->visualized) {
         basilisk_entity_queue_subscribe_to_event(visual, "sdl renderer draw",

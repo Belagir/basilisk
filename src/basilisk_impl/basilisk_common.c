@@ -28,7 +28,7 @@ const identifier *const identifier_root = (const identifier *const) &identifier_
 /* Comapares two characters by their position in the ASCII table. */
 static i32 identifier_compare_character(const void *lhs, const void *rhs);
 
-/* Versatile utility to create identifiers from NULL-terminated strings with finer control. */
+/* Versatile utility to create identifiers from nullptr-terminated strings with finer control. */
 static identifier *identifier_create_base(const char *str, allocator alloc, bool keep_terminator);
 
 // -------------------------------------------------------------------------------------------------
@@ -36,10 +36,10 @@ static identifier *identifier_create_base(const char *str, allocator alloc, bool
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief Allocates an identifier that copies the contents of a NULL-terminated string.
- * The function will return NULL if the identifier is empty or contains at least one '/'.
+ * @brief Allocates an identifier that copies the contents of a nullptr-terminated string.
+ * The function will return nullptr if the identifier is empty or contains at least one '/'.
  *
- * @param[in] str NULL-terminated string to copy
+ * @param[in] str nullptr-terminated string to copy
  * @param[inout] alloc Allocator used for the copy.
  * @return identifier *
  */
@@ -56,9 +56,9 @@ identifier *identifier_from_cstring(const char *str, allocator alloc)
 }
 
 /**
- * @brief Allocates a path from a NULL-terminated string of names separated by '/'.
+ * @brief Allocates a path from a nullptr-terminated string of names separated by '/'.
  *
- * @param[in] str NULL-terminated string to copy
+ * @param[in] str nullptr-terminated string to copy
  * @param[inout] alloc Allocator used for the copy.
  * @return path *
  */
@@ -71,7 +71,7 @@ path *path_from_cstring(const char *str, allocator alloc)
     path *new_path = { 0u };
 
     if (!str) {
-        return NULL;
+        return nullptr;
     }
 
     // allocating read data & output data
@@ -118,7 +118,7 @@ void path_destroy(path **p, allocator alloc)
     }
 
     range_destroy_dynamic(alloc, &RANGE_TO_ANY(*p));
-    *p = NULL;
+    *p = nullptr;
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -193,7 +193,7 @@ void print_path(const path *p)
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief Compares an identifier to a NULL-terminated string.
+ * @brief Compares an identifier to a nullptr-terminated string.
  *
  * @param id
  * @param str
@@ -272,10 +272,10 @@ static i32 identifier_compare_character(const void *lhs, const void *rhs)
 static identifier *identifier_create_base(const char *str, allocator alloc, bool keep_terminator)
 {
     size_t str_length = 0u;
-    identifier *new_identifier = NULL;
+    identifier *new_identifier = nullptr;
 
     if (!str) {
-        return NULL;
+        return nullptr;
     }
 
     str_length = c_string_length(str, keep_terminator);

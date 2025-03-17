@@ -22,7 +22,7 @@
  * @brief Stores an event linked to an entity that stacked it.
  */
 typedef struct event_stacked {
-    /** Entity that stacked the event. Might be NULL. */
+    /** Entity that stacked the event. Might be nullptr. */
     basilisk_engine_entity *source;
     /** Actual event. */
     event ev;
@@ -70,7 +70,7 @@ static void event_broker_cleanup_empty_subscriptions(event_broker *broker, alloc
  */
 event_broker *event_broker_create(allocator alloc)
 {
-    event_broker *new_broker = NULL;
+    event_broker *new_broker = nullptr;
 
     new_broker = alloc.malloc(alloc, sizeof(*new_broker));
 
@@ -102,7 +102,7 @@ void event_broker_destroy(event_broker **broker, allocator alloc)
     range_destroy_dynamic(alloc, &RANGE_TO_ANY((*broker)->subs));
     alloc.free(alloc, *broker);
 
-    *broker = NULL;
+    *broker = nullptr;
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -115,7 +115,7 @@ void event_broker_destroy(event_broker **broker, allocator alloc)
  */
 event_stack *event_stack_create(allocator alloc)
 {
-    event_stack *new_stack = NULL;
+    event_stack *new_stack = nullptr;
 
     new_stack = alloc.malloc(alloc, sizeof(*new_stack));
 
@@ -147,7 +147,7 @@ void event_stack_destroy(event_stack **stack, allocator alloc)
     range_destroy_dynamic(alloc, &RANGE_TO_ANY((*stack)->stack_impl));
 
     alloc.free(alloc, *stack);
-    *stack = NULL;
+    *stack = nullptr;
 }
 
 // -------------------------------------------------------------------------------------------------

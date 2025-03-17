@@ -65,8 +65,8 @@ static bool basilisk_entity_definition_unit_is_same_as(basilisk_entity_definitio
  */
 basilisk_engine_entity *basilisk_engine_entity_create(const identifier *id, basilisk_specific_entity user_data, basilisk_engine *handle, allocator alloc)
 {
-    basilisk_engine_entity *new_entity = NULL;
-    const basilisk_entity_definition *subtyped_definition = NULL;
+    basilisk_engine_entity *new_entity = nullptr;
+    const basilisk_entity_definition *subtyped_definition = nullptr;
 
     new_entity = alloc.malloc(alloc, sizeof(*new_entity) + user_data.entity_def.data_size);
 
@@ -74,7 +74,7 @@ basilisk_engine_entity *basilisk_engine_entity_create(const identifier *id, basi
         // core informations
         *new_entity = (basilisk_engine_entity) {
                 .id = range_create_dynamic_from_copy_of(alloc, RANGE_TO_ANY(id)),
-                .parent = NULL,
+                .parent = nullptr,
                 .children = range_create_dynamic(alloc, sizeof(*new_entity->children->data), BASILISK_COLLECTIONS_START_LENGTH),
                 .host_handle = handle,
 
@@ -113,7 +113,7 @@ void basilisk_engine_entity_destroy(basilisk_engine_entity **target, allocator a
     range_destroy_dynamic(alloc, &RANGE_TO_ANY((*target)->id));
 
     alloc.free(alloc, *target);
-    *target = NULL;
+    *target = nullptr;
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -127,7 +127,7 @@ void basilisk_engine_entity_destroy(basilisk_engine_entity **target, allocator a
 basilisk_engine_entity *basilisk_engine_entity_get_containing_full_entity(const basilisk_entity *entity)
 {
     if (!entity) {
-        return NULL;
+        return nullptr;
     }
 
     return CONTAINER_OF(entity, basilisk_engine_entity, data);
@@ -142,7 +142,7 @@ basilisk_engine_entity *basilisk_engine_entity_get_containing_full_entity(const 
 basilisk_entity *basilisk_engine_entity_get_specific_data(basilisk_engine_entity *target)
 {
     if (!target) {
-        return NULL;
+        return nullptr;
     }
 
     return target->data;
@@ -157,7 +157,7 @@ basilisk_entity *basilisk_engine_entity_get_specific_data(basilisk_engine_entity
 basilisk_engine *basilisk_engine_entity_get_host_engine_handle(basilisk_engine_entity *target)
 {
     if (!target) {
-        return NULL;
+        return nullptr;
     }
 
     return target->host_handle;
@@ -172,7 +172,7 @@ basilisk_engine *basilisk_engine_entity_get_host_engine_handle(basilisk_engine_e
 const identifier *basilisk_engine_entity_get_name(const basilisk_engine_entity *target)
 {
     if (!target) {
-        return NULL;
+        return nullptr;
     }
 
     return target->id;
@@ -187,7 +187,7 @@ const identifier *basilisk_engine_entity_get_name(const basilisk_engine_entity *
 basilisk_engine_entity *basilisk_engine_entity_get_parent(basilisk_engine_entity *target)
 {
     if (!target) {
-        return NULL;
+        return nullptr;
     }
 
     return target->parent;
@@ -247,7 +247,7 @@ void basilisk_engine_entity_deparent(basilisk_engine_entity *target)
     }
 
     (void) sorted_range_remove_from(RANGE_TO_ANY(target->parent->children), &identifier_compare_doubleref, &target);
-    target->parent = NULL;
+    target->parent = nullptr;
 }
 
 /**
@@ -259,7 +259,7 @@ void basilisk_engine_entity_deparent(basilisk_engine_entity *target)
  */
 void basilisk_engine_entity_destroy_children(basilisk_engine_entity *target, allocator alloc)
 {
-    basilisk_engine_entity_range *all_children = NULL;
+    basilisk_engine_entity_range *all_children = nullptr;
 
     if (!target) {
         return;
@@ -283,11 +283,11 @@ void basilisk_engine_entity_destroy_children(basilisk_engine_entity *target, all
  */
 basilisk_engine_entity *basilisk_engine_entity_get_child(basilisk_engine_entity *target, const path *id_path)
 {
-    basilisk_engine_entity *visited_entity = NULL;
+    basilisk_engine_entity *visited_entity = nullptr;
     size_t pos_path = 0u;
 
     if (!target) {
-        return NULL;
+        return nullptr;
     } else if (!id_path || (id_path->length == 0u)) {
         return target;
     }
@@ -295,7 +295,7 @@ basilisk_engine_entity *basilisk_engine_entity_get_child(basilisk_engine_entity 
     visited_entity = target;
     while (visited_entity && (pos_path < id_path->length)) {
         visited_entity = basilisk_engine_entity_get_direct_child(visited_entity, id_path->data[pos_path]);
-        pos_path += (size_t) (visited_entity != NULL);
+        pos_path += (size_t) (visited_entity != nullptr);
     }
 
     return visited_entity;
@@ -314,7 +314,7 @@ basilisk_engine_entity *basilisk_engine_entity_get_direct_child(basilisk_engine_
     size_t pos_child = 0u;
 
     if (!target || !id) {
-        return NULL;
+        return nullptr;
     }
 
     found_child = sorted_range_find_in(
@@ -326,7 +326,7 @@ basilisk_engine_entity *basilisk_engine_entity_get_direct_child(basilisk_engine_
     if (found_child) {
         return target->children->data[pos_child];
     }
-    return NULL;
+    return nullptr;
 }
 
 /**
@@ -339,10 +339,10 @@ basilisk_engine_entity *basilisk_engine_entity_get_direct_child(basilisk_engine_
 basilisk_engine_entity_range *basilisk_engine_entity_get_children(basilisk_engine_entity *target, allocator alloc)
 {
     size_t child_pos = 0u;
-    basilisk_engine_entity_range *entities = NULL;
+    basilisk_engine_entity_range *entities = nullptr;
 
     if (!target) {
-        return NULL;
+        return nullptr;
     }
 
     entities = range_create_dynamic_from_copy_of(alloc, RANGE_TO_ANY(target->children));

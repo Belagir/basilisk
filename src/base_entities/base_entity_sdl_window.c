@@ -87,7 +87,7 @@ static void BE_window_sdl_deinit(basilisk_entity *self_data)
     BE_window_sdl *window_data = (BE_window_sdl *) self_data;
 
     SDL_DestroyWindow(window_data->window);
-    window_data->window = NULL;
+    window_data->window = nullptr;
 
     SDL_QuitSubSystem(SDL_INIT_VIDEO);
 }
@@ -115,7 +115,7 @@ static void BE_window_sdl_quit(basilisk_entity *self_data, void *event_data)
 SDL_Window *BE_window_sdl_get_window(basilisk_entity *window_entity)
 {
     if (!basilisk_entity_is(window_entity, ENTITY_DEF_WINDOW_SDL)) {
-        return NULL;
+        return nullptr;
     }
 
     return ((struct BE_window_sdl *) window_entity)->window;

@@ -52,7 +52,7 @@ static void BE_shape_2D_init(basilisk_entity *self_data)
         return;
     }
 
-    shape->body = basilisk_entity_get_parent(self_data, NULL, &ENTITY_DEF_BODY_2D);
+    shape->body = basilisk_entity_get_parent(self_data, nullptr, &ENTITY_DEF_BODY_2D);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -86,7 +86,7 @@ shape_2D_id shape_2D_what(const basilisk_entity *shape_entity)
 shape_2D_circle *shape_2D_as_circle(basilisk_entity *shape_entity)
 {
     if (!basilisk_entity_is(shape_entity, ENTITY_DEF_SHAPE_2D)) {
-        return NULL;
+        return nullptr;
     }
 
     struct BE_shape_2D *shape = (struct BE_shape_2D *) shape_entity;
@@ -104,7 +104,7 @@ shape_2D_circle *shape_2D_as_circle(basilisk_entity *shape_entity)
 shape_2D_rect *shape_2D_as_rect(basilisk_entity *shape_entity)
 {
     if (!basilisk_entity_is(shape_entity, ENTITY_DEF_SHAPE_2D)) {
-        return NULL;
+        return nullptr;
     }
 
     struct BE_shape_2D *shape = (struct BE_shape_2D *) shape_entity;
@@ -121,7 +121,7 @@ shape_2D_rect *shape_2D_as_rect(basilisk_entity *shape_entity)
 basilisk_entity *shape_2D_get_body(basilisk_entity *shape_entity)
 {
     if (!basilisk_entity_is(shape_entity, ENTITY_DEF_SHAPE_2D)) {
-        return NULL;
+        return nullptr;
     }
 
     struct BE_shape_2D *shape = (struct BE_shape_2D *) shape_entity;

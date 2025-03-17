@@ -26,11 +26,11 @@ static basilisk_entity *graft_sdl_window_callback(basilisk_entity *entity, void 
 
 static basilisk_entity *graft_sdl_window_callback(basilisk_entity *entity, void *graft_args)
 {
-    basilisk_entity *context = NULL;
-    basilisk_entity *window = NULL;
-    basilisk_entity *render_manager = NULL;
-    basilisk_entity *event_relay = NULL;
-    basilisk_entity *collision_manager = NULL;
+    basilisk_entity *context = nullptr;
+    basilisk_entity *window = nullptr;
+    basilisk_entity *render_manager = nullptr;
+    basilisk_entity *event_relay = nullptr;
+    basilisk_entity *collision_manager = nullptr;
 
     if (!graft_args) {
         return nullptr;

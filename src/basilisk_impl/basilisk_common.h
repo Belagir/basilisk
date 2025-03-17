@@ -41,10 +41,10 @@ typedef RANGE(identifier *) path;
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-/* Allocates an identifier that copies the contents of a NULL-terminated string. */
+/* Allocates an identifier that copies the contents of a nullptr-terminated string. */
 identifier *identifier_from_cstring(const char *str, allocator alloc);
 
-/* Allocates a path from a NULL-terminated string of names separated by '/'. */
+/* Allocates a path from a nullptr-terminated string of names separated by '/'. */
 path *path_from_cstring(const char *str, allocator alloc);
 
 /* Utility to bulk remove indentifiers stored in a path. */

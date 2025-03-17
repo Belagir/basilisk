@@ -125,7 +125,7 @@ static void cockatrice_engine_int_handler(int val) {
 basilisk_engine *basilisk_engine_create(void)
 {
     allocator used_alloc = make_system_allocator();
-    basilisk_engine *new_engine = NULL;
+    basilisk_engine *new_engine = nullptr;
 
     signal(SIGINT, &cockatrice_engine_int_handler);
 
@@ -143,7 +143,7 @@ basilisk_engine *basilisk_engine_create(void)
 
                 .root_entity = basilisk_engine_entity_create(identifier_root, (basilisk_specific_entity) { 0u }, new_engine, used_alloc),
 
-                .active_entities = NULL,
+                .active_entities = nullptr,
                 .update_active_entities = false,
 
                 .should_quit = false,
@@ -187,20 +187,20 @@ void basilisk_engine_destroy(basilisk_engine **handle)
     logger_destroy(&(*handle)->logger);
 
     used_alloc.free(used_alloc, *handle);
-    *handle = NULL;
+    *handle = nullptr;
 }
 
 /**
  * @brief Returns the data pointer of the root entity to be used with basilisk_entity_*() functions.
  * The pointer itself points to unallocated memory and cannot be dereferenced.
  *
- * @param[in] handle Handle to an engine instance. If NULL, the functions returns NULL.
+ * @param[in] handle Handle to an engine instance. If nullptr, the functions returns nullptr.
  * @return basilisk_entity *
  */
 basilisk_entity *basilisk_engine_root_entity(basilisk_engine *handle)
 {
     if (!handle) {
-        return NULL;
+        return nullptr;
     }
 
     return basilisk_engine_entity_get_specific_data(handle->root_entity);
@@ -245,7 +245,7 @@ void basilisk_engine_run(basilisk_engine *handle, int fps) {
 
         basilisk_engine_frame_step_entities(handle, (f32) frame_delay);
 
-        (void) nanosleep(&(struct timespec) { .tv_nsec = (long) (frame_delay * 1000000.f) }, NULL);
+        (void) nanosleep(&(struct timespec) { .tv_nsec = (long) (frame_delay * 1000000.f) }, nullptr);
     } while (!handle->should_quit);
 }
 
@@ -280,23 +280,23 @@ void basilisk_entity_quit(basilisk_entity *entity)
  */
 basilisk_entity *basilisk_entity_add_child(basilisk_entity *entity, const char *str_id, basilisk_specific_entity user_data)
 {
-    basilisk_entity *new_entity = NULL;
-    identifier *new_entity_id = NULL;
+    basilisk_entity *new_entity = nullptr;
+    identifier *new_entity_id = nullptr;
 
     basilisk_engine_entity *full_entity = basilisk_engine_entity_get_containing_full_entity(entity);
     basilisk_engine *handle = basilisk_engine_entity_get_host_engine_handle(full_entity);
 
     if (!full_entity || !handle) {
-        return NULL;
+        return nullptr;
     }
 
     new_entity_id = identifier_from_cstring(str_id, handle->alloc);
 
     if (!new_entity_id) {
-        return NULL;
+        return nullptr;
     }
 
-    while (basilisk_engine_entity_get_direct_child(full_entity, new_entity_id) != NULL) {
+    while (basilisk_engine_entity_get_direct_child(full_entity, new_entity_id) != nullptr) {
         identifier_increment(&new_entity_id, handle->alloc);
     }
 
@@ -405,29 +405,29 @@ void basilisk_entity_stack_event(basilisk_entity *entity, const char *str_event_
 
 /**
  * @brief Returns the first parent entity of the provided name and definition.
- * If no corresponding parent is found, the function returns NULL.
+ * If no corresponding parent is found, the function returns nullptr.
  *
  * @param[in] entity Entity from which to search for the parent.
- * @param[in] str_parent_name Name of the potential parent. Can be NULL if you just want to search by type or get the first parent.
- * @param[in] entity_def Entity definition used to create the potential parent. Can be NULL if you just want to search by name or get the first parent.
+ * @param[in] str_parent_name Name of the potential parent. Can be nullptr if you just want to search by type or get the first parent.
+ * @param[in] entity_def Entity definition used to create the potential parent. Can be nullptr if you just want to search by name or get the first parent.
  * @return basilisk_entity *
  */
 basilisk_entity *basilisk_entity_get_parent(basilisk_entity *entity, const char *str_parent_name, const basilisk_entity_definition *entity_def)
 {
     if (!entity) {
-        return NULL;
+        return nullptr;
     }
 
     basilisk_engine_entity *full_entity = basilisk_engine_entity_get_containing_full_entity(entity);
     full_entity = basilisk_engine_entity_get_parent(full_entity);
 
-    if ((entity_def == NULL) && (str_parent_name == NULL)) {
+    if ((entity_def == nullptr) && (str_parent_name == nullptr)) {
         return basilisk_engine_entity_get_specific_data(full_entity);
     }
 
-    while ((full_entity != NULL)
-            && (((entity_def == NULL) || (!basilisk_engine_entity_has_definition(full_entity, *entity_def)))
-                    && ((str_parent_name == NULL) || (identifier_compare_to_cstring(basilisk_engine_entity_get_name(full_entity), str_parent_name) != 0))))
+    while ((full_entity != nullptr)
+            && (((entity_def == nullptr) || (!basilisk_engine_entity_has_definition(full_entity, *entity_def)))
+                    && ((str_parent_name == nullptr) || (identifier_compare_to_cstring(basilisk_engine_entity_get_name(full_entity), str_parent_name) != 0))))
     {
         full_entity = basilisk_engine_entity_get_parent(full_entity);
     }
@@ -436,24 +436,24 @@ basilisk_entity *basilisk_entity_get_parent(basilisk_entity *entity, const char 
 }
 
 /**
- * @brief Returns the child of the entity at the end of the provided path. If no such child is found, returns NULL.
+ * @brief Returns the child of the entity at the end of the provided path. If no such child is found, returns nullptr.
  * If the given path is empty, the root is returned : it is the entity given as argument.
  *
  * @param[in] entity Entity from which to search for the child.
  * @param[in] path Path to the potential child entity.
- * @param[in] entity_def Entity definition used to create the potential parent. Can be NULL if you just want to search by name..
+ * @param[in] entity_def Entity definition used to create the potential parent. Can be nullptr if you just want to search by name..
  * @return basilisk_entity *
  */
 basilisk_entity *basilisk_entity_get_child(basilisk_entity *entity, const char *str_path, const basilisk_entity_definition *entity_def)
 {
     if (!entity || !str_path) {
-        return NULL;
+        return nullptr;
     }
 
     basilisk_engine_entity *full_entity = basilisk_engine_entity_get_containing_full_entity(entity);
     basilisk_engine *handle = basilisk_engine_entity_get_host_engine_handle(full_entity);
-    basilisk_engine_entity *found_entity = NULL;
-    path *child_path = NULL;
+    basilisk_engine_entity *found_entity = nullptr;
+    path *child_path = nullptr;
 
     if (handle) {
         child_path = path_from_cstring(str_path, handle->alloc);
@@ -462,7 +462,7 @@ basilisk_entity *basilisk_entity_get_child(basilisk_entity *entity, const char *
     }
 
     if (entity_def && !basilisk_engine_entity_has_definition(found_entity, *entity_def)) {
-        return NULL;
+        return nullptr;
     }
 
     return basilisk_engine_entity_get_specific_data(found_entity);
@@ -518,14 +518,14 @@ void basilisk_engine_declare_resource(basilisk_engine *handle, const char *str_s
 /**
  * @brief Returns the data from a resource present in a storage. The entity will be registered as using this storage, and if it is the first
  * one to do so, all of the storage's resources will be loaded in memory. On entity removal, the entity will be also removed from the storage's
- * users, and if it was the last one, the storage will be unloaded. You can also pass NULL to the `str_file_path` argument to notify the engine
+ * users, and if it was the last one, the storage will be unloaded. You can also pass nullptr to the `str_file_path` argument to notify the engine
  * that the provided entity needs to keep the storage loaded as long as it lives.
  *
  * The memory returned is owned by the engine and will follow its own lifetime.
  *
  * @param[in] entity Entity querying a resource. It will be registered as a user of the storage.
  * @param[in] str_storage_name Name of the storage containing the resource.
- * @param[in] str_file_path File path to the actual resource. Can be NULL.
+ * @param[in] str_file_path File path to the actual resource. Can be nullptr.
  * @param[out] out_size Outgoing number of bytes the function returned.
  * @return void *
  */
@@ -534,14 +534,14 @@ void *basilisk_entity_fetch_resource(basilisk_entity *entity, const char *str_st
     const char *str_storage_path = str_storage_name; // for lisibility and intent
 
     if (!entity) {
-        return NULL;
+        return nullptr;
     }
 
     basilisk_engine_entity *full_entity = basilisk_engine_entity_get_containing_full_entity(entity);
     basilisk_engine *handle = basilisk_engine_entity_get_host_engine_handle(full_entity);
 
     if (!handle) {
-        return NULL;
+        return nullptr;
     }
 
     resource_manager_add_supplicant(handle->res_manager, str_storage_path, full_entity, handle->alloc);
@@ -562,7 +562,7 @@ void *basilisk_entity_fetch_resource(basilisk_entity *entity, const char *str_st
  */
 static void basilisk_engine_annihilate_entity_and_chilren(basilisk_engine *handle, basilisk_engine_entity *target)
 {
-    basilisk_engine_entity_range *all_children = NULL;
+    basilisk_engine_entity_range *all_children = nullptr;
 
     if (!handle) {
         return;
@@ -611,7 +611,7 @@ static void basilisk_engine_annihilate_entity(basilisk_engine *handle, basilisk_
  */
 static void basilisk_engine_process_command(basilisk_engine *handle, command cmd)
 {
-    basilisk_engine_entity *subject = NULL;
+    basilisk_engine_entity *subject = nullptr;
 
     if (!handle) {
         return;
@@ -706,7 +706,7 @@ static void basilisk_engine_process_event(basilisk_engine *handle, event process
  */
 static void basilisk_engine_frame_step_entities(basilisk_engine *handle, f32 elapsed_ms)
 {
-    basilisk_engine_entity_range *all_entities = NULL;
+    basilisk_engine_entity_range *all_entities = nullptr;
 
     if (!handle ||!handle->active_entities) {
         return;

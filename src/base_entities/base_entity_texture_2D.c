@@ -56,7 +56,7 @@ static void BE_texture_2D_init(basilisk_entity *self_data)
 
     BE_texture_2D *texture_data = (BE_texture_2D *) self_data;
 
-    texture_data->body = basilisk_entity_get_parent(self_data, NULL, &ENTITY_DEF_BODY_2D);
+    texture_data->body = basilisk_entity_get_parent(self_data, nullptr, &ENTITY_DEF_BODY_2D);
 
     basilisk_entity_queue_subscribe_to_event(self_data, "sdl renderer draw", (basilisk_specific_event_subscription) { .index = texture_data->draw_index, .callback = &BE_texture_2D_on_draw });
 }
@@ -82,7 +82,7 @@ static void BE_texture_2D_on_draw(basilisk_entity *self_data, void *event_data)
     BE_texture_2D *texture_data = (BE_texture_2D *) self_data;
     BE_render_manager_sdl_event_draw *draw_data = (BE_render_manager_sdl_event_draw *) event_data;
 
-    SDL_QueryTexture(texture_data->texture, NULL, NULL, &text_w, &text_h);
+    SDL_QueryTexture(texture_data->texture, nullptr, nullptr, &text_w, &text_h);
 
     dest = (SDL_Rect) { .x = 0, .y = 0, .w = text_w, .h = text_h, };
     if (texture_data->body) {
@@ -95,10 +95,10 @@ static void BE_texture_2D_on_draw(basilisk_entity *self_data, void *event_data)
     SDL_RenderCopyEx(
             draw_data->renderer,
             texture_data->texture,
-            NULL,
+            nullptr,
             &dest,
             body_2D_global(texture_data->body).angle,
-            NULL,
+            nullptr,
             SDL_FLIP_NONE
     );
 }

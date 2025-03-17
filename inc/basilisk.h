@@ -152,7 +152,7 @@ basilisk_entity *basilisk_entity_graft(basilisk_entity *entity, basilisk_specifi
 // -------------------------------------------------------------------------------------------------
 // ENTITY SEARCHING
 
-/* Search for a parent of a certain name and / or definition an entity might be related to. If the name and definition are NULL, the first parent is returned. */
+/* Search for a parent of a certain name and / or definition an entity might be related to. If the name and definition are nullptr, the first parent is returned. */
 basilisk_entity *basilisk_entity_get_parent(basilisk_entity *entity, const char *str_parent_name, const basilisk_entity_definition *entity_def);
 /* Search for a child entity located at a specific path relative to an entity, while optionally checking if it was created with a specific definition. */
 basilisk_entity *basilisk_entity_get_child(basilisk_entity *entity, const char *str_path, const basilisk_entity_definition *entity_def);
