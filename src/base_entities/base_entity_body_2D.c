@@ -23,15 +23,15 @@
  *
  * @see BE_STATIC_body_2D, ENTITY_DEF_BODY_2D
  */
-typedef struct BE_body_2D {
+struct BE_body_2D {
     /** Parent 2D body this body is pulling its global position from, automatically pulled from the entity's parents. Could be NULL. Overriden on initialisation. */
-    BE_body_2D *previous;
+    struct BE_body_2D *previous;
 
     /** Local position of the object in respect to its optional previous parent 2D body. */
     properties_2D local;
     /** Global position of the object on the world plane. Overriden on each frame. */
     properties_2D global;
-} BE_body_2D;
+};
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -48,7 +48,7 @@ static void BE_body_2D_on_frame(basilisk_entity *self_data, float elapsed_ms);
 // -------------------------------------------------------------------------------------------------
 
 /* Updates the global properties of a BE_body_2D object from its local properties. */
-static void BE_body_2D_update(BE_body_2D *body);
+static void BE_body_2D_update(struct BE_body_2D *body);
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -66,7 +66,7 @@ static void BE_body_2D_init(basilisk_entity *self_data)
         return;
     }
 
-    BE_body_2D *self_body = (BE_body_2D *) self_data;
+    struct BE_body_2D *self_body = (struct BE_body_2D *) self_data;
 
     self_body->previous = basilisk_entity_get_parent(self_data, NULL, &ENTITY_DEF_BODY_2D);
     BE_body_2D_update(self_body);
@@ -87,7 +87,7 @@ static void BE_body_2D_on_frame(basilisk_entity *self_data, float elapsed_ms)
         return;
     }
 
-    BE_body_2D *self_body = (BE_body_2D *) self_data;
+    struct BE_body_2D *self_body = (struct BE_body_2D *) self_data;
     BE_body_2D_update(self_body);
 }
 
@@ -100,7 +100,7 @@ static void BE_body_2D_on_frame(basilisk_entity *self_data, float elapsed_ms)
  *
  * @param[inout] body target body to update
  */
-static void BE_body_2D_update(BE_body_2D *body)
+static void BE_body_2D_update(struct BE_body_2D *body)
 {
     if (!body) {
         return;
@@ -126,11 +126,13 @@ static void BE_body_2D_update(BE_body_2D *body)
  * @param[in] body BE_body_2D to examine
  * @return properties_2D
  */
-properties_2D BE_body_2D_local(const BE_body_2D *body)
+properties_2D body_2D_local(const basilisk_entity *body_entity)
 {
-    if (!body) {
+    if (!body_entity) {
         return (properties_2D) { 0u };
     }
+
+    const struct BE_body_2D *body = (const struct BE_body_2D *) body_entity;
 
     return body->local;
 }
@@ -141,11 +143,13 @@ properties_2D BE_body_2D_local(const BE_body_2D *body)
  * @param[in] body BE_body_2D to examine
  * @return properties_2D
  */
-properties_2D BE_body_2D_global(const BE_body_2D *body)
+properties_2D body_2D_global(const basilisk_entity *body_entity)
 {
-    if (!body) {
+    if (!body_entity) {
         return (properties_2D) { 0u };
     }
+
+    const struct BE_body_2D *body = (const struct BE_body_2D *) body_entity;
 
     return body->global;
 }
@@ -157,14 +161,16 @@ properties_2D BE_body_2D_global(const BE_body_2D *body)
  * @param[inout] body_2D BE_body_2D entity to modify
  * @param[in] new_properties new local properties of the BE_body_2D entity
  */
-void BE_body_2D_local_set(BE_body_2D *body_2D, properties_2D new_properties)
+void body_2D_local_set(basilisk_entity *body_entity, properties_2D new_properties)
 {
-    if (!body_2D) {
+    if (!body_entity) {
         return;
     }
 
-    body_2D->local = new_properties;
-    BE_body_2D_update(body_2D);
+    struct BE_body_2D *body = (struct BE_body_2D *) body_entity;
+
+    body->local = new_properties;
+    BE_body_2D_update(body);
 }
 
 /**
@@ -174,41 +180,21 @@ void BE_body_2D_local_set(BE_body_2D *body_2D, properties_2D new_properties)
  * @param[inout] body_2D BE_body_2D entity to move
  * @param[in] change movement vector
  */
-void BE_body_2D_translate(BE_body_2D *body_2D, vector2_t change)
+void body_2D_translate(basilisk_entity *body_entity, vector2_t change)
 {
-    if (!body_2D) {
+    if (!body_entity) {
         return;
     }
 
-    body_2D->local.position = vector2_add(body_2D->local.position, change);
-    BE_body_2D_update(body_2D);
+    struct BE_body_2D *body = (struct BE_body_2D *) body_entity;
+
+    body->local.position = vector2_add(body->local.position, change);
+    BE_body_2D_update(body);
 }
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
-
-/**
- * @brief Returns a statically allocated BE_body_2D object constructed from the given properties.
- * Successive calls to this function will always yield the same object, with some eventual differing content (depending on the given arguments).
- * Use this to build new BE_body_2D entity instances with a call to `basilisk_entity_add_child()` that will copy the data inside the returned object.
- *
- * @see BE_body_2D, ENTITY_DEF_BODY_2D
- *
- * @param[in] properties starting local position of the body
- * @return basilisk_entity*
- */
-basilisk_entity *BE_STATIC_body_2D(properties_2D properties)
-{
-    static BE_body_2D buffer = { 0u };
-
-    buffer = (BE_body_2D) { 0u };
-    buffer = (BE_body_2D) {
-            .local = properties,
-    };
-
-    return &buffer;
-}
 
 /**
  * @brief Defines the entity properties of a BE_body_2D entity.
@@ -221,13 +207,28 @@ basilisk_entity *BE_STATIC_body_2D(properties_2D properties)
  * local position.
  * If no such parent is found, then the local position of the entity is the same as its global position.
  *
- * However, you can only change the entity's local position with `BE_body_2D_local_set()` and other setter functions.
+ * However, you can only change the entity's local position with `body_2D_local_set()` and other setter functions.
  *
- * @see BE_STATIC_body_2D, BE_body_2D
+ * @see BE_body_2D
  *
  */
 const basilisk_entity_definition ENTITY_DEF_BODY_2D = {
-        .data_size = sizeof(BE_body_2D),
+        .data_size = sizeof(struct BE_body_2D),
         .on_init = BE_body_2D_init,
         .on_frame = &BE_body_2D_on_frame,
 };
+
+struct basilisk_specific_entity create_body_2D(properties_2D properties)
+{
+    static struct BE_body_2D buffer = { 0u };
+
+    buffer = (struct BE_body_2D) { 0u };
+    buffer = (struct BE_body_2D) {
+            .local = properties,
+    };
+
+    return (struct basilisk_specific_entity) {
+            .entity_def = ENTITY_DEF_BODY_2D,
+            .data = &buffer
+    };
+}

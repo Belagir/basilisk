@@ -21,7 +21,7 @@
  */
 typedef struct BE_texture_2D {
     /** Position information of the texture entity. */
-    BE_body_2D *body;
+    basilisk_entity *body;
     /** Draw index to register a drawing operation on initialisation. */
     i32 draw_index;
 
@@ -86,10 +86,10 @@ static void BE_texture_2D_on_draw(basilisk_entity *self_data, void *event_data)
 
     dest = (SDL_Rect) { .x = 0, .y = 0, .w = text_w, .h = text_h, };
     if (texture_data->body) {
-        dest.x = (int) BE_body_2D_global(texture_data->body).position.x;
-        dest.y = (int) BE_body_2D_global(texture_data->body).position.y;
-        dest.w = (int) (BE_body_2D_global(texture_data->body).scale.x * (f32) text_w);
-        dest.h = (int) (BE_body_2D_global(texture_data->body).scale.y * (f32) text_h);
+        dest.x = (int) body_2D_global(texture_data->body).position.x;
+        dest.y = (int) body_2D_global(texture_data->body).position.y;
+        dest.w = (int) (body_2D_global(texture_data->body).scale.x * (f32) text_w);
+        dest.h = (int) (body_2D_global(texture_data->body).scale.y * (f32) text_h);
     }
 
     SDL_RenderCopyEx(
@@ -97,7 +97,7 @@ static void BE_texture_2D_on_draw(basilisk_entity *self_data, void *event_data)
             texture_data->texture,
             NULL,
             &dest,
-            BE_body_2D_global(texture_data->body).angle,
+            body_2D_global(texture_data->body).angle,
             NULL,
             SDL_FLIP_NONE
     );
@@ -106,33 +106,6 @@ static void BE_texture_2D_on_draw(basilisk_entity *self_data, void *event_data)
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
-
-/**
- * @brief Returns a statically allocated BE_texture_2D object wrapping around the given SDL texture.
- * Successive calls to this function will always yield the same object, with some eventual differing content (depending on the given arguments).
- * Use this to build new BE_texture_2D instances with a call to `basilisk_entity_add_child()` that will copy the data inside the returned object.
- *
- * @see BE_texture_2D, ENTITY_DEF_TEXTURE_2D
- *
- * @param[in] properties starting local position of the body
- * @return basilisk_entity*
- */
-basilisk_entity *BE_STATIC_texture_2D(SDL_Texture *texture, i32 draw_index)
-{
-    static BE_texture_2D buffer = { 0u };
-
-    if (!texture) {
-        return NULL;
-    }
-
-    buffer = (BE_texture_2D) { 0u };
-    buffer = (BE_texture_2D) {
-            .texture = texture,
-            .draw_index = draw_index,
-    };
-
-    return &buffer;
-}
 
 /**
  * @brief Defines the entity properties of a BE_texture_2D entity.
@@ -146,3 +119,23 @@ const basilisk_entity_definition ENTITY_DEF_TEXTURE_2D = {
 
         .on_init = &BE_texture_2D_init,
 };
+
+struct basilisk_specific_entity create_texture_2D(SDL_Texture *texture, i32 draw_index)
+{
+    static BE_texture_2D buffer = { 0u };
+
+    if (!texture) {
+        return (struct basilisk_specific_entity) { 0u };
+    }
+
+    buffer = (BE_texture_2D) { 0u };
+    buffer = (BE_texture_2D) {
+            .texture = texture,
+            .draw_index = draw_index,
+    };
+
+    return (struct basilisk_specific_entity) {
+            .entity_def = ENTITY_DEF_TEXTURE_2D,
+            .data = &buffer,
+    };
+}

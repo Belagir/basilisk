@@ -17,15 +17,15 @@
 /**
  * @brief Private data layout of a basic shape entity.
  */
-typedef struct BE_shape_2D {
+struct BE_shape_2D {
     /** Eventual parent 2D body. */
-    BE_body_2D *body;
+    basilisk_entity *body;
 
     /** Specific shape identifier value. */
     shape_2D_id kind;
     /** Specific shape implementation. */
     union { shape_2D_circle as_circle; shape_2D_rect as_rect; };
-} BE_shape_2D;
+};
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -46,7 +46,7 @@ static void BE_shape_2D_init(basilisk_entity *self_data);
  */
 static void BE_shape_2D_init(basilisk_entity *self_data)
 {
-    BE_shape_2D *shape = (BE_shape_2D *) self_data;
+    struct BE_shape_2D *shape = (struct BE_shape_2D *) self_data;
 
     if (!shape) {
         return;
@@ -60,92 +60,54 @@ static void BE_shape_2D_init(basilisk_entity *self_data)
 // -------------------------------------------------------------------------------------------------
 
 /**
- * @brief Returns a statically allocated BE_shape_2D constructed as a circle.
- * Successive calls to this function will always yield the same object, with some eventual differing content (depending on the given arguments).
- * Use this to build new BE_shape_2D circle instances with a call to `basilisk_entity_add_child()` that will copy the data inside the returned object.
- *
- * @param[in] circle Properties of the new circle shape.
- * @return basilisk_entity *
- */
-basilisk_entity *BE_STATIC_shape_2D_circle(shape_2D_circle circle)
-{
-    static BE_shape_2D buffer = { 0u };
-
-    buffer = (BE_shape_2D) { 0u };
-    buffer = (BE_shape_2D) {
-            .kind = SHAPE_2D_CIRCLE,
-            .as_circle = circle,
-    };
-
-    return &buffer;
-}
-
-/**
- * @brief Returns a statically allocated BE_shape_2D constructed as an axis-aligned rectangle.
- * Successive calls to this function will always yield the same object, with some eventual differing content (depending on the given arguments).
- * Use this to build new BE_shape_2D rectangle instances with a call to `basilisk_entity_add_child()` that will copy the data inside the returned object.
- *
- * @see BE_shape_2D, ENTITY_DEF_SHAPE_2D
- *
- * @param[in] rect Properties of the new rectangular shape.
- * @return basilisk_entity *
- */
-basilisk_entity *BE_STATIC_shape_2D_rectangle(shape_2D_rect rect)
-{
-    static BE_shape_2D buffer = { 0u };
-
-    buffer = (BE_shape_2D) { 0u };
-    buffer = (BE_shape_2D) {
-            .kind = SHAPE_2D_RECT,
-            .as_rect = rect,
-    };
-
-    return &buffer;
-}
-
-/**
  * @brief Returns the nature of a shape entity.
  *
  * @param[in] shape Shape entity to examine.
  * @return shape_2D_id
  */
-shape_2D_id BE_shape_2D_what(const BE_shape_2D *shape)
+shape_2D_id shape_2D_what(const basilisk_entity *shape_entity)
 {
-    if (!shape) {
+    if (!shape_entity) {
         return -1;
     }
+
+    struct BE_shape_2D *shape = (struct BE_shape_2D *) shape_entity;
 
     return shape->kind;
 }
 
 /**
  * @brief Sends the specific data of a shape as if it were a circle.
- * Use in conjunction `BE_shape_2D_what()`.
+ * Use in conjunction `shape_2D_what()`.
  *
  * @param[in] shape Shape entity to examine.
  * @return shape_2D_circle *
  */
-shape_2D_circle *BE_shape_2D_as_circle(BE_shape_2D *shape)
+shape_2D_circle *shape_2D_as_circle(basilisk_entity *shape_entity)
 {
-    if (!shape || (shape->kind != SHAPE_2D_CIRCLE)) {
+    if (!shape_entity) {
         return NULL;
     }
+
+    struct BE_shape_2D *shape = (struct BE_shape_2D *) shape_entity;
 
     return &(shape->as_circle);
 }
 
 /**
  * @brief Sends the specific data of a shape as if it were a rectangle.
- * Use in conjunction `BE_shape_2D_what()`.
+ * Use in conjunction `shape_2D_what()`.
  *
  * @param[in] shape Shape entity to examine.
  * @return shape_2D_rect *
  */
-shape_2D_rect *BE_shape_2D_as_rect(BE_shape_2D *shape)
+shape_2D_rect *shape_2D_as_rect(basilisk_entity *shape_entity)
 {
-    if (!shape || (shape->kind != SHAPE_2D_RECT)) {
+    if (!shape_entity) {
         return NULL;
     }
+
+    struct BE_shape_2D *shape = (struct BE_shape_2D *) shape_entity;
 
     return &(shape->as_rect);
 }
@@ -156,11 +118,13 @@ shape_2D_rect *BE_shape_2D_as_rect(BE_shape_2D *shape)
  * @param[in] shape Shape entity to examine.
  * @return BE_body_2D *
  */
-BE_body_2D *BE_shape_2D_get_body(BE_shape_2D *shape)
+basilisk_entity *shape_2D_get_body(basilisk_entity *shape_entity)
 {
-    if (!shape) {
+    if (!shape_entity) {
         return NULL;
     }
+
+    struct BE_shape_2D *shape = (struct BE_shape_2D *) shape_entity;
 
     return shape->body;
 }
@@ -178,6 +142,39 @@ BE_body_2D *BE_shape_2D_get_body(BE_shape_2D *shape)
  *
  */
 const basilisk_entity_definition ENTITY_DEF_SHAPE_2D = {
-        .data_size = sizeof(BE_shape_2D),
+        .data_size = sizeof(struct BE_shape_2D),
         .on_init = &BE_shape_2D_init,
 };
+
+struct basilisk_specific_entity create_shape_2D_circle(shape_2D_circle circle)
+{
+    static struct BE_shape_2D buffer = { 0u };
+
+    buffer = (struct BE_shape_2D) { 0u };
+    buffer = (struct BE_shape_2D) {
+            .kind = SHAPE_2D_CIRCLE,
+            .as_circle = circle,
+    };
+
+    return (struct basilisk_specific_entity) {
+        .entity_def = ENTITY_DEF_SHAPE_2D,
+        .data = &buffer,
+    };
+}
+
+struct basilisk_specific_entity create_shape_2D_rectangle(shape_2D_rect rect)
+{
+    static struct BE_shape_2D buffer = { 0u };
+
+    buffer = (struct BE_shape_2D) { 0u };
+    buffer = (struct BE_shape_2D) {
+            .kind = SHAPE_2D_RECT,
+            .as_rect = rect,
+    };
+
+    return (struct basilisk_specific_entity) {
+        .entity_def = ENTITY_DEF_SHAPE_2D,
+        .data = &buffer,
+    };
+}
+

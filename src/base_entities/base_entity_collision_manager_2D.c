@@ -26,7 +26,7 @@
  * @see ENTITY_DEF_COLLISION_MANAGER_2D, BE_shape_2D_collider
  */
 typedef struct BE_collision_manager_2D {
-    RANGE(BE_shape_2D_collider *) *registered_collisions;
+    RANGE(basilisk_entity *) *registered_collisions;
 } BE_collision_manager_2D;
 
 // -------------------------------------------------------------------------------------------------
@@ -59,7 +59,7 @@ static collision_2D_info collision_2D_info_reflect(collision_2D_info info);
  * @param[inout] collision_manager target collision manager
  * @param[in] col added collider
  */
-void BE_collision_manager_2D_register_shape(basilisk_entity *collision_manager_entity, BE_shape_2D_collider *col)
+void collision_manager_2D_register_shape(basilisk_entity *collision_manager_entity, basilisk_entity *col)
 {
     if (!collision_manager_entity || !col || !basilisk_entity_is(collision_manager_entity, ENTITY_DEF_COLLISION_MANAGER_2D)) {
         return;
@@ -77,7 +77,7 @@ void BE_collision_manager_2D_register_shape(basilisk_entity *collision_manager_e
  * @param[inout] collision_manager target collision manager
  * @param[in] col removed collider
  */
-void BE_collision_manager_2D_unregister_shape(basilisk_entity *collision_manager_entity, BE_shape_2D_collider *col)
+void collision_manager_2D_unregister_shape(basilisk_entity *collision_manager_entity, basilisk_entity *col)
 {
     if (!collision_manager_entity || !col || !basilisk_entity_is(collision_manager_entity, ENTITY_DEF_COLLISION_MANAGER_2D)) {
         return;
@@ -125,8 +125,8 @@ static void BE_collision_manager_2D_deinit(basilisk_entity *self_data)
 static void BE_collision_manager_2D_frame(basilisk_entity *self_data, float elapsed_time)
 {
     BE_collision_manager_2D *col_manager = (BE_collision_manager_2D *) self_data;
-    BE_shape_2D_collider *shape_1 = NULL;
-    BE_shape_2D_collider *shape_2 = NULL;
+    basilisk_entity *shape_1 = NULL;
+    basilisk_entity *shape_2 = NULL;
     collision_2D_info collision_info = { 0u };
 
     for (size_t i = 0u ; i < col_manager->registered_collisions->length ; i++) {
@@ -134,8 +134,8 @@ static void BE_collision_manager_2D_frame(basilisk_entity *self_data, float elap
             shape_1 = col_manager->registered_collisions->data[i];
             shape_2 = col_manager->registered_collisions->data[j];
             if (BE_collision_manager_2D_GJK_check(shape_1, shape_2, &collision_info)) {
-                BE_shape_2D_collider_exec_callback(shape_1, shape_2, collision_info);
-                BE_shape_2D_collider_exec_callback(shape_2, shape_1, collision_2D_info_reflect(collision_info));
+                shape_2D_collider_exec_callback(shape_1, shape_2, collision_info);
+                shape_2D_collider_exec_callback(shape_2, shape_1, collision_2D_info_reflect(collision_info));
             }
         }
     }

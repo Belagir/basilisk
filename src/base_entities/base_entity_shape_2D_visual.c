@@ -22,7 +22,7 @@
  */
 typedef struct BE_shape_2D_visual {
     /** Pointer to a parent shape entity. */
-    BE_shape_2D *visualized;
+    basilisk_entity *visualized;
 
     /** Color of the shape. */
     SDL_Color color;
@@ -122,47 +122,19 @@ static void BE_shape_2D_visual_on_draw(basilisk_entity *self_data, void *event_d
 
     SDL_SetRenderDrawColor(event_draw->renderer, visual->color.r, visual->color.g, visual->color.b, visual->color.a);
 
-    switch (BE_shape_2D_what(visual->visualized)) {
+    switch (shape_2D_what(visual->visualized)) {
         case SHAPE_2D_CIRCLE:
-            BE_shape_2D_visual_render_draw_circle(event_draw->renderer, BE_body_2D_global(BE_shape_2D_get_body(visual->visualized)).position, BE_shape_2D_as_circle(visual->visualized)->radius);
+            BE_shape_2D_visual_render_draw_circle(event_draw->renderer, body_2D_global(shape_2D_get_body(visual->visualized)).position, shape_2D_as_circle(visual->visualized)->radius);
             break;
         case SHAPE_2D_RECT:
             rectangle = (SDL_FRect) {
-                    .x = BE_body_2D_global(BE_shape_2D_get_body(visual->visualized)).position.x,
-                    .y = BE_body_2D_global(BE_shape_2D_get_body(visual->visualized)).position.y,
-                    .w = BE_shape_2D_as_rect(visual->visualized)->width,
-                    .h = BE_shape_2D_as_rect(visual->visualized)->height, };
+                    .x = body_2D_global(shape_2D_get_body(visual->visualized)).position.x,
+                    .y = body_2D_global(shape_2D_get_body(visual->visualized)).position.y,
+                    .w = shape_2D_as_rect(visual->visualized)->width,
+                    .h = shape_2D_as_rect(visual->visualized)->height, };
             SDL_RenderDrawRectF(event_draw->renderer, &rectangle);
             break;
     }
-}
-
-// -------------------------------------------------------------------------------------------------
-// -------------------------------------------------------------------------------------------------
-// -------------------------------------------------------------------------------------------------
-
-/**
- * @brief Returns a statically allocated BE_shape_2D_visual constructed as an axis-aligned rectangle.
- * Successive calls to this function will always yield the same object, with some eventual differing content (depending on the given arguments).
- * Use this to build new BE_shape_2D_visual instances with a call to `basilisk_entity_add_child()` that will copy the data inside the returned object.
- *
- * @see BE_shape_2D_visual, ENTITY_DEF_SHAPE_2D_VISUAL, BE_shape_2D
- *
- * @param[in] color color of the drawn shape
- * @param[in] draw_index drazw index of the drawn shape
- * @return basilisk_entity *
- */
-basilisk_entity *BE_STATIC_shape_2D_visual(SDL_Color color, i32 draw_index)
-{
-    static BE_shape_2D_visual buffer = { 0u };
-
-    buffer = (BE_shape_2D_visual) { 0u };
-    buffer = (BE_shape_2D_visual) {
-            .color = color,
-            .draw_index = draw_index,
-    };
-
-    return &buffer;
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -183,3 +155,19 @@ const basilisk_entity_definition ENTITY_DEF_SHAPE_2D_VISUAL = {
 
         .on_init = &BE_shape_2D_visual_on_init,
 };
+
+struct basilisk_specific_entity create_shape_2D_visual(SDL_Color color, i32 draw_index)
+{
+    static BE_shape_2D_visual buffer = { 0u };
+
+    buffer = (BE_shape_2D_visual) { 0u };
+    buffer = (BE_shape_2D_visual) {
+            .color = color,
+            .draw_index = draw_index,
+    };
+
+    return (struct basilisk_specific_entity) {
+            .entity_def = ENTITY_DEF_SHAPE_2D_VISUAL,
+            .data = &buffer,
+    };
+}
