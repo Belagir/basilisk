@@ -114,7 +114,7 @@ static void BE_window_sdl_quit(basilisk_entity *self_data, void *event_data)
  */
 SDL_Window *BE_window_sdl_get_window(basilisk_entity *window_entity)
 {
-    if (!window_entity || !basilisk_entity_is(window_entity, ENTITY_DEF_WINDOW_SDL)) {
+    if (!basilisk_entity_is(window_entity, ENTITY_DEF_WINDOW_SDL)) {
         return NULL;
     }
 

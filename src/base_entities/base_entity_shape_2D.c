@@ -67,7 +67,7 @@ static void BE_shape_2D_init(basilisk_entity *self_data)
  */
 shape_2D_id shape_2D_what(const basilisk_entity *shape_entity)
 {
-    if (!shape_entity) {
+    if (!basilisk_entity_is(shape_entity, ENTITY_DEF_SHAPE_2D)) {
         return -1;
     }
 
@@ -85,7 +85,7 @@ shape_2D_id shape_2D_what(const basilisk_entity *shape_entity)
  */
 shape_2D_circle *shape_2D_as_circle(basilisk_entity *shape_entity)
 {
-    if (!shape_entity) {
+    if (!basilisk_entity_is(shape_entity, ENTITY_DEF_SHAPE_2D)) {
         return NULL;
     }
 
@@ -103,7 +103,7 @@ shape_2D_circle *shape_2D_as_circle(basilisk_entity *shape_entity)
  */
 shape_2D_rect *shape_2D_as_rect(basilisk_entity *shape_entity)
 {
-    if (!shape_entity) {
+    if (!basilisk_entity_is(shape_entity, ENTITY_DEF_SHAPE_2D)) {
         return NULL;
     }
 
@@ -120,7 +120,7 @@ shape_2D_rect *shape_2D_as_rect(basilisk_entity *shape_entity)
  */
 basilisk_entity *shape_2D_get_body(basilisk_entity *shape_entity)
 {
-    if (!shape_entity) {
+    if (!basilisk_entity_is(shape_entity, ENTITY_DEF_SHAPE_2D)) {
         return NULL;
     }
 

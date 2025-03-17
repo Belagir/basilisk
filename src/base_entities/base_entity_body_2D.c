@@ -128,7 +128,7 @@ static void BE_body_2D_update(struct BE_body_2D *body)
  */
 properties_2D body_2D_local(const basilisk_entity *body_entity)
 {
-    if (!body_entity) {
+    if (!basilisk_entity_is(body_entity, ENTITY_DEF_BODY_2D)) {
         return (properties_2D) { 0u };
     }
 
@@ -145,7 +145,7 @@ properties_2D body_2D_local(const basilisk_entity *body_entity)
  */
 properties_2D body_2D_global(const basilisk_entity *body_entity)
 {
-    if (!body_entity) {
+    if (!body_entity || !basilisk_entity_is(body_entity, ENTITY_DEF_BODY_2D)) {
         return (properties_2D) { 0u };
     }
 
@@ -163,7 +163,7 @@ properties_2D body_2D_global(const basilisk_entity *body_entity)
  */
 void body_2D_local_set(basilisk_entity *body_entity, properties_2D new_properties)
 {
-    if (!body_entity) {
+    if (!basilisk_entity_is(body_entity, ENTITY_DEF_BODY_2D)) {
         return;
     }
 
@@ -182,7 +182,7 @@ void body_2D_local_set(basilisk_entity *body_entity, properties_2D new_propertie
  */
 void body_2D_translate(basilisk_entity *body_entity, vector2_t change)
 {
-    if (!body_entity) {
+    if (!basilisk_entity_is(body_entity, ENTITY_DEF_BODY_2D)) {
         return;
     }
 

@@ -87,9 +87,13 @@ vector2_t shape_2D_collider_support(const basilisk_entity *col_entity, vector2_t
 {
     properties_2D properties = { 0u };
 
+    if (!basilisk_entity_is(col_entity, ENTITY_DEF_SHAPE_2D_COLLIDER)) {
+        return (vector2_t) { NAN, NAN };
+    }
+
     const BE_shape_2D_collider *col = (const BE_shape_2D_collider *) col_entity;
 
-    if (!col || !col->monitored) {
+    if (!col->monitored) {
         return (vector2_t) { NAN, NAN };
     }
 
@@ -125,11 +129,11 @@ vector2_t shape_2D_collider_support(const basilisk_entity *col_entity, vector2_t
  */
 basilisk_entity *shape_2D_collider_get_body(const basilisk_entity *col_entity)
 {
-    const BE_shape_2D_collider *col = (const BE_shape_2D_collider *) col_entity;
-
-    if (!col) {
-        return NULL;
+    if (!basilisk_entity_is(col_entity, ENTITY_DEF_SHAPE_2D_COLLIDER)) {
+        return nullptr;
     }
+
+    const BE_shape_2D_collider *col = (const BE_shape_2D_collider *) col_entity;
 
     return shape_2D_get_body(col->monitored);
 }
@@ -142,6 +146,10 @@ basilisk_entity *shape_2D_collider_get_body(const basilisk_entity *col_entity)
  */
 void shape_2D_collider_set_callback(basilisk_entity *col_entity, shape_2D_collider_callback_info callback)
 {
+    if (!basilisk_entity_is(col_entity, ENTITY_DEF_SHAPE_2D_COLLIDER)) {
+        return;
+    }
+
     BE_shape_2D_collider *col = (BE_shape_2D_collider *) col_entity;
 
     if (!col) {
@@ -160,9 +168,13 @@ void shape_2D_collider_set_callback(basilisk_entity *col_entity, shape_2D_collid
  */
 void shape_2D_collider_exec_callback(basilisk_entity *hit_entity, basilisk_entity *other_entity, collision_2D_info collision_info)
 {
+    if (!basilisk_entity_is(hit_entity, ENTITY_DEF_SHAPE_2D_COLLIDER) || !basilisk_entity_is(other_entity, ENTITY_DEF_SHAPE_2D_COLLIDER)) {
+        return;
+    }
+
     BE_shape_2D_collider *hit = (BE_shape_2D_collider *) hit_entity;
 
-    if (!hit || !hit->callback_info.callback) {
+    if (!hit->callback_info.callback) {
         return;
     }
 

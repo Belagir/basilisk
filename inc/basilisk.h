@@ -157,7 +157,7 @@ basilisk_entity *basilisk_entity_get_parent(basilisk_entity *entity, const char 
 /* Search for a child entity located at a specific path relative to an entity, while optionally checking if it was created with a specific definition. */
 basilisk_entity *basilisk_entity_get_child(basilisk_entity *entity, const char *str_path, const basilisk_entity_definition *entity_def);
 /* Resolves wether or not the entity has been defined using a specific definition or was marked as subtyping it. */
-bool basilisk_entity_is(basilisk_entity *entity, basilisk_entity_definition entity_def);
+bool basilisk_entity_is(const basilisk_entity *entity, basilisk_entity_definition entity_def);
 
 
 // -------------------------------------------------------------------------------------------------

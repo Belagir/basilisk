@@ -124,7 +124,7 @@ void basilisk_engine_entity_destroy(basilisk_engine_entity **target, allocator a
  * @param[in] entity user data trusted to be the data field of a basilisk_engine_entity.
  * @return basilisk_engine_entity *
  */
-basilisk_engine_entity *basilisk_engine_entity_get_containing_full_entity(basilisk_entity *entity)
+basilisk_engine_entity *basilisk_engine_entity_get_containing_full_entity(const basilisk_entity *entity)
 {
     if (!entity) {
         return NULL;
@@ -200,7 +200,7 @@ basilisk_engine_entity *basilisk_engine_entity_get_parent(basilisk_engine_entity
  * @param entity_def
  * @return
  */
-bool basilisk_engine_entity_has_definition(basilisk_engine_entity *entity, basilisk_entity_definition entity_def)
+bool basilisk_engine_entity_has_definition(const basilisk_engine_entity *entity, basilisk_entity_definition entity_def)
 {
     bool has_def = false;
     size_t pos = 0u;

@@ -475,7 +475,7 @@ basilisk_entity *basilisk_entity_get_child(basilisk_entity *entity, const char *
  * @param entity_def
  * @return
  */
-bool basilisk_entity_is(basilisk_entity *entity, basilisk_entity_definition entity_def)
+bool basilisk_entity_is(const basilisk_entity *entity, basilisk_entity_definition entity_def)
 {
     basilisk_engine_entity *full_entity = basilisk_engine_entity_get_containing_full_entity(entity);
     return basilisk_engine_entity_has_definition(full_entity, entity_def);

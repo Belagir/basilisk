@@ -39,7 +39,7 @@ void basilisk_engine_entity_destroy(basilisk_engine_entity **target, allocator a
 // DIRECT GETTERS
 
 /* Trusting that the entity points to the data of an entity, returns the full entity containing it. */
-basilisk_engine_entity *basilisk_engine_entity_get_containing_full_entity(basilisk_entity *entity);
+basilisk_engine_entity *basilisk_engine_entity_get_containing_full_entity(const basilisk_entity *entity);
 /* Returns a pointer to the specific user data in an entity, even if it was unallocated. */
 basilisk_entity *basilisk_engine_entity_get_specific_data(basilisk_engine_entity *target);
 /* Returns the engine instance hosting this entity. */
@@ -49,7 +49,7 @@ const identifier *basilisk_engine_entity_get_name(const basilisk_engine_entity *
 
 basilisk_engine_entity *basilisk_engine_entity_get_parent(basilisk_engine_entity *target);
 
-bool basilisk_engine_entity_has_definition(basilisk_engine_entity *entity, basilisk_entity_definition entity_def);
+bool basilisk_engine_entity_has_definition(const basilisk_engine_entity *entity, basilisk_entity_definition entity_def);
 
 // -------------------------------------------------------------------------------------------------
 // HIERACHY MODIFICATIONS

@@ -61,7 +61,7 @@ static collision_2D_info collision_2D_info_reflect(collision_2D_info info);
  */
 void collision_manager_2D_register_shape(basilisk_entity *collision_manager_entity, basilisk_entity *col)
 {
-    if (!collision_manager_entity || !col || !basilisk_entity_is(collision_manager_entity, ENTITY_DEF_COLLISION_MANAGER_2D)) {
+    if (!basilisk_entity_is(collision_manager_entity, ENTITY_DEF_COLLISION_MANAGER_2D) || !basilisk_entity_is(col, ENTITY_DEF_SHAPE_2D_COLLIDER)) {
         return;
     }
 
@@ -79,7 +79,7 @@ void collision_manager_2D_register_shape(basilisk_entity *collision_manager_enti
  */
 void collision_manager_2D_unregister_shape(basilisk_entity *collision_manager_entity, basilisk_entity *col)
 {
-    if (!collision_manager_entity || !col || !basilisk_entity_is(collision_manager_entity, ENTITY_DEF_COLLISION_MANAGER_2D)) {
+    if (!basilisk_entity_is(collision_manager_entity, ENTITY_DEF_COLLISION_MANAGER_2D) || !basilisk_entity_is(col, ENTITY_DEF_SHAPE_2D_COLLIDER)) {
         return;
     }
 
